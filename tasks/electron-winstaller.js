@@ -14,7 +14,8 @@ createInstaller('win32-x64')
 function createInstaller(platform) {
     var appName = module.exports.name;
     var appDir = path.join(__dirname, '..', 'packager', `${appName}-${platform}`);
-    var installerDir = path.join(__dirname, '..', 'installer', `${appName}-${platform}`);
+    //var installerDir = path.join(__dirname, '..', 'installer', `${appName}-${platform}`);
+    var installerDir = path.join(__dirname, '..', 'installer');
     var iconDir = path.join(__dirname, '..', 'src', 'assets', 'icons', 'icon.ico');
 
     console.log(`Creating installer for ${platform} started...`);

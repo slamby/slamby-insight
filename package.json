@@ -30,11 +30,11 @@
         "packager": "npm run packager:win32 && npm run packager:linux && npm run packager:osx",
         
         "installer:win": "node tasks/electron-winstaller.js",
-        "installer:debian:x86": "electron-installer-debian --src packager/slambyinsight-linux-ia32/ --dest installer/slambyinsight-debian-x86/ --arch i386 --config linux-installer-config.json",
-        "installer:debian:x64": "electron-installer-debian --src packager/slambyinsight-linux-x64/ --dest installer/slambyinsight-debian-x64/ --arch amd64 --config linux-installer-config.json",
+        "installer:debian:x86": "electron-installer-debian --src packager/slambyinsight-linux-ia32/ --dest installer/ --arch i386 --config linux-installer-config.json",
+        "installer:debian:x64": "electron-installer-debian --src packager/slambyinsight-linux-x64/ --dest installer/ --arch amd64 --config linux-installer-config.json",
         "installer:debian": "npm run installer:debian:x86 && npm run installer:debian:x64",
-        "installer:redhat:x86": "electron-installer-redhat --src packager/slambyinsight-linux-ia32/ --dest installer/slambyinsight-redhat-x86/ --arch i386 --config linux-installer-config.json",
-        "installer:redhat:x64": "electron-installer-redhat --src packager/slambyinsight-linux-x64/ --dest installer/slambyinsight-redhat-x64/ --arch amd64 --config linux-installer-config.json",
+        "installer:redhat:x86": "electron-installer-redhat --src packager/slambyinsight-linux-ia32/ --dest installer/ --arch i386 --config linux-installer-config.json",
+        "installer:redhat:x64": "electron-installer-redhat --src packager/slambyinsight-linux-x64/ --dest installer/ --arch amd64 --config linux-installer-config.json",
         "installer:redhat": "npm run installer:redhat:x86 && npm run installer:redhat:x64",
         "installer": "npm run installer:win && npm run installer:debian && npm run installer:redhat",
         

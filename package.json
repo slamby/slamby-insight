@@ -1,7 +1,7 @@
 {
     "name": "slambyinsight",
     "description": "Slamby Insight Application",
-    "version": "0.2.0",
+    "version": "0.2.0-alpha1",
     "author": "Slamby",
     "main": "src/main.js",
     "homepage": "https://www.slamby.com",

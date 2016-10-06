@@ -1,0 +1,6 @@
+{
+    "name": "slambyinsight",
+    "dependencies": {
+        "bootstrap-side-navbar": "latest"
+    }
+}

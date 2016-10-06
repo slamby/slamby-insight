@@ -1,0 +1,14 @@
+{
+    "name": "name",
+    "description": "description",
+    "version": "0.0.0",
+    "author": "author",
+    "main": "main.js",
+    "license": "ISC",
+    "dependencies": {
+        "electron-settings": "^2.2.1",
+        "electron-squirrel-startup": "^1.0.0",
+        "pkginfo": "^0.4.0",
+        "winston": "^2.2.0"
+    }
+}

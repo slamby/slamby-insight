@@ -1,0 +1,15 @@
+<template #template let-c="close " let-d="dismiss ">
+    <div class="modal-header ">
+        <button type="button " class="close " aria-label="Close " (click)="c( 'Cross click') ">
+                <span aria-hidden="true ">&times;</span>
+            </button>
+        <h4 class="modal-title ">Document Details</h4>
+    </div>
+    <div class="modal-body ">
+        <DocumentDetails [document]="document">
+        </DocumentDetails>
+    </div>
+    <div class="modal-footer ">
+        <button type="button " class="btn btn-secondary " (click)="c( 'Close click') ">Close</button>
+    </div>
+</template>

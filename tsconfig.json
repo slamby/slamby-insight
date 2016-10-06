@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "types": [
+      "lodash",
+      "node",
+      "hammerjs"
+    ]
+  },
+  "include": [
+    "src/app/app.ts"
+  ]
+}

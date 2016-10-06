@@ -1,0 +1,23 @@
+<div class="btn-group">
+    <div ngbDropdown class="dropdown" (openChange)="openChange($event)" #notificationDropdown="ngbDropdown">
+        <button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu1"
+                aria-haspopup="true" aria-expanded="true">
+            <i class="fa fa-bell-o" (click)="$event.stopPropagation();notificationDropdown.toggle();"></i>
+            <span class="label label-danger" *ngIf="unreadCount() > 0">{{unreadCount()}}</span>
+        </button>
+        <div class="dropdown-menu">
+            <ul *ngIf="count() > 0" aria-labelledby="dropdownMenu1">
+                <li *ngFor="let notification of displayNotifications()">
+                    <div class="small"><strong>{{notification.title}}</strong></div>
+                    <div class="small">{{notification.message}}</div>
+                    <div class="small"><small class="text-muted">{{notification.timestamp | date: "short"}}</small></div>
+                </li>
+            </ul>
+            <ul *ngIf="count() == 0" aria-labelledby="dropdownMenu1">
+                <li>
+                    <div>No new notifications</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

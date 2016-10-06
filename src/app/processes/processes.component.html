@@ -1,0 +1,60 @@
+<div>
+    <output-dialog></output-dialog>
+    <input type="checkbox" [checked]="loadAll" (change)="checkAll()" name="loadAll">Load All
+    <br role="separator" class="divider">
+    <div *ngIf="processes && processes.length" class="table-responsive">
+        <table class="table table-responsive table-striped table-hover" contextmenu="contextmenu">
+            <thead>
+                <tr>
+                    <th>ResultMessage</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Percent</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>ErrorMessages</th>
+                    <th>Id</th>
+                    <th>
+                        <a class="btn" (click)="refresh()">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                        </a>
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let process of processes">
+                    <td>
+                        <p [innerHTML]="process.ResultMessage | convertTextToUrl"></p>
+                    </td>
+                    <td>{{ process.Start }}</td>
+                    <td>{{ process.End }}</td>
+                    <td>{{ process.Percent }} %</td>
+                    <td>{{ process.Description }}</td>
+                    <td>{{ process.Type }}</td>
+                    <td>{{ process.Status }}</td>
+                    <td>{{ process.ErrorMessages }}</td>
+                    <td>{{ process.Id }}</td>
+                    <td>
+                        <a class="btn" (click)="refresh(process)">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                        </a>
+                    </td>
+                    <td>
+                        <button md-icon-button [md-menu-trigger-for]="menu">
+                            <md-icon>more_vert</md-icon>
+                        </button>
+                        <md-menu #menu="mdMenu" x-position="before">
+                            <button md-menu-item (click)="details(process)">Details</button>
+                            <button md-menu-item (click)="cancel(process)" *ngIf="process.Status == processStatus.InProgress">Cancel</button>
+                        </md-menu>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div *ngIf="!(processes && processes.length)">
+        <p>No processes found.</p>
+    </div>
+</div>

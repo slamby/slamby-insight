@@ -1,0 +1,370 @@
+<div>
+    <CommonTemplates></CommonTemplates>
+    <dataset-selector></dataset-selector>
+    <tag-selector></tag-selector>
+    <document-details-dialog></document-details-dialog>
+    <input-dialog></input-dialog>
+    <div class='panel-body'>
+        <div class='has-error' *ngIf='errorMessage'>{{errorMessage}}</div>
+        <div>
+            <ngb-tabset>
+                <ngb-tab title="Documents">
+                    <template ngbTabContent>
+                        <!--add or edit document section-->
+                        <div>
+                            <br/>
+                            <button type="button" class="btn  btn-outline-primary" (click)="collapsePendingDocument()">Add New Document</button>
+                            <br/>
+                            <br/>
+                            <form #fd="ngForm" [ngbCollapse]="newDocumentFormIsCollapsed" (ngSubmit)="saveDocument()" class="collapse">
+                                <p>
+                                    <textarea [(ngModel)]="pendingDocument.Document" name="document" cols="200" rows="10" style="{min-height: 300px; min-width: 400px;}"></textarea>
+                                </p>
+                                <p>
+                                    <button class="btn" type="submit" [disabled]="!fd.valid">Save</button>
+                                </p>
+                            </form>
+                            <br/>
+                        </div>
+                        <hr role="separator" class="divider">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <!--field filter section-->
+                                <div class="col-md-3">
+                                    <div class="card" style="display: inline;">
+                                        <div class="card-header">
+                                            <span class="h3">
+                                        Fields
+                                    </span>
+                                        </div>
+                                        <br role="separator" class="divider">
+                                        <div class="card-block">
+                                            <div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
+                                                <table class='table table-striped'>
+                                                    <thead>
+                                                        <th><input type="checkbox" [checked]="getSelectedItemsCount(fields) == fields.length"
+                                                                name="checkAll" (change)="checkField($event)" style="margin: 3px;"></th>
+                                                        <th>Field</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr *ngFor='let field of fields'>
+                                                            <td><input type="checkbox" [checked]="field.IsSelected" name="check"
+                                                                    (change)="checkField($event, field)"></td>
+                                                            <td>{{field.Name}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <button class="btn btn-default" (click)="fieldFilter()">Set Fields</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 divider" role="separator">
+                                </div>
+                                <!--filter section-->
+                                <div class="col-md-3">
+                                    <div class="card" style="display: inline;">
+                                        <div class="card-header">
+                                            <span class="h3">
+                                        Filter
+                                    </span>
+                                        </div>
+                                        <br role="separator" class="divider">
+                                        <div class="card-block">
+                                            <form (submit)="filter()">
+                                                <div class="form-group">
+                                                    <button type="button" class="btn  btn-outline-primary" (click)="filterTagsIsCollapsed = !filterTagsIsCollapsed">Select tags</button>
+                                                    <br role="separator" class="divider">
+                                                    <br>
+                                                    <div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
+                                                        <table class='table table-striped collapse' [ngbCollapse]="filterTagsIsCollapsed">
+                                                            <thead>
+                                                                <th><input type="checkbox" [checked]="getSelectedItemsCount(tagsForFilter) == tagsForFilter.length"
+                                                                        name="checkAll" (change)="checkFilterTag($event)" style="margin: 3px;"></th>
+                                                                <th>Name</th>
+                                                                <th>Id</th>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr *ngFor='let tag of tagsForFilter'>
+                                                                    <td><input type="checkbox" [checked]="tag.IsSelected" name="check"
+                                                                            (change)="checkFilterTag($event, tag)"></td>
+                                                                    <!--<td><input type="checkbox" [(checked)]="tag.IsSelected"></td>-->
+                                                                    <td>{{tag.Name}}</td>
+                                                                    <td>{{tag.Id}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <p>{{ getSelectedItems(tagsForFilter) }} item(s) selected
+                                                    </p>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Query: </label>
+                                                    <input type="text" class="form-control" name="query" [(ngModel)]="filterSettings.Filter.Query">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Scroll size: </label>
+                                                    <input type="number" class="form-control" name="size" [(ngModel)]="filterSettings.Pagination.Limit">
+                                                </div>
+                                                <button type="submit" class="btn btn-default">Filter</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-1 divider" role="separator">
+                                </div>
+                                <!--sampling section-->
+                                <div class="col-md-3">
+                                    <div class="card" style="display: inline;">
+                                        <div class="card-header">
+                                            <span class="h3">
+                                                Sample
+                                            </span>
+                                        </div>
+                                        <br role="separator" class="divider">
+                                        <div class="card-block">
+                                            <form (submit)="getSample()">
+                                                <div class="form-group">
+                                                    <button type="button" class="btn  btn-outline-primary" (click)="sampleTagsIsCollapsed = !sampleTagsIsCollapsed">Select tags</button>
+                                                    <br role="separator" class="divider">
+                                                    <br/>
+                                                    <div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
+                                                        <table class='table table-striped collapse' [ngbCollapse]="sampleTagsIsCollapsed">
+                                                            <thead>
+                                                                <th><input type="checkbox" [checked]="getSelectedItemsCount(tagsForSample) == tagsForSample.length"
+                                                                        (change)="checkSampleTag($event)" name="checkAll" style="margin: 3px;"></th>
+                                                                <th>Name</th>
+                                                                <th>Id</th>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr *ngFor='let tag of tagsForSample'>
+                                                                    <td><input type="checkbox" [checked]="tag.IsSelected" name="check"
+                                                                            (change)="checkSampleTag($event, tag)"></td>
+                                                                    <td>{{tag.Name}}</td>
+                                                                    <td>{{tag.Id}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <p>{{ getSelectedItems(tagsForSample) }} item(s) selected
+                                                    </p>
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="checkbox" name="isFix" [(ngModel)]="sampleSettings.IsFix">Fix
+                                                    Size
+                                                    <br/>
+                                                    <div *ngIf="sampleSettings.IsFix">
+                                                        <div class="form-group">
+                                                            <label>Size: </label>
+                                                            <input type="number" class="form-control" name="size" [(ngModel)]="sampleSettings.Settings.Size">
+                                                        </div>
+                                                    </div>
+                                                    <div *ngIf="!sampleSettings.IsFix">
+                                                        <div class="form-group">
+                                                            <label>Percent: </label>
+                                                            <input type="number" class="form-control" name="percent" [(ngModel)]="sampleSettings.Settings.Percent">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-default" type="submit">Get Sample</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br/>
+                        <hr role="separator" class="divider">
+                        <!--bulk actions-->
+                        <div class="button-container">
+                            <button type="button" class="btn btn-default" (click)="deleteDocuments()">Delete</button>
+                            <button type="button" class="btn btn-default" (click)="copyTo()">Copy To</button>
+                            <button type="button" class="btn btn-default" (click)="moveTo()">Move To</button>
+                            <button type="button" class="btn btn-default" (click)="copyAllTo()">Copy To All</button>
+                            <button type="button" class="btn btn-default" (click)="moveAllTo()">Move To All</button>
+                            <button type="button" class="btn btn-default" (click)="addTags()">Add Tags</button>
+                            <button type="button" class="btn btn-default" (click)="removeTags()">Remove Tags</button>
+                            <button type="button" class="btn btn-default" (click)="clearTags()">Clear Tag List</button>
+                        </div>
+                        <br role="separator" class="divider">
+                        <!--Document table-->
+                        <div class='table-responsive'>
+                            <p>{{getSelectedItemsCount(documents)}} item(s) selected</p>
+                            <table class='table table-striped' *ngIf='documents && documents.length' infinite-scroll [infiniteScrollDistance]="5" (scrolled)="loadMore()">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div>
+                                                <input type="checkbox" [checked]="getSelectedItemsCount(documents) == documents.length" (change)="checkDocument($event)"
+                                                    style="margin: 3px;">
+                                            </div>
+                                        </th>
+                                        <th *ngFor='let header of headers'>{{header}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor='let document of documents' (click)='select(document)' (dblclick)='openDocument(document)'>
+                                        <td><input type="checkbox" [checked]="document.IsSelected" (change)="checkDocument($event, document)"></td>
+                                        <!--<td><input type="checkbox" [(checked)]="document.IsSelected"></td>-->
+                                        <td *ngFor='let header of headers'>{{document.Item[header]}}</td>
+                                        <td>
+                                            <!--<div ngbDropdown class="dropdown">
+                                                <button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="true">
+                                                    Actions
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="documentDropdownMenu">
+                                                    <li><a (click)="preview(document)">Preview</a></li>
+                                                    <li><a (click)="openDocument(document)">Open</a></li>
+                                                    <li><a (click)="editDocument(document)">Edit</a></li>
+                                                    <li><a (click)="copyTo([document])">CopyTo</a></li>
+                                                    <li><a (click)="moveTo([document])">MoveTo</a></li>
+                                                    <li><a (click)="addTags([document])">AddTags</a></li>
+                                                    <li><a (click)="removeTags([document])">RemoveTags</a></li>
+                                                    <li><a (click)="clearTags([document])">Clear tags</a></li>
+                                                    <li><a (click)="deleteDocuments([document])">Delete</a></li>
+                                                </ul>
+                                            </div>-->
+                                            <button md-icon-button [md-menu-trigger-for]="menu">
+                                                <md-icon>more_vert</md-icon>
+                                            </button>
+                                            <md-menu #menu="mdMenu" x-position="before">
+                                                <button md-menu-item (click)="preview(document)">Preview</button>
+                                                <button md-menu-item (click)="openDocument(document)">Open</button>
+                                                <button md-menu-item (click)="editDocument(document)">Edit</button>
+                                                <button md-menu-item (click)="copyTo([document])">CopyTo</button>
+                                                <button md-menu-item (click)="moveTo([document])">MoveTo</button>
+                                                <button md-menu-item (click)="addTags([document])">AddTags</button>
+                                                <button md-menu-item (click)="removeTags([document])">RemoveTags</button>
+                                                <button md-menu-item (click)="clearTags([document])">Clear tags</button>
+                                                <button md-menu-item (click)="deleteDocuments([document])">Delete</button>
+                                            </md-menu>
+                                            <!--<ul>
+                                                <li><a (click)="preview(document)">Preview</a></li>
+                                                <li><a (click)="openDocument(document)">Open</a></li>
+                                                <li><a (click)="editDocument(document)">Edit</a></li>
+                                                <li><a (click)="copyTo([document])">CopyTo</a></li>
+                                                <li><a (click)="moveTo([document])">MoveTo</a></li>
+                                                <li><a (click)="addTags([document])">AddTags</a></li>
+                                                <li><a (click)="removeTags([document])">RemoveTags</a></li>
+                                                <li><a (click)="clearTags([document])">Clear tags</a></li>
+                                                <li><a (click)="deleteDocuments([document])">Delete</a></li>
+                                            </ul>-->
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <button (click)='loadMore()' *ngIf='_scrollId'>Load more</button>
+                        </div>
+                        <div>
+                            <p>{{selectedDocument}}</p>
+                        </div>
+                    </template>
+                </ngb-tab>
+                <ngb-tab title="Tags">
+                    <template ngbTabContent>
+                        <br/>
+                        <br/>
+                        <div>
+                            <button type="button" class="btn  btn-outline-primary" (click)="collapsePendingTag()">Add New Tag</button>
+                            <br/>
+                            <br/>
+                            <form #ft="ngForm" [ngbCollapse]="newTagFormIsCollapsed" (ngSubmit)="saveTag()" class="collapse">
+                                <div class="table-responsive">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <label>Id: </label>
+                                                </td>
+                                                <td>
+                                                    <input type="text" [(ngModel)]="pendingTag.Tag.Id" name="id">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <label>Name: </label>
+                                                </td>
+                                                <td>
+                                                    <input type="text" [(ngModel)]="pendingTag.Tag.Name" name="name">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <label>ParentId: </label>
+                                                </td>
+                                                <td>
+                                                    <input type="text" [(ngModel)]="pendingTag.Tag.ParentId" name="parent">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p>
+                                    <button class="btn" type="submit" [disabled]="!ft.valid">Save</button>
+                                </p>
+                            </form>
+                            <br/>
+                            <br/>
+                        </div>
+                        <br/>
+                        <hr role="separator" class="divider">
+                        <!--bulk actions-->
+                        <div class="button-container">
+                            <button type="button" class="btn btn-default" (click)="exportWords()">Export Words</button>
+                        </div>
+                        <br role="separator" class="divider">
+                        <div class='table-responsive'>
+                            <table class='table table-striped' *ngIf='currentTags && currentTags.length'>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div ngbDropdown>
+                                                <button class="btn" id="selectAllDropdownMenu" ngbDropdownToggle>Select All</button>
+                                                <div class="dropdown-menu" aria-labelledby="selectAllDropdownMenu">
+                                                    <input type="checkbox" [checked]="getSelectedItemsCount(currentTags) == currentTags.length" (change)="checkTag($event, null, false)"
+                                                        style="margin: 3px;">                                                    Select all on this page
+                                                    <input type="checkbox" [checked]="getSelectedItemsCount(tags) == tags.length" (change)="checkTag($event, null, true)" style="margin: 3px;">                                                    Select all
+                                                </div>
+                                                <p>{{getSelectedItems(tags)}} item(s) selected</p>
+                                            </div>
+                                        </th>
+                                        <th>Id</th>
+                                        <th>Name</th>
+                                        <th>ParentId</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor='let tag of currentTags'>
+                                        <td><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>
+                                        <td>{{tag.Item.Id}}</td>
+                                        <td>{{tag.Item.Name}}</td>
+                                        <td>{{tag.Item.ParentId}}</td>
+                                        <td>
+                                            <div ngbDropdown class="dropdown">
+                                                <button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="tagDropdownMenu" data-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="true">
+                                                    Actions
+                                                    <span class="caret"></span>
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="tagDropdownMenu">
+                                                    <li><a (click)="exportWords(tag)">Edit</a></li>
+                                                    <li><a (click)="editTag(tag)">Edit</a></li>
+                                                    <li><a (click)="deleteTag(tag)">Delete</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <ngb-pagination [collectionSize]="tags.length" [(page)]="tagPage" [maxSize]="tagPageSize" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
+                        </div>
+                    </template>
+                </ngb-tab>
+            </ngb-tabset>
+        </div>
+    </div>
+</div>

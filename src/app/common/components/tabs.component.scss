@@ -1,0 +1,49 @@
+$tabbar-height: 44px;
+$tabbar-scrollbar-height: 4px;
+
+.tabs-container {
+    height: 100%;
+    overflow: visible; 
+
+    .tab-header {
+        height: $tabbar-height;
+        margin-bottom: $tabbar-scrollbar-height;
+
+        ul.nav.nav-tabs {
+            display: -webkit-box;
+            overflow-x: auto;
+            overflow-y: hidden;
+
+            li {
+                float: none;
+                cursor: default;
+                font-weight: normal;
+                a {
+                    color: darkslategray;
+                    button {
+                        visibility: hidden;
+                    }
+                }
+            }
+            li.active {
+                cursor: default;
+                font-weight: bold;
+                a {
+                    color: black;
+                    button {
+                        visibility: visible;
+                    }
+                }
+            }
+            li:hover a button {
+                visibility: visible;
+            }
+        }
+    }
+
+    .tab-content {
+        height: calc(100% - #{$tabbar-height} - #{$tabbar-scrollbar-height});
+        padding: 10px;
+        overflow-x: hidden;
+    }
+}

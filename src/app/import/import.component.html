@@ -1,0 +1,33 @@
+<div>
+    <div class='panel-body'>
+
+        <div class='has-error' *ngIf='errorMessage'>{{errorMessage}}</div>
+
+        <div class='table-responsive'>
+            Select a dataset:
+            <br/>
+            <select [(ngModel)]='selectedDataset' name="name">
+                <option [ngValue]="dataset" *ngFor='let dataset of datasets'>{{dataset.Name}}</option>
+            </select>
+            <br/>
+            <br/> Select a file:
+            <br/>
+            <input (change)="onFileSelectionChange($event)" type="file" />
+            <br/>
+            <div *ngIf="selectedFile && selectedDataset && this.selectedFile.name.endsWith('.csv')">
+                <label>HasHeader: </label>
+                <input type="checkbox" [(ngModel)]="csvSettings.force">
+                <br/>
+                <label>Delimiter: </label>
+                <input type="text" name="delimiter" [(ngModel)]="csvSettings.delimiter"> (blank = auto detect)
+            </div>
+            <br/>
+            <label>Import tags </label>
+            <input type="checkbox" [(ngModel)]="tagImport">
+            <br/>
+            <button (click)='read()' *ngIf='selectedFile && selectedDataset'>Read and Import</button>
+            <br/>
+            <progress value='{{percent}}' *ngIf='!importReady' max="100"></progress>
+        </div>
+    </div>
+</div>

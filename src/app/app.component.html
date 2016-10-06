@@ -1,0 +1,62 @@
+<template ngbModalContainer></template>
+<settings-dialog #settingsDialog></settings-dialog>
+<div *ngIf="optionService.currentEndpoint" class="body-wrapper">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                    aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <span class="navbar-brand">{{pageTitle}} {{version}}</span>
+                <span class="navbar-text endpoint">{{selectedBaseUrl()}}</span>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <notification-icon></notification-icon>
+                    </li>
+                    <li *ngIf="!globals.developmentMode">
+                        <a class="btn" (click)="checkUpdates()" title="Check Updates">
+                            <i class="fa fa-arrow-circle-o-down"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="btn" (click)="settingsDialog.open()" title="Settings">
+                            <i class="fa fa-cogs"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <ng2-slim-loading-bar [color]="'blue'" [height]="'4px'"></ng2-slim-loading-bar>
+        </div>
+        <div class="row">
+            <div class="sidebar">
+                <ul class="nav nav-sidebar">
+                    <li *ngFor="let menuItem of menuItems" (dblclick)="tabs.addTab(menuItem)">
+                        <a>
+                            <i class="fa {{menuItem.pageIcon}}"></i> {{menuItem.pageTitle}}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="main">
+                <tabs #tabs [defaultType]="defaultTab" [listenMessages]=true [clipContent]=true></tabs>
+            </div>
+        </div>
+        <ng2-toasty></ng2-toasty>
+    </div>
+</div>
+
+<div *ngIf="!optionService.currentEndpoint" class="endpoint-wrapper">
+
+    <logon (onSelected)="endpointSelected($event)"></logon>
+
+</div>

@@ -1,0 +1,17 @@
+<template #template let-c="close " let-d="dismiss ">
+    <div class="modal-header ">
+        <button type="button " class="close " aria-label="Close " (click)="cancel(); d( 'Cross click') ">
+                <span aria-hidden="true ">&times;</span>
+            </button>
+        <h4 class="modal-title ">Dataset Selector</h4>
+    </div>
+    <div class="modal-body ">
+        <select [(ngModel)]='model.Selected' name="name ">
+            <option [ngValue]="dataset " *ngFor='let dataset of model.Datasets'>{{dataset.Name}}</option>
+        </select>
+    </div>
+    <div class="modal-footer ">
+        <button type="button " class="btn btn-primary " (click)="select(); c() ">Select</button>
+        <button type="button " class="btn btn-secondary " (click)="cancel(); c( 'Close click') ">Cancel</button>
+    </div>
+</template>

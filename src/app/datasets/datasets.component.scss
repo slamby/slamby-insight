@@ -1,0 +1,12 @@
+@import '_common';
+
+thead {
+    color: $table-header-color;
+}
+
+.sample-json {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    height: 300px;
+    min-height: 200px;
+    resize: vertical;
+}

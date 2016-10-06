@@ -1,0 +1,21 @@
+<div class="panel-body table-responsive">
+    <table class="table table-condensed table-hover">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Message</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let notification of getCurrentPage()">
+                <td>{{notification.type}}</td>
+                <td>{{notification.title}}</td>
+                <td>{{notification.message}}</td>
+                <td>{{notification.timestamp | date: "MM/dd/yyyy HH:mm:ss"}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <ngb-pagination [collectionSize]="count()" [(page)]="page" [(pageSize)]="pageSize" [maxSize]="5" [rotate]="false"></ngb-pagination>
+</div>

@@ -1,0 +1,39 @@
+@import '_common';
+
+.wrapper {
+    background-color: $slamby-color; 
+    bottom: 0px;
+    left: 0px;
+    position: fixed;
+    right: 0px;
+    top: 0px;
+
+    &.disabled {
+        cursor: progress;
+    }
+
+    div.modal {
+        display: block;
+
+        .list-group {
+            min-height: 100px;    
+            max-height: 350px;
+            overflow-y: auto;
+
+            .list-group-item {
+                font-weight: bold;
+                text-align: center;
+            }
+        }
+    }
+}
+
+.overlay {
+    background-color: rgba(255,255,255,0.5);
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    cursor: progress;
+}

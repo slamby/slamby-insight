@@ -1,0 +1,62 @@
+@import '_common';
+
+/*
+Global overrides for Bootstrap
+*/
+html {
+    -webkit-user-select: none;
+     user-select: none;
+     cursor: default;
+}
+
+img {
+    -webkit-user-drag: none;
+}
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+}
+
+.dropdown {
+    ul.dropdown-menu {
+        li > a {
+            cursor: pointer;
+        }
+        li.disabled > a {
+            cursor: not-allowed;
+        }
+    }
+}
+
+.selected-row,
+.table-striped>tbody>tr:nth-of-type(even).selected-row,
+.table-striped>tbody>tr:nth-of-type(odd).selected-row {
+    background-color: #f0f8ff;
+
+    &:hover {
+        background-color: darken(#f0f8ff, 2%);
+    }
+}
+
+/*
+    Scrollbar
+*/
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.slim-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #ddd;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #666; 
+}

@@ -3,7 +3,7 @@ const path = require('path');
 const pkginfo = require('pkginfo')(module);
 
 createInstaller('win32-x64')
-    .then(() => createInstaller('win32-ia32'))
+    //.then(() => createInstaller('win32-ia32'))
     .then(() => console.log("Install created!"))
     .catch((e) => {
             console.log(`Error occured: ${e.message}`);
@@ -13,6 +13,7 @@ createInstaller('win32-x64')
 
 function createInstaller(platform) {
     var appName = module.exports.name;
+    var setupExeName = `${appName}-${module.exports.version}-${platform}.exe`;
     var appDir = path.join(__dirname, '..', 'packager', `${appName}-${platform}`);
     //var installerDir = path.join(__dirname, '..', 'installer', `${appName}-${platform}`);
     var installerDir = path.join(__dirname, '..', 'installer');
@@ -27,7 +28,9 @@ function createInstaller(platform) {
         exe: 'slambyinsight.exe',
         title: 'Slamby Insight',
         setupIcon: iconDir,
-        iconUrl: 'https://www.slamby.com/app/icon.png'
+        setupExe: setupExeName,
+        iconUrl: 'https://www.slamby.com/app/icon.png',
+        noMsi: true
     });
 
     return resultPromise.then(() => console.log(`Creating installer for ${platform} succeded!`));

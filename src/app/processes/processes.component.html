@@ -3,9 +3,10 @@
     <input type="checkbox" [checked]="loadAll" (change)="checkAll()" name="loadAll">Load All
     <br role="separator" class="divider">
     <div *ngIf="processes && processes.length" class="table-responsive">
-        <table class="table table-responsive table-striped table-hover" contextmenu="contextmenu">
+        <table class="table table-responsive table-striped table-hover" contextmenu="contextmenu" style="overflow-y: auto; overflow-x: auto; max-height: 80%">
             <thead>
                 <tr>
+                    <th></th>
                     <th>ResultMessage</th>
                     <th>Start</th>
                     <th>End</th>
@@ -23,8 +24,9 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
-                <tr *ngFor="let process of processes">
+            <tbody *vsFor="processes; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+                <tr *ngFor="let process of _items; let i = index">
+                    <td>{{ i + _startIndex + 1}}</td>
                     <td>
                         <p [innerHTML]="process.ResultMessage | convertTextToUrl"></p>
                     </td>

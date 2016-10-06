@@ -84,8 +84,8 @@
                                                                 <th>Name</th>
                                                                 <th>Id</th>
                                                             </thead>
-                                                            <tbody>
-                                                                <tr *ngFor='let tag of tagsForFilter'>
+                                                            <tbody *vsFor="tagsForFilter; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection">
+                                                                <tr *ngFor='let tag of _items'>
                                                                     <td><input type="checkbox" [checked]="tag.IsSelected" name="check"
                                                                             (change)="checkFilterTag($event, tag)"></td>
                                                                     <!--<td><input type="checkbox" [(checked)]="tag.IsSelected"></td>-->
@@ -136,8 +136,8 @@
                                                                 <th>Name</th>
                                                                 <th>Id</th>
                                                             </thead>
-                                                            <tbody>
-                                                                <tr *ngFor='let tag of tagsForSample'>
+                                                            <tbody *vsFor="tagsForSample; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection">
+                                                                <tr *ngFor='let tag of _items'>
                                                                     <td><input type="checkbox" [checked]="tag.IsSelected" name="check"
                                                                             (change)="checkSampleTag($event, tag)"></td>
                                                                     <td>{{tag.Name}}</td>
@@ -188,11 +188,12 @@
                         </div>
                         <br role="separator" class="divider">
                         <!--Document table-->
-                        <div class='table-responsive'>
+                        <div class='table-responsive' style="overflow-y: auto; overflow-x: auto; max-height: 400px">
                             <p>{{getSelectedItemsCount(documents)}} item(s) selected</p>
                             <table class='table table-striped' *ngIf='documents && documents.length' infinite-scroll [infiniteScrollDistance]="5" (scrolled)="loadMore()">
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th>
                                             <div>
                                                 <input type="checkbox" [checked]="getSelectedItemsCount(documents) == documents.length" (change)="checkDocument($event)"
@@ -202,8 +203,9 @@
                                         <th *ngFor='let header of headers'>{{header}}</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr *ngFor='let document of documents' (click)='select(document)' (dblclick)='openDocument(document)'>
+                                <tbody *vsFor="documents; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+                                    <tr *ngFor='let document of _items; let i = index' (click)='select(document)' (dblclick)='openDocument(document)'>
+                                        <td>{{ i + _startIndex + 1}}</td>
                                         <td><input type="checkbox" [checked]="document.IsSelected" (change)="checkDocument($event, document)"></td>
                                         <!--<td><input type="checkbox" [(checked)]="document.IsSelected"></td>-->
                                         <td *ngFor='let header of headers'>{{document.Item[header]}}</td>
@@ -240,17 +242,6 @@
                                                 <button md-menu-item (click)="clearTags([document])">Clear tags</button>
                                                 <button md-menu-item (click)="deleteDocuments([document])">Delete</button>
                                             </md-menu>
-                                            <!--<ul>
-                                                <li><a (click)="preview(document)">Preview</a></li>
-                                                <li><a (click)="openDocument(document)">Open</a></li>
-                                                <li><a (click)="editDocument(document)">Edit</a></li>
-                                                <li><a (click)="copyTo([document])">CopyTo</a></li>
-                                                <li><a (click)="moveTo([document])">MoveTo</a></li>
-                                                <li><a (click)="addTags([document])">AddTags</a></li>
-                                                <li><a (click)="removeTags([document])">RemoveTags</a></li>
-                                                <li><a (click)="clearTags([document])">Clear tags</a></li>
-                                                <li><a (click)="deleteDocuments([document])">Delete</a></li>
-                                            </ul>-->
                                         </td>
                                     </tr>
                                 </tbody>
@@ -317,19 +308,15 @@
                             <button type="button" class="btn btn-default" (click)="exportWords()">Export Words</button>
                         </div>
                         <br role="separator" class="divider">
-                        <div class='table-responsive'>
-                            <table class='table table-striped' *ngIf='currentTags && currentTags.length'>
+                        <div class='table-responsive' style="overflow-y: auto; overflow-x: auto; max-height: 400px">
+                            <p>{{getSelectedItemsCount(tags)}} item(s) selected</p>
+                            <table class='table table-striped' *ngIf='tags && tags.length'>
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th>
-                                            <div ngbDropdown>
-                                                <button class="btn" id="selectAllDropdownMenu" ngbDropdownToggle>Select All</button>
-                                                <div class="dropdown-menu" aria-labelledby="selectAllDropdownMenu">
-                                                    <input type="checkbox" [checked]="getSelectedItemsCount(currentTags) == currentTags.length" (change)="checkTag($event, null, false)"
-                                                        style="margin: 3px;">                                                    Select all on this page
-                                                    <input type="checkbox" [checked]="getSelectedItemsCount(tags) == tags.length" (change)="checkTag($event, null, true)" style="margin: 3px;">                                                    Select all
-                                                </div>
-                                                <p>{{getSelectedItems(tags)}} item(s) selected</p>
+                                            <div>
+                                                <input type="checkbox" [checked]="getSelectedItemsCount(tags) == tags.length" (change)="checkTag($event)" style="margin: 3px;">
                                             </div>
                                         </th>
                                         <th>Id</th>
@@ -337,30 +324,38 @@
                                         <th>ParentId</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr *ngFor='let tag of currentTags'>
+                                <tbody *vsFor="tags; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+                                    <tr *ngFor='let tag of _items; let i = index'>
                                         <td><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>
+                                        <td>{{ i + _startIndex + 1}}</td>
                                         <td>{{tag.Item.Id}}</td>
                                         <td>{{tag.Item.Name}}</td>
                                         <td>{{tag.Item.ParentId}}</td>
                                         <td>
                                             <div ngbDropdown class="dropdown">
-                                                <button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="tagDropdownMenu" data-toggle="dropdown"
+                                                <button md-icon-button [md-menu-trigger-for]="menu">
+                                                    <md-icon>more_vert</md-icon>
+                                                </button>
+                                                <md-menu #menu="mdMenu" x-position="before">
+                                                    <button md-menu-item (click)="exportWords(tag)">Export</button>
+                                                    <button md-menu-item (click)="editTag(tag)">Edit</button>
+                                                    <button md-menu-item (click)="deleteTag(tag)">Delete</button>
+                                                </md-menu>
+                                                <!--<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="tagDropdownMenu" data-toggle="dropdown"
                                                     aria-haspopup="true" aria-expanded="true">
                                                     Actions
                                                     <span class="caret"></span>
                                                 </button>
                                                 <ul class="dropdown-menu" aria-labelledby="tagDropdownMenu">
-                                                    <li><a (click)="exportWords(tag)">Edit</a></li>
+                                                    <li><a (click)="exportWords(tag)">Export</a></li>
                                                     <li><a (click)="editTag(tag)">Edit</a></li>
                                                     <li><a (click)="deleteTag(tag)">Delete</a></li>
-                                                </ul>
+                                                </ul>-->
                                             </div>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <ngb-pagination [collectionSize]="tags.length" [(page)]="tagPage" [maxSize]="tagPageSize" [rotate]="true" [boundaryLinks]="true"></ngb-pagination>
                         </div>
                     </template>
                 </ngb-tab>

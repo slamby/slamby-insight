@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, AfterContentInit, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, AfterContentInit, ViewChild, NgZone } from '@angular/core';
 import { Response } from '@angular/http';
 
 import { DialogResult } from '../models/dialog-result';
@@ -75,9 +75,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         Id: ''
     };
     pendingTag: TagWrapper = JSON.parse(JSON.stringify(this.defaultTag, null, 4));
-    currentTags: Array<SelectedItem<ITag>> = [];
-    _tagPage = 1;
-    tagPageSize = 10;
 
     // filter and sampling
     fields: Array<SelectedItem<any>> = [];
@@ -108,25 +105,12 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         IsFix: true,
     };
 
-
-    set tagPage(page: number) {
-        if (this.tags != null) {
-            this._tagPage = page * this.tagPageSize > this.tags.length ? page - 1 : page;
-            if (this.tags.length > 0) {
-                this.currentTags = this.tags.slice((page - 1) * this.tagPageSize,
-                    page * this.tagPageSize > this.tags.length ? this.tags.length : page * this.tagPageSize);
-            }
-        } else {
-            this._tagPage = 1;
-        }
-    }
-    get tagPage() { return this._tagPage; }
-
     constructor(private _documentService: DocumentService,
         private _tagService: TagService,
         private _datasetService: DatasetService,
         private _messenger: Messenger,
-        private _notificationService: NotificationService) {
+        private _notificationService: NotificationService,
+        private _zone: NgZone) {
     }
 
     ngAfterContentInit() {
@@ -168,7 +152,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         IsSelected: false
                     };
                 });
-                this.tagPage = 1;
             },
             error => this.errorMessage = <any>error
         );
@@ -261,7 +244,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 .subscribe(
                 paginated => {
                     this._scrollId = paginated.ScrollId;
-                    this.documents.push(...paginated.Items.map<SelectedItem<any>>(
+                    this.documents = _.concat(this.documents, paginated.Items.map<SelectedItem<any>>(
                         d => { return { IsSelected: false, Id: d[this._dataset.IdField], Item: d }; })
                     );
                 },
@@ -678,10 +661,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             this._documentService.createDocument(this.dataset.Name, docToSave).subscribe(
                 error => this.errorMessage = <any>error,
                 () => {
-                    this.documents.push(JSON.parse(JSON.stringify({
+                    this.documents= _.concat(this.documents, [<SelectedItem<any>>_.cloneDeep({
                         IsSelected: false,
                         Item: docToSave
-                    })));
+                    })]);
                     this.setHeaders();
                     this.collapsePendingDocument();
                 }
@@ -706,23 +689,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         }
     }
 
-    checkTag(e, tag?: SelectedItem<ITag>, all?: boolean) {
+    checkTag(e, tag?: SelectedItem<ITag>) {
         if (tag) {
             this.tags[this.tags.indexOf(tag)].IsSelected = e.target.checked;
-            this.currentTags[this.currentTags.indexOf(tag)].IsSelected = e.target.checked;
-        } else {
-            this.currentTags.forEach(t => {
+        }
+        else {
+            this.tags.forEach(t => {
                 t.IsSelected = e.target.checked;
             });
-            if (all) {
-                this.tags.forEach(t => {
-                    t.IsSelected = e.target.checked;
-                });
-            } else {
-                this.currentTags.forEach(t => {
-                    this.tags[this.tags.indexOf(t)].IsSelected = e.target.checked;
-                });
-            }
         }
     }
 
@@ -733,9 +707,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             () => {
                 let index = this.tags.findIndex(t => t.Item.Id === selected.Item.Id);
                 this.tags.splice(index, 1);
-                index = this.currentTags.findIndex(t => t.Item.Id === selected.Item.Id);
-                this.currentTags.splice(index, 1);
-                this.tagPage = this.tagPage;
             }
         );
     }
@@ -778,18 +749,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     saveTag() {
-        let tagToSave = JSON.parse(JSON.stringify(this.pendingTag.Tag));
+        let tagToSave = _.cloneDeep(this.pendingTag.Tag);
         if (this.pendingTag.IsNew) {
             this._tagService.createTag(this.dataset.Name, tagToSave).subscribe(
                 (newTag: ITag) => {
-                    this.tags.push({
+                    this.tags = _.concat(this.tags, [{
                         IsSelected: false,
-                        Item: JSON.parse(JSON.stringify(newTag))
-                    });
-                    this.currentTags.push({
-                        IsSelected: false,
-                        Item: JSON.parse(JSON.stringify(newTag))
-                    });
+                        Item: _.cloneDeep(newTag)
+                    }]);
                     this.collapsePendingTag();
                 },
                 error => this.errorMessage = <any>error
@@ -799,9 +766,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 error => this.errorMessage = <any>error,
                 () => {
                     let index = this.tags.indexOf(this.tags.find(d => d.Item.Id === this.pendingTag.Id));
-                    this.tags[index] = JSON.parse(JSON.stringify(this.pendingTag.Tag));
-                    index = this.currentTags.indexOf(this.currentTags.find(d => d.Item.Id === this.pendingTag.Id));
-                    this.currentTags[index] = JSON.parse(JSON.stringify(this.pendingTag.Tag));
+                    this.tags[index].Item = _.cloneDeep(this.pendingTag.Tag);
                     this.collapsePendingTag();
                 }
             );
@@ -811,7 +776,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     collapsePendingTag() {
         this.newTagFormIsCollapsed = !this.newTagFormIsCollapsed;
         if (this.newTagFormIsCollapsed) {
-            this.pendingTag = JSON.parse(JSON.stringify(this.defaultTag));
+            this.pendingTag = _.cloneDeep(this.defaultTag);
         }
     }
 

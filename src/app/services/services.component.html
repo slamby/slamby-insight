@@ -8,9 +8,10 @@
     </div>
     <br role="separator" class="divider">
     <div *ngIf="services && services.length">
-        <table class="table table-striped table-hover" contextmenu="contextmenu">
+        <table class="table table-striped table-hover" contextmenu="contextmenu" style="overflow-y: auto; overflow-x: auto; height: 80%">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Alias</th>
                     <th>Name</th>
                     <th>Id</th>
@@ -25,8 +26,9 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr *ngFor="let service of services">
+            <tbody *vsFor="services; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+                <tr *ngFor="let service of _items; let i = index">
+                    <td>{{ i + _startIndex + 1}}</td>
                     <td>{{ service.Alias }}</td>
                     <td>{{ service.Name }}</td>
                     <td>{{ service.Id }}</td>
@@ -39,6 +41,39 @@
                         </a>
                     </td>
                     <td>
+                        <!--<div [ngSwitch]="service.Status">
+                            <button md-icon-button [md-menu-trigger-for]="menu">
+                                <md-icon>more_vert</md-icon>
+                            </button>
+                            <md-menu #menu="mdMenu" x-position="before" *ngSwitchCase="serviceStatus.New">
+                                <button md-menu-item (click)="details(service)">Details</button>
+                                <button md-menu-item (click)="prepare(service)">Prepare</button>
+                                <button md-menu-item (click)="delete(service)">Delete</button>
+                            </md-menu>
+                            <md-menu #menu="mdMenu" x-position="before" *ngSwitchCase="serviceStatus.Busy">
+                                <button md-menu-item (click)="details(service)">Details</button>
+                                <button md-menu-item (click)="cancel(service)">Cancel</button>
+                                <button md-menu-item (click)="delete(service)">Delete</button>
+                            </md-menu>
+                            <md-menu #menu="mdMenu" x-position="before" *ngSwitchCase="serviceStatus.Prepared">
+                                <button md-menu-item (click)="details(service)">Details</button>
+                                <button md-menu-item (click)="activate(service)">Activate</button>
+                                <button md-menu-item (click)="export(service)">Export</button>
+                                <button md-menu-item (click)="delete(service)">Delete</button>
+                            </md-menu>
+                            <md-menu #menu="mdMenu" x-position="before" *ngSwitchCase="serviceStatus.Active">
+                                <button md-menu-item (click)="details(service)">Details</button>
+                                <button md-menu-item (click)="deactivate(service)">Deactivate</button>
+                                <button md-menu-item (click)="recommend(service)">Recommend</button>
+                                <button md-menu-item *ngIf="service.Type==serviceType.Prc" (click)="index(service)">Index</button>
+                                <button md-menu-item *ngIf="service.Type==serviceType.Prc && service.IndexSettings" (click)="partialIndex(service)">PartialIndex</button>
+                                <button md-menu-item *ngIf="service.Type==serviceType.Prc && service.IndexSettings" (click)="recommendById(service)">RecommendById</button>
+                                <button md-menu-item (click)="export(service)">Export</button>
+                                <button md-menu-item (click)="delete(service)">Delete</button>
+                            </md-menu>
+                            <md-menu #menu="mdMenu" *ngSwitchDefault>
+                            </md-menu>
+                        </div>-->
                         <div class="btn-group">
                             <div ngbDropdown class="dropdown" [ngSwitch]="service.Status">
                                 <button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"

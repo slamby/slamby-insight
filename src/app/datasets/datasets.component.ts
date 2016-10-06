@@ -1,5 +1,5 @@
-import { Component, OnInit, AfterContentInit }  from '@angular/core';
-import { Response }  from '@angular/http';
+import { Component, OnInit, AfterContentInit } from '@angular/core';
+import { Response } from '@angular/http';
 import { Messenger } from '../common/services/messenger.service';
 
 import { IDataSet } from 'slamby-sdk-angular2';
@@ -62,7 +62,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                     error => this.handleError(error),
                     () => {
                         dataSetToSave.Statistics = { DocumentsCount: 0 };
-                        this.dataSets.push(_.cloneDeep(dataSetToSave));
+                        this.dataSets = _.concat(this.dataSets, [_.cloneDeep(dataSetToSave)]);
                         this.newDataSetFormIsCollapsed = true;
                         this.newDataSet = this.getDefaultDataSet();
                     });
@@ -72,7 +72,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                 this._datasetService.createDatasetWithSchema(dataSetToSave).subscribe(
                     error => this.handleError(error),
                     () => {
-                        this.dataSets.push(_.cloneDeep(this.newDataSet.dataSet));
+                        this.dataSets = _.concat(this.dataSets, [_.cloneDeep(this.newDataSet.dataSet)]);
                         this.newDataSetFormIsCollapsed = true;
                         this.newDataSet = this.getDefaultDataSet();
                     });

@@ -64,7 +64,7 @@ export class ProcessesComponent implements OnInit {
                     // update process list
                     let index = this.processes.findIndex(p => p.Id === process.Id);
                     if (index < 0) {
-                        this.processes.push(process);
+                        this.processes = _.concat(this.processes, [process]);
                         this.processes = _.orderBy(this.processes, p => p.Start, ['desc']);
                     } else {
                         this.processes[index] = process;
@@ -74,7 +74,7 @@ export class ProcessesComponent implements OnInit {
                     index = this.activeProcesses.findIndex(p => p.Id === process.Id);
                     if (process.Status === IProcess.IStatusEnum.InProgress) {
                         if (index < 0) {
-                            this.activeProcesses.push(process);
+                            this.activeProcesses = _.concat(this.activeProcesses, [process]);
                             this.activeProcesses = _.orderBy(this.activeProcesses, p => p.Start, ['desc']);
                         } else {
                             this.activeProcesses[index] = process;

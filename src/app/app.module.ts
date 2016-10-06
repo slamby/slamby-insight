@@ -44,6 +44,7 @@ import { MaterialModule } from '@angular/material';
 import { SlimLoadingBarModule } from 'ng2-slim-loading-bar';
 import { ToastyModule } from 'ng2-toasty';
 import { SafeJsonPipe, PrettyJsonPipe, PrettyJsonComponent } from 'angular2-prettyjson';
+import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
 
 @NgModule({
     declarations: [
@@ -75,7 +76,9 @@ import { SafeJsonPipe, PrettyJsonPipe, PrettyJsonComponent } from 'angular2-pret
 
         SafeJsonPipe,
         PrettyJsonPipe,
-        PrettyJsonComponent
+        PrettyJsonComponent,
+        
+        VsFor
     ],
     imports: [
         BrowserModule,

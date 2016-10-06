@@ -94,7 +94,7 @@ export class ServicesComponent implements OnInit {
                     model.Model.Type = type;
                     this._servicesService.createService(<IService>model.Model).subscribe(
                         (service: IService) => {
-                            this.services.push(service);
+                            this.services = _.concat(this.services, [service]);
                             this.refresh(service);
                         },
                         error => this.handleError(error)
@@ -173,7 +173,7 @@ export class ServicesComponent implements OnInit {
 
                     source.subscribe(
                         (s: IPrcService | IClassifierService | IService) => {
-                            this.services.push(s);
+                            this.services = this.services = _.concat(this.services, [s]);
                             dialogModel.Done += 1;
                             dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
                         },

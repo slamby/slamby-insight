@@ -68,6 +68,7 @@ export class ProcessesComponent implements OnInit {
                         this.processes = _.orderBy(this.processes, p => p.Start, ['desc']);
                     } else {
                         this.processes[index] = process;
+                        this.processes = _.cloneDeep(this.processes);
                     }
 
                     // update active list
@@ -78,11 +79,12 @@ export class ProcessesComponent implements OnInit {
                             this.activeProcesses = _.orderBy(this.activeProcesses, p => p.Start, ['desc']);
                         } else {
                             this.activeProcesses[index] = process;
+                            this.activeProcesses = _.cloneDeep(this.activeProcesses);
                         }
                     } else {
                         if (index >= 0) {
                             this._notificationService.info(process.ResultMessage, 'Process finished');
-                            this.activeProcesses.splice(index, 1);
+                            this.activeProcesses = _.without(this.activeProcesses, this.activeProcesses.find(p => p.Id === process.Id))
                         }
                     }
                 },

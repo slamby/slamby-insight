@@ -283,9 +283,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
         source.subscribe(
             (d: SelectedItem<any>) => {
-                let index = this.documents.findIndex(doc => doc.Item[this._dataset.IdField] === d.Item[this._dataset.IdField]);
-                this.documents.splice(index, 1);
-                this.documents = JSON.parse(JSON.stringify(this.documents));
+                this.documents = _.without(this.documents, d);
                 dialogModel.Done += 1;
                 dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
             },
@@ -327,9 +325,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             return Observable.create((observer: Observer<any>) => {
                 let id = currentItem.Item[this._dataset.IdField];
                 let updatedDoc = {};
-                updatedDoc[this._dataset.TagField] = (
-                    typeof currentItem.Item[this._dataset.TagField] === 'string' ||
-                    currentItem.Item[this._dataset.TagField] instanceof String) ? '' : [];
+                updatedDoc[this._dataset.TagField] = !_.isArray(currentItem.Item[this._dataset.TagField]) ? '' : [];
                 this._documentService.updateDocument(this._dataset.Name, id, updatedDoc).subscribe(
                     updated => {
                         observer.next(updated);
@@ -455,9 +451,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         this.dialogService.close();
                     },
                     () => {
-                        _.remove(this.documents, d => {
-                            return docIdsToMove.indexOf(d.Item[this.dataset.IdField]) > -1;
-                        });
+                        var docsToRemove = this.documents.filter(d => docIdsToMove.indexOf(d.Item[this.dataset.IdField]) > -1);
+                        this.documents = _.without(this.documents, ...docsToRemove);
                         this.dialogService.close();
                     }
                 );
@@ -479,8 +474,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
     addTags(selectedItems?: Array<SelectedItem<any>>) {
         let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
-        let idFieldIsString = _.isString(selectedDocs[0].Item[this._dataset.TagField]);
-        let tagsForDocs = selectedDocs.map(d => idFieldIsString ? [d.Item[this._dataset.TagField]] : d.Item[this._dataset.TagField]);
+        let tagFieldIsSimple = !_.isArray(selectedDocs[0].Item[this._dataset.TagField]);
+        let tagsForDocs = selectedDocs.map(d => tagFieldIsSimple ? [d.Item[this._dataset.TagField]] : d.Item[this._dataset.TagField]);
         let commonTags = tagsForDocs[0];
         for (let i = 1; i < tagsForDocs.length; i++) {
             commonTags = _.intersection(commonTags, tagsForDocs[i]);
@@ -491,7 +486,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 sm.IsSelected = commonTags.indexOf(t.Item.Id) > -1;
                 return sm;
             }),
-            IsMultiselectAllowed: !idFieldIsString
+            IsMultiselectAllowed: !tagFieldIsSimple
         };
         this.tagSelector.dialogClosed.subscribe(
             (model: TagSelectorModel) => {
@@ -514,7 +509,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                     return Observable.create((observer: Observer<any>) => {
                         let id = currentItem.Item[this._dataset.IdField];
                         let updatedDoc = {};
-                        updatedDoc[this._dataset.TagField] = idFieldIsString
+                        updatedDoc[this._dataset.TagField] = tagFieldIsSimple
                             ? selectedTagIds[0]
                             : _.union(currentItem.Item[this._dataset.TagField], selectedTagIds);
                         this._documentService.updateDocument(this._dataset.Name, id, updatedDoc).subscribe(
@@ -562,8 +557,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
     removeTags(selectedItems?: Array<SelectedItem<any>>) {
         let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
-        let idFieldIsString = _.isString(selectedDocs[0].Item[this._dataset.TagField]);
-        let tagsForDocs = selectedDocs.map(d => idFieldIsString ? [d.Item[this._dataset.TagField]] : d.Item[this._dataset.TagField]);
+        let tagFieldIsSimple = !_.isArray(selectedDocs[0].Item[this._dataset.TagField]);
+        let tagsForDocs = selectedDocs.map(d => tagFieldIsSimple ? [d.Item[this._dataset.TagField]] : d.Item[this._dataset.TagField]);
         let commonTags = tagsForDocs[0];
         for (let i = 1; i < tagsForDocs.length; i++) {
             commonTags = _.intersection(commonTags, tagsForDocs[i]);
@@ -597,7 +592,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                     return Observable.create((observer: Observer<any>) => {
                         let id = currentItem.Item[this._dataset.IdField];
                         let updatedDoc = {};
-                        updatedDoc[this._dataset.TagField] = idFieldIsString
+                        updatedDoc[this._dataset.TagField] = tagFieldIsSimple
                             ? ''
                             : _.without(currentItem.Item[this._dataset.TagField], selectedTagIds);
                         this._documentService.updateDocument(this._dataset.Name, id, updatedDoc).subscribe(
@@ -661,7 +656,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             this._documentService.createDocument(this.dataset.Name, docToSave).subscribe(
                 error => this.errorMessage = <any>error,
                 () => {
-                    this.documents= _.concat(this.documents, [<SelectedItem<any>>_.cloneDeep({
+                    this.documents = _.concat(this.documents, [<SelectedItem<any>>_.cloneDeep({
                         IsSelected: false,
                         Item: docToSave
                     })]);

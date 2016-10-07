@@ -99,8 +99,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
             .subscribe(
             error => this.handleError(error),
             () => {
-                let index = this.dataSets.indexOf(selected);
-                this.dataSets.splice(index, 1);
+                this.dataSets = _.without(this.dataSets, selected);
             });
     }
 

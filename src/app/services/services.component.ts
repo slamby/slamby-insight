@@ -71,10 +71,7 @@ export class ServicesComponent implements OnInit {
             .deleteService(selected.Id)
             .subscribe(
             error => this.handleError(error),
-            () => {
-                let index = this.services.findIndex(s => s.Id === selected.Id);
-                this.services.splice(index, 1);
-            });
+            () => this.services = _.without(this.services, selected));
     }
 
     add(type: IService.ITypeEnum) {
@@ -113,6 +110,7 @@ export class ServicesComponent implements OnInit {
                     (classifierService: IClassifierService) => {
                         let index = this.services.findIndex(s => s.Id === classifierService.Id);
                         this.services[index] = classifierService;
+                        this.services = _.cloneDeep(this.services);
                     },
                     error => this.handleError(error)
                 );
@@ -121,6 +119,7 @@ export class ServicesComponent implements OnInit {
                     (prcService: IPrcService) => {
                         let index = this.services.findIndex(s => s.Id === prcService.Id);
                         this.services[index] = prcService;
+                        this.services = _.cloneDeep(this.services);
                     },
                     error => this.handleError(error)
                 );

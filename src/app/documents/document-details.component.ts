@@ -40,6 +40,7 @@ styles: [`
 })
 export class DocumentDetailsComponent {
     static pageTitle: string = 'DocumentDetails';
+    static pageIcon: string = 'fa-file';
 
     private _document: any;
     @Input() set document(doc: any) {

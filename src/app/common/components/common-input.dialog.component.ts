@@ -7,29 +7,8 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'input-dialog',
-    template: `
-        <template #template let-c="close" let-d="dismiss">
-            <div class="modal-header">
-                <button type="button" class="close" aria-label="Close" (click)="cancel(); d('Cross click')">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">{{model.Header}}</h4>
-            </div>
-            <div *ngIf="model.ErrorMessage">
-                <p>{{model.ErrorMessage}}</p>
-            </div>
-            <form (submit)="ok(); c()">
-                <div class="modal-body">
-                        <textarea [rows]="getRowNumber(_json)" style="width: 100%" name="jsonText" [(ngModel)]="_json">
-                        </textarea>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit " class="btn btn-primary ">Ok</button>
-                    <button type="button" class="btn btn-secondary" (click)="cancel(); c('Close click')">Close</button>
-                </div>
-            </form>
-        </template>
-    `
+    template: require('./common-input.dialog.component.html'),
+    styles: [require('./common-input.dialog.component.scss')]
 })
 export class CommonInputDialogComponent {
     private _json: string;

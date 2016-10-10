@@ -1,20 +1,22 @@
 <div>
     <output-dialog></output-dialog>
-    <input type="checkbox" [checked]="loadAll" (change)="checkAll()" name="loadAll">Load All
+    <md-slide-toggle [checked]="loadAll" (change)="checkAll()" color="primary">
+        Show Inactive Processes
+    </md-slide-toggle>
     <br role="separator" class="divider">
-    <div *ngIf="processes && processes.length" class="table-responsive">
+    <div class="table-responsive">
         <table class="table table-responsive table-striped table-hover" contextmenu="contextmenu" style="overflow-y: auto; overflow-x: auto; max-height: 80%">
             <thead>
                 <tr>
                     <th></th>
-                    <th>ResultMessage</th>
+                    <th>Result</th>
                     <th>Start</th>
                     <th>End</th>
                     <th>Percent</th>
                     <th>Description</th>
                     <th>Type</th>
                     <th>Status</th>
-                    <th>ErrorMessages</th>
+                    <th>Error</th>
                     <th>Id</th>
                     <th>
                         <a class="btn" (click)="refresh()">
@@ -23,15 +25,15 @@
                     </th>
                     <th></th>
                 </tr>
-            </thead>
+            </thead> 
             <tbody *vsFor="processes; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
                 <tr *ngFor="let process of _items; let i = index">
                     <td>{{ i + _startIndex + 1}}</td>
                     <td>
                         <p [innerHTML]="process.ResultMessage | convertTextToUrl"></p>
                     </td>
-                    <td>{{ process.Start }}</td>
-                    <td>{{ process.End }}</td>
+                    <td>{{ process.Start | date:'short' }}</td>
+                    <td>{{ process.End | date:'short' }}</td>
                     <td>{{ process.Percent }} %</td>
                     <td>{{ process.Description }}</td>
                     <td>{{ process.Type }}</td>
@@ -49,14 +51,14 @@
                         </button>
                         <md-menu #menu="mdMenu" x-position="before">
                             <button md-menu-item (click)="details(process)">Details</button>
-                            <button md-menu-item (click)="cancel(process)" *ngIf="process.Status == processStatus.InProgress">Cancel</button>
+                            <button md-menu-item (click)="cancel(process)" *ngIf="isInProgress(process)">Cancel</button>
                         </md-menu>
                     </td>
                 </tr>
+                <tr *ngIf="!(processes && processes.length)">
+                    <td colspan="12">No processes found.</td>
+                </tr>
             </tbody>
         </table>
-    </div>
-    <div *ngIf="!(processes && processes.length)">
-        <p>No processes found.</p>
     </div>
 </div>

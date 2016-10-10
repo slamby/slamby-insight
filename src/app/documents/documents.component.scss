@@ -7,3 +7,18 @@ thead {
         width: 140px;
     }
 }
+
+.tags-table {
+    thead tr {
+        th:nth-child(1),
+        th:nth-child(2),
+        th:nth-child(6) {
+            width: 60px;
+        }
+
+        th:nth-child(3),
+        th:nth-child(5) {
+            width: 120px
+        }
+    }
+}

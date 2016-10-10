@@ -11,6 +11,7 @@ import { SettingsDialogComponent } from './settings/settings.dialog.component';
 
 import { DatasetSelectorDialogComponent } from './datasets/dataset-selector.dialog.component';
 import { TagSelectorDialogComponent } from './documents/tag-selector.dialog.component';
+import { ConfirmDialogComponent } from './common/components/confirm.dialog.component';
 
 import { ImportComponent } from './import/import.component';
 import { DatasetsComponent } from './datasets/datasets.component';
@@ -73,6 +74,7 @@ import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
         COMPONENTS_DECLARATIONS,
         DIRECTIVES_DECLARATIONS,
         PIPES_DECLARATIONS,
+        ConfirmDialogComponent,
 
         SafeJsonPipe,
         PrettyJsonPipe,

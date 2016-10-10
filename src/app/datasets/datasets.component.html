@@ -1,4 +1,5 @@
 <div>
+    <confirm-dialog></confirm-dialog>
     <button type="button" class="btn btn-outline-primary" (click)="newDataSetFormIsCollapsed = !newDataSetFormIsCollapsed">Add New DataSet</button>
     <br/>
     <div class="well collapse col-sm-6" [ngbCollapse]="newDataSetFormIsCollapsed">
@@ -95,7 +96,7 @@
                             <button md-menu-item (click)="gotoDocuments(dataSet)">Open</button>
                             <button md-menu-item (click)="cloneDataSet(dataSet)">Clone</button>
                             <button md-menu-item (click)="renameDataSet(dataSet)">Rename</button>
-                            <button md-menu-item (click)="deleteDataSet(dataSet)">Delete</button>
+                            <button md-menu-item (click)="deleteConfirm(dataSet)">Delete</button>
                         </md-menu>
                     </td>
                 </tr>

@@ -4,6 +4,7 @@
     <tag-selector></tag-selector>
     <document-details-dialog></document-details-dialog>
     <input-dialog></input-dialog>
+    <confirm-dialog></confirm-dialog>
     <div class='panel-body'>
         <div class='has-error' *ngIf='errorMessage'>{{errorMessage}}</div>
         <div>
@@ -177,14 +178,14 @@
                         <hr role="separator" class="divider">
                         <!--bulk actions-->
                         <div class="button-container">
-                            <button type="button" class="btn btn-default" (click)="deleteDocuments()">Delete</button>
+                            <button type="button" class="btn btn-default" (click)="deleteConfirm()">Delete</button>
                             <button type="button" class="btn btn-default" (click)="copyTo()">Copy To</button>
                             <button type="button" class="btn btn-default" (click)="moveTo()">Move To</button>
                             <button type="button" class="btn btn-default" (click)="copyAllTo()">Copy To All</button>
                             <button type="button" class="btn btn-default" (click)="moveAllTo()">Move To All</button>
                             <button type="button" class="btn btn-default" (click)="addTags()">Add Tags</button>
                             <button type="button" class="btn btn-default" (click)="removeTags()">Remove Tags</button>
-                            <button type="button" class="btn btn-default" (click)="clearTags()">Clear Tag List</button>
+                            <button type="button" class="btn btn-default" (click)="clearTagsConfirm()">Clear Tag List</button>
                         </div>
                         <br role="separator" class="divider">
                         <!--Document table-->
@@ -224,8 +225,8 @@
                                                     <li><a (click)="moveTo([document])">MoveTo</a></li>
                                                     <li><a (click)="addTags([document])">AddTags</a></li>
                                                     <li><a (click)="removeTags([document])">RemoveTags</a></li>
-                                                    <li><a (click)="clearTags([document])">Clear tags</a></li>
-                                                    <li><a (click)="deleteDocuments([document])">Delete</a></li>
+                                                    <li><a (click)="clearTagsConfirm([document])">Clear tags</a></li>
+                                                    <li><a (click)="deleteConfirm([document])">Delete</a></li>
                                                 </ul>
                                             </div>-->
                                             <button md-icon-button [md-menu-trigger-for]="menu">
@@ -239,8 +240,8 @@
                                                 <button md-menu-item (click)="moveTo([document])">MoveTo</button>
                                                 <button md-menu-item (click)="addTags([document])">AddTags</button>
                                                 <button md-menu-item (click)="removeTags([document])">RemoveTags</button>
-                                                <button md-menu-item (click)="clearTags([document])">Clear tags</button>
-                                                <button md-menu-item (click)="deleteDocuments([document])">Delete</button>
+                                                <button md-menu-item (click)="clearTagsConfirm([document])">Clear tags</button>
+                                                <button md-menu-item (click)="deleteConfirm([document])">Delete</button>
                                             </md-menu>
                                         </td>
                                     </tr>
@@ -306,6 +307,7 @@
                         <!--bulk actions-->
                         <div class="button-container">
                             <button type="button" class="btn btn-default" (click)="exportWords()">Export Words</button>
+                            <button type="button" class="btn btn-default" (click)="deleteTagConfirm()">Delete</button>
                         </div>
                         <br role="separator" class="divider">
                         <div class='table-responsive' style="overflow-y: auto; overflow-x: auto; max-height: 400px">
@@ -326,8 +328,8 @@
                                 </thead>
                                 <tbody *vsFor="tags; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
                                     <tr *ngFor='let tag of _items; let i = index'>
-                                        <td><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>
                                         <td>{{ i + _startIndex + 1}}</td>
+                                        <td><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>
                                         <td>{{tag.Item.Id}}</td>
                                         <td>{{tag.Item.Name}}</td>
                                         <td>{{tag.Item.ParentId}}</td>
@@ -337,9 +339,9 @@
                                                     <md-icon>more_vert</md-icon>
                                                 </button>
                                                 <md-menu #menu="mdMenu" x-position="before">
-                                                    <button md-menu-item (click)="exportWords(tag)">Export</button>
+                                                    <button md-menu-item (click)="exportWords([tag])">Export</button>
                                                     <button md-menu-item (click)="editTag(tag)">Edit</button>
-                                                    <button md-menu-item (click)="deleteTag(tag)">Delete</button>
+                                                    <button md-menu-item (click)="deleteTagConfirm([tag])">Delete</button>
                                                 </md-menu>
                                                 <!--<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="tagDropdownMenu" data-toggle="dropdown"
                                                     aria-haspopup="true" aria-expanded="true">

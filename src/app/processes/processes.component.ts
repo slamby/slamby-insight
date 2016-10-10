@@ -26,9 +26,7 @@ export class ProcessesComponent implements OnInit {
     @ViewChild(CommonOutputDialogComponent) detailsDialog: CommonOutputDialogComponent;
 
     loadAll = false;
-    processStatus = IProcess.IStatusEnum;
     processes: Array<IProcess> = [];
-
     activeProcesses: Array<IProcess> = [];
 
     refreshInterval = 5;
@@ -84,7 +82,7 @@ export class ProcessesComponent implements OnInit {
                     } else {
                         if (index >= 0) {
                             this._notificationService.info(process.ResultMessage, 'Process finished');
-                            this.activeProcesses = _.without(this.activeProcesses, this.activeProcesses.find(p => p.Id === process.Id))
+                            this.activeProcesses = _.without(this.activeProcesses, this.activeProcesses.find(p => p.Id === process.Id));
                         }
                     }
                 },
@@ -130,6 +128,10 @@ export class ProcessesComponent implements OnInit {
         };
         this.detailsDialog.model = model;
         this.detailsDialog.open();
+    }
+
+    isInProgress(process: IProcess): boolean {
+        return process.Status === IProcess.IStatusEnum.InProgress;
     }
 
     handleError(response: Response) {

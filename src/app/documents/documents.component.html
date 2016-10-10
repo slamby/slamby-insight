@@ -100,11 +100,11 @@
                                                     </p>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Query: </label>
+                                                    <label>Query </label>
                                                     <input type="text" class="form-control" name="query" [(ngModel)]="filterSettings.Filter.Query">
                                                 </div>
                                                 <div class="form-group">
-                                                    <label>Scroll size: </label>
+                                                    <label>Scroll size </label>
                                                     <input type="number" class="form-control" name="size" [(ngModel)]="filterSettings.Pagination.Limit">
                                                 </div>
                                                 <button type="submit" class="btn btn-default">Filter</button>
@@ -156,13 +156,13 @@
                                                     <br/>
                                                     <div *ngIf="sampleSettings.IsFix">
                                                         <div class="form-group">
-                                                            <label>Size: </label>
+                                                            <label>Size </label>
                                                             <input type="number" class="form-control" name="size" [(ngModel)]="sampleSettings.Settings.Size">
                                                         </div>
                                                     </div>
                                                     <div *ngIf="!sampleSettings.IsFix">
                                                         <div class="form-group">
-                                                            <label>Percent: </label>
+                                                            <label>Percent </label>
                                                             <input type="number" class="form-control" name="percent" [(ngModel)]="sampleSettings.Settings.Percent">
                                                         </div>
                                                     </div>
@@ -197,8 +197,7 @@
                                         <th></th>
                                         <th>
                                             <div>
-                                                <input type="checkbox" [checked]="getSelectedItemsCount(documents) == documents.length" (change)="checkDocument($event)"
-                                                    style="margin: 3px;">
+                                                <input type="checkbox" [checked]="getSelectedItemsCount(documents) == documents.length" (change)="checkDocument($event)" style="margin: 3px;">
                                             </div>
                                         </th>
                                         <th *ngFor='let header of headers'>{{header}}</th>
@@ -232,16 +231,16 @@
                                             <button md-icon-button [md-menu-trigger-for]="menu">
                                                 <md-icon>more_vert</md-icon>
                                             </button>
-                                            <md-menu #menu="mdMenu" x-position="before">
-                                                <button md-menu-item (click)="preview(document)">Preview</button>
-                                                <button md-menu-item (click)="openDocument(document)">Open</button>
-                                                <button md-menu-item (click)="editDocument(document)">Edit</button>
+                                            <md-menu #menu="mdMenu" x-position="before" y-position="above">
                                                 <button md-menu-item (click)="copyTo([document])">CopyTo</button>
                                                 <button md-menu-item (click)="moveTo([document])">MoveTo</button>
                                                 <button md-menu-item (click)="addTags([document])">AddTags</button>
                                                 <button md-menu-item (click)="removeTags([document])">RemoveTags</button>
                                                 <button md-menu-item (click)="clearTagsConfirm([document])">Clear tags</button>
                                                 <button md-menu-item (click)="deleteConfirm([document])">Delete</button>
+                                                <button md-menu-item (click)="editDocument(document)">Edit</button>
+                                                <button md-menu-item (click)="openDocument(document)">Open</button>
+                                                <button md-menu-item (click)="preview(document)">Preview</button>
                                             </md-menu>
                                         </td>
                                     </tr>
@@ -259,50 +258,42 @@
                 <ngb-tab title="Tags">
                     <template ngbTabContent>
                         <br/>
-                        <br/>
-                        <div>
+                        <div class="row">
                             <button type="button" class="btn  btn-outline-primary" (click)="collapsePendingTag()">Add New Tag</button>
+                        </div>
                             <br/>
-                            <br/>
-                            <form #ft="ngForm" [ngbCollapse]="newTagFormIsCollapsed" (ngSubmit)="saveTag()" class="collapse">
-                                <div class="table-responsive">
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <label>Id: </label>
-                                                </td>
-                                                <td>
-                                                    <input type="text" [(ngModel)]="pendingTag.Tag.Id" name="id">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label>Name: </label>
-                                                </td>
-                                                <td>
-                                                    <input type="text" [(ngModel)]="pendingTag.Tag.Name" name="name">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <label>ParentId: </label>
-                                                </td>
-                                                <td>
-                                                    <input type="text" [(ngModel)]="pendingTag.Tag.ParentId" name="parent">
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <form class="form-horizontal collapse" #tagForm="ngForm" [ngbCollapse]="newTagFormIsCollapsed" (ngSubmit)="saveTag()">
+                                    <div class="form-group">
+                                        <label for="id" class="col-sm-2 control-label">Id</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" [(ngModel)]="pendingTag.Tag.Id" name="id" placeholder="Tag Id" />
                                 </div>
-                                <p>
-                                    <button class="btn" type="submit" [disabled]="!ft.valid">Save</button>
-                                </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="name" class="col-sm-2 control-label">Name</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" [(ngModel)]="pendingTag.Tag.Name" name="name" placeholder="Tag Name" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="parentId" class="col-sm-2 control-label">Parent Id</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" [(ngModel)]="pendingTag.Tag.ParentId" name="parentId" placeholder="Tag ParentId" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-offset-2 col-sm-10">
+                                            <button class="btn" type="submit" [disabled]="!tagForm.valid">Save</button>
+                                        </div>
+                                    </div>
                             </form>
                             <br/>
-                            <br/>
+                        </div>
                         </div>
                         <br/>
+
                         <hr role="separator" class="divider">
                         <!--bulk actions-->
                         <div class="button-container">
@@ -312,7 +303,7 @@
                         <br role="separator" class="divider">
                         <div class='table-responsive' style="overflow-y: auto; overflow-x: auto; max-height: 400px">
                             <p>{{getSelectedItemsCount(tags)}} item(s) selected</p>
-                            <table class='table table-striped' *ngIf='tags && tags.length'>
+                            <table class='table table-striped tags-table' *ngIf='tags && tags.length'>
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -324,6 +315,7 @@
                                         <th>Id</th>
                                         <th>Name</th>
                                         <th>ParentId</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody *vsFor="tags; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
@@ -343,16 +335,6 @@
                                                     <button md-menu-item (click)="editTag(tag)">Edit</button>
                                                     <button md-menu-item (click)="deleteTagConfirm([tag])">Delete</button>
                                                 </md-menu>
-                                                <!--<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="tagDropdownMenu" data-toggle="dropdown"
-                                                    aria-haspopup="true" aria-expanded="true">
-                                                    Actions
-                                                    <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="tagDropdownMenu">
-                                                    <li><a (click)="exportWords(tag)">Export</a></li>
-                                                    <li><a (click)="editTag(tag)">Edit</a></li>
-                                                    <li><a (click)="deleteTag(tag)">Delete</a></li>
-                                                </ul>-->
                                             </div>
                                         </td>
                                     </tr>

@@ -39,6 +39,7 @@ import * as _ from 'lodash';
 })
 export class DocumentsComponent implements OnInit, AfterContentInit {
     static pageTitle: string = 'Documents';
+    static pageIcon: string = 'fa-archive';
 
     _dataset: IDataSet;
     @Input()

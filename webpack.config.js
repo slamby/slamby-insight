@@ -12,7 +12,8 @@ module.exports = {
     'angular2': [
       'rxjs',
       'reflect-metadata',
-      '@angular/core'
+      '@angular/core',
+      'hammerjs'
     ],
     'app': './src/app/app'
   },

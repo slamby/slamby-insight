@@ -101,7 +101,7 @@ function loadIndexHtml() {
 function createWindow() {
 
     // Create the browser window.
-    mainWindow = new BrowserWindow({ width: 1024, height: 768, minWidth: 1024, minHeight: 768, icon: iconPath, backgroundColor: '#00B5AB', show: false, blinkFeatures: 'OverlayScrollbars' });
+    mainWindow = new BrowserWindow({ width: 1024, height: 768, minWidth: 1024, minHeight: 768, icon: iconPath, backgroundColor: '#00B5AB', show: false, blinkFeatures: 'OverlayScrollbars', title: 'Slamby Insight' });
 
     mainWindow.maximize();
     loadIndexHtml();

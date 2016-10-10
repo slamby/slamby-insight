@@ -30,7 +30,8 @@ function createInstaller(platform) {
         setupIcon: iconDir,
         setupExe: setupExeName,
         iconUrl: 'https://www.slamby.com/app/icon.png',
-        noMsi: true
+        noMsi: true,
+        skipUpdateIcon: true
     });
 
     return resultPromise.then(() => console.log(`Creating installer for ${platform} succeded!`));

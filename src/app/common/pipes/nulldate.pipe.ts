@@ -1,10 +1,10 @@
-import { Pipe } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 @Pipe({
     name: 'nullDate'
 })
-export class NullDatePipe {
+export class NullDatePipe implements PipeTransform {
     constructor(private datePipe: DatePipe) {}
 
     transform(value: any, format: string, text = ''): string {

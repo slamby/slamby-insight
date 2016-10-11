@@ -9,7 +9,7 @@ import { DocumentsComponent } from '../documents/documents.component';
 
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
-import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component'
+import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component';
 import { ConfirmModel } from '../models/confirm.model';
 import { DialogResult } from '../models/dialog-result';
 
@@ -106,7 +106,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         this.confirmDialog.model = model;
         this.confirmDialog.dialogClosed.subscribe(
             (result: ConfirmModel) => {
-                if (result.Result == DialogResult.Yes) {
+                if (result.Result === DialogResult.Yes) {
                     this.deleteDataSet(selected);
                 }
             },

@@ -1,33 +1,79 @@
 <div>
-    <div class='panel-body'>
+	<div class="panel-body">
+		<div class="row">
+			<div class="col-sm-6">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="datasets" class="col-sm-2 control-label">Dataset</label>
+						<div class="col-sm-10">
+							<select [(ngModel)]="selectedDataset" name="datasets" class="form-control">
+                                <option [ngValue]="dataset" *ngFor="let dataset of datasets">{{dataset.Name}}</option>
+                            </select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="importfile" class="col-sm-2 control-label">Import file</label>
+						<div class="col-sm-10">
+							<input (change)="onFileSelectionChange($event)" type="file" class="form-control" name="importfile" accept=".csv, .json" />
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<div class="checkbox">
+                                <md-slide-toggle [(ngModel)]="tagImport" color="primary" [ngModelOptions]="{standalone: true}">
+                                    Tag Import
+                                </md-slide-toggle>
+							</div>
+						</div>
+					</div>
+					<div *ngIf="selectedFile && selectedDataset && isCsvFile(selectedFile.name)">
+						<div class="form-group">
+							<label for="importfile" class="col-sm-2 control-label">Delimiter</label>
+							<div class="col-sm-10">
+								<input [(ngModel)]="csvSettings.delimiter" (change)="onFileSelectionChange($event)" type="text" class="form-control" name="delimiter"
+									placeholder="Csv field delimiter" />
+							</div>
+						</div>
+                        <div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<div class="checkbox">
+                                    <md-slide-toggle [(ngModel)]="csvSettings.hasHeader" color="primary" [ngModelOptions]="{standalone: true}">
+                                        Has header row
+                                    </md-slide-toggle>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="button" class="btn btn-default" (click)="this.import()" [disabled]="!selectedFile || !selectedDataset || (status.inProgress && !status.finished)">
+                                Import {{ tagImport ? 'Tags' : 'Documents'}}
+                            </button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="progress" *ngIf="status.inProgress || status.finished">
+					<div class="progress-bar" role="progressbar" [attr.aria-valuenow]="status.percent" aria-valuemin="0" aria-valuemax="100"
+						[style.width]="status.percent + '%'">
+						{{status.percent}}%
+					</div>
+				</div>
 
-        <div class='has-error' *ngIf='errorMessage'>{{errorMessage}}</div>
-
-        <div class='table-responsive'>
-            Select a dataset:
-            <br/>
-            <select [(ngModel)]='selectedDataset' name="name">
-                <option [ngValue]="dataset" *ngFor='let dataset of datasets'>{{dataset.Name}}</option>
-            </select>
-            <br/>
-            <br/> Select a file:
-            <br/>
-            <input (change)="onFileSelectionChange($event)" type="file" />
-            <br/>
-            <div *ngIf="selectedFile && selectedDataset && this.selectedFile.name.endsWith('.csv')">
-                <label>HasHeader: </label>
-                <input type="checkbox" [(ngModel)]="csvSettings.force">
-                <br/>
-                <label>Delimiter: </label>
-                <input type="text" name="delimiter" [(ngModel)]="csvSettings.delimiter"> (blank = auto detect)
-            </div>
-            <br/>
-            <label>Import tags </label>
-            <input type="checkbox" [(ngModel)]="tagImport">
-            <br/>
-            <button (click)='read()' *ngIf='selectedFile && selectedDataset'>Read and Import</button>
-            <br/>
-            <progress value='{{percent}}' *ngIf='!importReady' max="100"></progress>
-        </div>
-    </div>
+				<div class="alert alert-danger" role="alert" *ngIf="status.finished && status.errorMessages.length">
+					<ul>
+						<li *ngFor="let errorMessage of status.errorMessages">
+							{{errorMessage}}
+						</li>
+					</ul>
+				</div>
+				<div class="alert alert-sucess" role="alert" *ngIf="status.finished && !status.errorMessages.length">
+					Import successful
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

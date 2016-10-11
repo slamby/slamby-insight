@@ -77,14 +77,13 @@ import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
         SafeJsonPipe,
         PrettyJsonPipe,
         PrettyJsonComponent,
-        
         VsFor
     ],
     imports: [
         BrowserModule,
         FormsModule,
         HttpModule,
-        NgbModule,
+        NgbModule.forRoot(),
         InfiniteScrollModule,
         ToastModule,
         MaterialModule.forRoot(),

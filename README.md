@@ -16,9 +16,13 @@ npm install
 ```
 npm run build
 ```
+or
+```
+npm run watch
+```
 
 ### Run application
 
 ```
-npm run start 
+npm start 
 ```

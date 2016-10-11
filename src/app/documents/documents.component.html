@@ -281,6 +281,10 @@
 						</div>
 						<br role="separator" class="divider">
 						<p>{{getSelectedItemsCount(tags)}} item(s) selected</p>
+                        <div class="row">
+                            <div class="col-md-2">Filter by:</div>
+                            <div class="col-md-4"><input type="text" #listFilter (keyup)="0" /></div>
+                        </div>
 						<div>
 							<div class="vs-table-header" style="">
 								<table class='table' *ngIf='tags && tags.length'>
@@ -307,7 +311,7 @@
 							</div>
 							<div class="vs-table-body">
 								<table class='table table-striped tags-table' *ngIf='tags && tags.length'>
-									<tbody *vsFor="tags; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+									<tbody *vsFor="tags | filterBy:{Item: {Name:listFilter.value}}; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
 										<tr *ngFor='let tag of _items; let i = index'>
 											<td class="vs-col-short">{{ i + _startIndex + 1}}</td>
 											<td class="vs-col-short"><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>

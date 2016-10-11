@@ -2,6 +2,8 @@ import { Component, OnInit, Input, AfterContentInit, ViewChild, NgZone } from '@
 import { Response } from '@angular/http';
 
 import { DialogResult } from '../models/dialog-result';
+import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component'
+import { ConfirmModel } from '../models/confirm.model';
 
 import { DocumentService } from '../common/services/document.service';
 import { DatasetService } from '../common/services/dataset.service';
@@ -53,6 +55,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     @ViewChild(TagSelectorDialogComponent) tagSelector: TagSelectorDialogComponent;
     @ViewChild(DocumentDetailsDialogComponent) documentDetailsDialog: DocumentDetailsDialogComponent;
     @ViewChild(CommonInputDialogComponent) inputDialog: CommonInputDialogComponent;
+    @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
 
     documentDetails = DocumentDetailsComponent;
 
@@ -80,7 +83,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     // filter and sampling
     fields: Array<SelectedItem<any>> = [];
     filterTagsIsCollapsed: boolean = true;
-    tagsForFilter: Array<SelectedItem<any>> = [];
+    tagsForFilter: Array<SelectedItem<ITag>> = [];
     filterIsActive: boolean = true;
     filterSettings: IDocumentFilterSettings = {
         Pagination: {
@@ -94,7 +97,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         FieldList: []
     };
     sampleTagsIsCollapsed: boolean = true;
-    tagsForSample: Array<SelectedItem<any>> = [];
+    tagsForSample: Array<SelectedItem<ITag>> = [];
     sampleSettings = {
         Settings: {
             Id: CommonHelper.guid(),
@@ -253,6 +256,25 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         }
     }
 
+    deleteConfirm(selectedItems?: Array<SelectedItem<any>>) {
+        let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
+        let model: ConfirmModel = {
+            Header: "Delete documents",
+            Message: "Are you sure to remove " + selectedDocs.length + " document(s)",
+            Buttons: ["yes", "no"]
+        };
+        this.confirmDialog.model = model;
+        this.confirmDialog.dialogClosed.subscribe(
+            (result: ConfirmModel) => {
+                if (result.Result == DialogResult.Yes) {
+                    this.deleteDocuments(selectedItems);
+                }
+            },
+            error => this.handleError(error)
+        );
+        this.confirmDialog.open();
+    }
+
     deleteDocuments(selectedItems?: Array<SelectedItem<any>>) {
         let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
         let dialogModel: ProgressDialogModel = {
@@ -308,6 +330,24 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             Id: selected.Item[this._dataset.IdField]
         };
         this.collapsePendingDocument();
+    }
+
+    clearTagsConfirm(selectedItems?: Array<SelectedItem<any>>) {
+        let model: ConfirmModel = {
+            Header: "Clear tags",
+            Message: "Are you sure to clear tags?",
+            Buttons: ["yes", "no"]
+        };
+        this.confirmDialog.model = model;
+        this.confirmDialog.dialogClosed.subscribe(
+            (result: ConfirmModel) => {
+                if (result.Result == DialogResult.Yes) {
+                    this.clearTags(selectedItems);
+                }
+            },
+            error => this.handleError(error)
+        );
+        this.confirmDialog.open();
     }
 
     clearTags(selectedItems?: Array<SelectedItem<any>>) {
@@ -696,15 +736,74 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         }
     }
 
-    deleteTag(selected: SelectedItem<ITag>) {
-        let id = selected.Item.Id;
-        this._tagService.deleteTag(this._dataset.Name, id).subscribe(
-            error => this.errorMessage = <any>error,
+    deleteTagConfirm(selectedItems?: Array<SelectedItem<ITag>>) {
+        let selectedTags = selectedItems ? selectedItems : this.tags.filter(d => d.IsSelected);
+        let model: ConfirmModel = {
+            Header: "Delete tags",
+            Message: "Are you sure to remove " + selectedTags.length + " tag(s)",
+            Buttons: ["yes", "no"]
+        };
+        this.confirmDialog.model = model;
+        this.confirmDialog.dialogClosed.subscribe(
+            (result: ConfirmModel) => {
+                if (result.Result == DialogResult.Yes) {
+                    this.deleteTag(selectedItems);
+                }
+            },
+            error => this.handleError(error)
+        );
+        this.confirmDialog.open();
+    }
+
+    deleteTag(selectedItems?: Array<SelectedItem<ITag>>) {
+        let selectedTags = selectedItems ? selectedItems : this.tags.filter(d => d.IsSelected);
+        let dialogModel: ProgressDialogModel = {
+            All: selectedTags.length,
+            ErrorCount: 0,
+            Done: 0,
+            Percent: 0,
+            IsDone: false,
+            Header: 'Deleting...'
+        };
+        this.dialogService.progressModel = dialogModel;
+        this.dialogService.openDialog('progress');
+        let sources = selectedTags.map<Observable<SelectedItem<ITag>>>(currentItem => {
+            return Observable.create((observer: Observer<SelectedItem<ITag>>) => {
+                this._tagService.deleteTag(this._dataset.Name, currentItem.Item.Id).subscribe(
+                    error => {
+                        observer.error(error);
+                        observer.complete();
+                    },
+                    () => {
+                        observer.next(currentItem);
+                        observer.complete();
+                    }
+                );
+            });
+        });
+        let source = Observable.concat(...sources);
+
+        source.subscribe(
+            (t: SelectedItem<ITag>) => {
+                this.tags = _.without(this.tags, t);
+                var tagtoRemove = this.tagsForFilter.find(t1 => t1.Id == t.Item.Id);
+                this.tagsForFilter = _.without(this.tagsForFilter, tagtoRemove);
+                tagtoRemove = this.tagsForSample.find(t1 => t1.Id == t.Item.Id);
+                this.tagsForSample = _.without(this.tagsForSample, tagtoRemove);
+                dialogModel.Done += 1;
+                dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
+            },
+            error => {
+                this.errorMessage = <any>error;
+                dialogModel.ErrorCount += 1;
+                dialogModel.Done += 1;
+                dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
+            },
             () => {
-                let index = this.tags.findIndex(t => t.Item.Id === selected.Item.Id);
-                this.tags.splice(index, 1);
+                dialogModel.IsDone = true;
             }
         );
+        dialogModel.IsDone = true;
     }
 
     editTag(selected: SelectedItem<ITag>) {
@@ -716,8 +815,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this.collapsePendingTag();
     }
 
-    exportWords(selected: SelectedItem<ITag>) {
-        var tagIdList = selected ? [selected.Id] : this.tags.filter(t => t.IsSelected).map(t => t.Item.Id);
+    exportWords(selectedItems?: Array<SelectedItem<ITag>>) {
+        var tagIdList = selectedItems ? selectedItems.map(t => t.Item.Id) : this.tags.filter(t => t.IsSelected).map(t => t.Item.Id);
 
         let settings: ITagsExportWordsSettings = {
             NGramList: _.range(1, this._dataset.NGramCount + 1),

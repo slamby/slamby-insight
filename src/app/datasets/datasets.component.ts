@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterContentInit } from '@angular/core';
+import { Component, OnInit, AfterContentInit, ViewChild } from '@angular/core';
 import { Response } from '@angular/http';
 import { Messenger } from '../common/services/messenger.service';
 
@@ -9,6 +9,9 @@ import { DocumentsComponent } from '../documents/documents.component';
 
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
+import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component'
+import { ConfirmModel } from '../models/confirm.model';
+import { DialogResult } from '../models/dialog-result';
 
 import * as _ from 'lodash';
 
@@ -19,6 +22,7 @@ import * as _ from 'lodash';
 export class DatasetsComponent implements OnInit, AfterContentInit {
     static pageTitle: string = 'Datasets';
     static pageIcon: string = 'fa-database';
+    @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
 
     dataSets: IDataSet[];
     selectedDataSet: IDataSet;
@@ -91,6 +95,24 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
 
     select(selected: IDataSet) {
         this.selectedDataSet = selected;
+    }
+
+    deleteConfirm(selected: IDataSet) {
+        let model: ConfirmModel = {
+            Header: "Delete dataset",
+            Message: "Are you sure to remove the following data set: " + selected.Name,
+            Buttons: ["yes", "no"]
+        };
+        this.confirmDialog.model = model;
+        this.confirmDialog.dialogClosed.subscribe(
+            (result: ConfirmModel) => {
+                if (result.Result == DialogResult.Yes) {
+                    this.deleteDataSet(selected);
+                }
+            },
+            error => this.handleError(error)
+        );
+        this.confirmDialog.open();
     }
 
     deleteDataSet(selected: IDataSet) {

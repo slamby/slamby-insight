@@ -20,6 +20,9 @@ import { DialogResult } from '../models/dialog-result';
 import { ProgressDialogModel } from '../models/progress-dialog-model';
 import { DialogComponent } from '../common/components/dialog.component';
 
+import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component'
+import { ConfirmModel } from '../models/confirm.model';
+
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { Observable, Observer } from 'rxjs';
@@ -35,6 +38,7 @@ export class ServicesComponent implements OnInit {
     @ViewChild(CommonInputDialogComponent) inputDialog: CommonInputDialogComponent;
     @ViewChild(CommonOutputDialogComponent) resultDialog: CommonOutputDialogComponent;
     @ViewChild(DialogComponent) dialogService: DialogComponent;
+    @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
 
     serviceType = IService.ITypeEnum;
     serviceStatus = IService.IStatusEnum;
@@ -64,6 +68,24 @@ export class ServicesComponent implements OnInit {
         };
         this.resultDialog.model = model;
         this.resultDialog.open();
+    }
+
+    deleteConfirm(selected: IService | IPrcService | IClassifierService) {
+        let model: ConfirmModel = {
+            Header: "Delete service",
+            Message: "Are you sure to remove the following service: " + selected.Name,
+            Buttons: ["yes", "no"]
+        };
+        this.confirmDialog.model = model;
+        this.confirmDialog.dialogClosed.subscribe(
+            (result: ConfirmModel) => {
+                if (result.Result == DialogResult.Yes) {
+                    this.delete(selected);
+                }
+            },
+            error => this.handleError(error)
+        );
+        this.confirmDialog.open();
     }
 
     delete(selected: IService | IPrcService | IClassifierService) {

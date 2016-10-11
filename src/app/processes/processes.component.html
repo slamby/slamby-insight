@@ -33,8 +33,8 @@
                         <p [innerHTML]="process.ResultMessage | convertTextToUrl"></p>
                     </td>
                     <td>{{ process.Start | date:'short' }}</td>
-                    <td>{{ process.End | date:'short' }}</td>
-                    <td>{{ process.Percent }} %</td>
+                    <td>{{ process.End | nullDate:'short':'n/a' }}</td>
+                    <td>{{ process.Percent }}%</td>
                     <td>{{ process.Description }}</td>
                     <td>{{ process.Type }}</td>
                     <td>{{ process.Status }}</td>

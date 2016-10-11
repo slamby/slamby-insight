@@ -207,27 +207,8 @@
                                     <tr *ngFor='let document of _items; let i = index' (click)='select(document)' (dblclick)='openDocument(document)'>
                                         <td>{{ i + _startIndex + 1}}</td>
                                         <td><input type="checkbox" [checked]="document.IsSelected" (change)="checkDocument($event, document)"></td>
-                                        <!--<td><input type="checkbox" [(checked)]="document.IsSelected"></td>-->
                                         <td *ngFor='let header of headers'>{{document.Item[header]}}</td>
                                         <td>
-                                            <!--<div ngbDropdown class="dropdown">
-                                                <button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown"
-                                                    aria-haspopup="true" aria-expanded="true">
-                                                    Actions
-                                                    <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="documentDropdownMenu">
-                                                    <li><a (click)="preview(document)">Preview</a></li>
-                                                    <li><a (click)="openDocument(document)">Open</a></li>
-                                                    <li><a (click)="editDocument(document)">Edit</a></li>
-                                                    <li><a (click)="copyTo([document])">CopyTo</a></li>
-                                                    <li><a (click)="moveTo([document])">MoveTo</a></li>
-                                                    <li><a (click)="addTags([document])">AddTags</a></li>
-                                                    <li><a (click)="removeTags([document])">RemoveTags</a></li>
-                                                    <li><a (click)="clearTagsConfirm([document])">Clear tags</a></li>
-                                                    <li><a (click)="deleteConfirm([document])">Delete</a></li>
-                                                </ul>
-                                            </div>-->
                                             <button md-icon-button [md-menu-trigger-for]="menu">
                                                 <md-icon>more_vert</md-icon>
                                             </button>

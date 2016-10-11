@@ -99,9 +99,9 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
 
     deleteConfirm(selected: IDataSet) {
         let model: ConfirmModel = {
-            Header: "Delete dataset",
-            Message: "Are you sure to remove the following data set: " + selected.Name,
-            Buttons: ["yes", "no"]
+            Header: 'Delete dataset',
+            Message: 'Are you sure to remove the following data set: ' + selected.Name,
+            Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
         this.confirmDialog.dialogClosed.subscribe(

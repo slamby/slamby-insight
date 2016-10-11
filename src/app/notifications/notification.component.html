@@ -12,7 +12,7 @@
             <tr *ngFor="let notification of getCurrentPage()">
                 <td>{{notification.type}}</td>
                 <td>{{notification.title}}</td>
-                <td>{{notification.message}}</td>
+                <td [innerHTML]="notification.message | convertTextToUrl"></td>
                 <td>{{notification.timestamp | date:'short'}}</td>
             </tr>
         </tbody>

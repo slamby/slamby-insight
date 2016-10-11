@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
@@ -96,7 +97,8 @@ import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
     providers: [
         SERVICE_PROVIDERS,
         COMPILER_PROVIDERS,
-        APPERROR_HANDLER_PROVIDERS
+        APPERROR_HANDLER_PROVIDERS,
+        DatePipe // for injecting into custom pipe
     ],
     bootstrap: [AppComponent],
 })

@@ -9,7 +9,7 @@
             <ul *ngIf="count() > 0" aria-labelledby="dropdownMenu1">
                 <li *ngFor="let notification of displayNotifications()">
                     <div class="small"><strong>{{notification.title}}</strong></div>
-                    <div class="small">{{notification.message}}</div>
+                    <div class="small" [innerHTML]="notification.message | convertTextToUrl"></div>
                     <div class="small"><small class="text-muted">{{notification.timestamp | date:'short'}}</small></div>
                 </li>
             </ul>

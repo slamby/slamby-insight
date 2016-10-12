@@ -38,7 +38,6 @@ import { LogonComponent } from './logon/logon.component';
 
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { InfiniteScrollModule } from 'angular2-infinite-scroll';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
 
 import { MaterialModule } from '@angular/material';
@@ -86,8 +85,7 @@ import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
         BrowserModule,
         FormsModule,
         HttpModule,
-        NgbModule.forRoot(),
-        InfiniteScrollModule,
+        NgbModule,
         ToastModule,
         MaterialModule.forRoot(),
         SlimLoadingBarModule.forRoot(),

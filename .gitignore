@@ -4,5 +4,6 @@ src/build/
 packager/
 .vscode/
 typings/
+installer/
 
 src/css/site.css

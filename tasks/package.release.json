@@ -8,6 +8,7 @@
     "dependencies": {
         "electron-settings": "^2.2.1",
         "electron-squirrel-startup": "^1.0.0",
+        "request": "^2.75.0",
         "pkginfo": "^0.4.0",
         "winston": "^2.2.0"
     }

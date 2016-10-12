@@ -12,6 +12,8 @@ const os = require('os');
 
 const logger = require('winston');
 logger.level = 'debug';
+
+logger.add(logger.transports.File, { filename: 'insight.log' });
 global.logger = logger;
 
 var SettingsHelper = require('./helper/settings-helper');
@@ -26,11 +28,13 @@ var pkginfo = require('pkginfo')(module, 'version');
 var globals = {
     version: "0.0.0",
     developmentMode: false,
-    selectedEndpoint: null
+    selectedEndpoint: null,
+    latestVersion: ""
 }
 var isDevelopment = process.env.NODE_ENV === 'development';
 var updateFeed = 'http://localhost:1337/updates/latest';
 var feedURL = '';
+var nutsUrl = 'https://insight.slamby.com'
 
 // Main entry point
 main();
@@ -91,6 +95,7 @@ function initErrorHandler() {
     process.on('uncaughtException', (err) => {
         // error handler goes here
         console.log('whoops! there was an error');
+        logger.error(err);
     });
 }
 
@@ -164,10 +169,40 @@ function registerIpcEvents() {
             return;
         }
         try {
-            event.returnValue = autoUpdater.checkForUpdates();
+            var latestVersionDetailsUrl = `${nutsUrl}/api/version/latest`;
+            var returnObject = {
+                isSuccessful : true,
+                version : null,
+                msg : ""
+            };
+
+            var request = require('request');
+            request({url: latestVersionDetailsUrl, json: true}, function(err, res, versionJson) {
+                if (err) {
+                    logger.error(err);
+                    returnObject.isSuccessful = false;
+                    returnObject.msg = 'Get latest version information failed';
+                    event.returnValue = returnObject;
+                    return;
+                }
+                returnObject.msg = 'Get latest version information succeed';
+                returnObject.version = globals.version == versionJson.tag ? null : versionJson.tag 
+                event.returnValue = returnObject;
+                globals.latestVersion = versionJson.tag;
+            });
         } catch (e) {
-            event.returnValue = e;
+            returnObject.isSuccessful = false;
+            returnObject.msg = 'Get latest version information failed';
+            logger.error(e);
+            event.returnValue = returnObject;
         }
+    });
+
+    ipcMain.on('install-updates', (event, arg) => {
+        feedURL = `${nutsUrl}/update/${os.platform()}_${os.arch()}/${globals.latestVersion}`;
+        logger.debug(`set autoupdater url to: ${feedURL}`);
+        autoUpdater.setFeedURL(feedURL);
+        autoUpdater.checkForUpdates();
     });
 }
 
@@ -176,18 +211,8 @@ function registerAutoUpdateEvents() {
         return;
     }
 
-    let updateBase = 'http://localhost:1337/updates';
-
-    if (os.platform() === 'darwin') {
-        updateFeed = `${updateBase}/latest/${globals.version}`;
-    }
-    else if (os.platform() === 'win32') {
-        // TODO: get installed app arch instead of OS?
-        updateFeed = `${updateBase}/releases/win${os.arch() === 'x64' ? '64' : '32'}`;
-    }
-
     autoUpdater.addListener("update-available", function (event) {
-        let msg = "A new update is available. Downloading update in the background.";
+        let msg = "Downloading update in the background.";
         logger.debug(msg);
         if (mainWindow) {
             mainWindow.webContents.send('update-message', 'update-available', msg);
@@ -220,10 +245,6 @@ function registerAutoUpdateEvents() {
             mainWindow.webContents.send('update-message', 'update-not-available', msg);
         }
     });
-
-    //const feedURL = `${updateFeed}?v=${module.exports.version}`;
-    feedURL = updateFeed;
-    autoUpdater.setFeedURL(feedURL);
 }
 
 function handleSquirrelEvent() {

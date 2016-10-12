@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 
 import { Endpoint } from './models/endpoint';
 import { Globals } from './models/globals';
@@ -10,6 +10,9 @@ import { ProcessesComponent } from './processes/processes.component';
 import { ImportComponent } from './import/import.component';
 import { ResourcesComponent } from './resources/resources.component';
 import { NotificationComponent } from './notifications/notification.component';
+import { ConfirmDialogComponent } from './common/components/confirm.dialog.component'
+import { ConfirmModel } from './models/confirm.model';
+import { DialogResult } from './models/dialog-result';
 
 import { OptionService } from './common/services/option.service';
 import { IpcHelper } from './common/helpers/ipc.helper';
@@ -28,6 +31,7 @@ const { ipcRenderer } = require('electron');
 export class AppComponent implements OnInit {
     version: string = 'v0.0.0';
     pageTitle: string = 'Slamby Insight';
+    @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
 
     menuItems = [WelcomeComponent, DatasetsComponent, ImportComponent, ServicesComponent,
         ProcessesComponent, ResourcesComponent, NotificationComponent];
@@ -93,6 +97,40 @@ export class AppComponent implements OnInit {
     }
 
     checkUpdates() {
-        IpcHelper.checkForUpdates();
+        var returnObject = IpcHelper.checkForUpdates();
+        if (!returnObject.isSuccessful){
+            let model : ConfirmModel = {
+                Header: "Version check failed",
+                Message: returnObject.msg,
+                Buttons: ["ok"]
+            }
+            this.confirmDialog.model = model;
+            this.confirmDialog.open();
+            return;
+        }
+
+        if (returnObject.version == null){
+            let model : ConfirmModel = {
+                Header: "Version check",
+                Message: `Congratulations! You already have the newest version!`,
+                Buttons: ["ok"]
+            }
+            this.confirmDialog.model = model;
+        } else {
+            let model: ConfirmModel = {
+                    Header: "Version check",
+                    Message: `There is a new version: ${returnObject.version}. Do you want to install it now?`,
+                    Buttons: ["yes", "no"]
+            };
+            this.confirmDialog.model = model;
+            this.confirmDialog.dialogClosed.subscribe (
+                (result: ConfirmModel) => {
+                    if (result.Result == DialogResult.Yes) {
+                        IpcHelper.downloadAndInstallUpdates();
+                    }
+                }
+            );
+        }
+        this.confirmDialog.open();
     }
 }

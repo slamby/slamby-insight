@@ -36,7 +36,7 @@
     "installer:redhat:x64": "electron-installer-redhat --src packager/slambyinsight-linux-x64/ --dest installer/ --arch amd64 --config linux-installer-config.json",
     "installer:redhat": "npm run installer:redhat:x86 && npm run installer:redhat:x64",
     "installer": "npm run installer:win && npm run installer:debian",
-    "x": "npm run packager:prepare && npm run packager:win32:x64 && npm run packager:win32:x86 && npm run installer"
+    "x": "npm run packager:prepare && npm run packager:win32:x64 && npm run installer:win"
   },
   "license": "ISC",
   "dependencies": {
@@ -72,6 +72,7 @@
     "papaparse": "^4.1.2",
     "pkginfo": "^0.4.0",
     "reflect-metadata": "^0.1.8",
+    "request": "^2.75.0",
     "rollup": "^0.36.1",
     "rxjs": "5.0.0-beta.12",
     "slamby-sdk-angular2": "^1.0.0",

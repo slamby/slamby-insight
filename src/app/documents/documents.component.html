@@ -187,7 +187,7 @@
 						<!--Document table-->
 						<div class='table-responsive' style="overflow-y: auto; overflow-x: auto; max-height: 400px">
 							<p>{{getSelectedItemsCount(documents)}} item(s) selected</p>
-							<table class='table table-striped' *ngIf='documents && documents.length' infinite-scroll [infiniteScrollDistance]="5" (scrolled)="loadMore()">
+							<table class='table table-striped table-interactive' *ngIf='documents && documents.length' infinite-scroll [infiniteScrollDistance]="5" (scrolled)="loadMore()">
 								<thead>
 									<tr>
 										<th></th>
@@ -282,12 +282,13 @@
 						<br role="separator" class="divider">
 						<p>{{getSelectedItemsCount(tags)}} item(s) selected</p>
                         <div class="row">
-                            <div class="col-md-2">Filter by:</div>
-                            <div class="col-md-4"><input type="text" #listFilter (keyup)="0" /></div>
+                            <!--<div class="col-md-2">Filter by:</div>
+                            <div class="col-md-4"><input type="text" #idFilter (keyup)="0" /></div>
+							<div class="col-md-4"><input type="text" #nameFilter (keyup)="0" /></div>-->
                         </div>
 						<div>
-							<div class="vs-table-header" style="">
-								<table class='table' *ngIf='tags && tags.length'>
+							<div class="vs-table-header">
+								<table class="table">
 									<thead>
 										<tr>
 											<th class="vs-col-short"></th>
@@ -306,21 +307,34 @@
 											<th class="vs-col-medium">Word Count</th>
 											<th class="vs-col-short"></th>
 										</tr>
+										<tr>
+											<th></th>
+											<th></th>
+											<th><input type="text" class="form-control input-sm" #idFilter (keyup)="0" placeholder="Id Filter" /></th>
+											<th><input type="text" class="form-control input-sm" #nameFilter (keyup)="0" placeholder="Name Filter" /></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+											<th></th>
+										</tr>
 									</thead>
 								</table>
 							</div>
 							<div class="vs-table-body">
 								<table class='table table-striped tags-table' *ngIf='tags && tags.length'>
-									<tbody *vsFor="tags | filterBy:{Item: {Name:listFilter.value}}; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+									<tbody *vsFor="tags | filter:{Item: {Id:idFilter.value}} | filter:{Item: {Name:nameFilter.value}}; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
 										<tr *ngFor='let tag of _items; let i = index'>
 											<td class="vs-col-short">{{ i + _startIndex + 1}}</td>
-											<td class="vs-col-short"><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>
+											<td class="vs-col-short text-center"><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>
 											<td class="vs-col-medium">{{tag.Item.Id}}</td>
 											<td>{{tag.Item.Name}}</td>
 											<td class="vs-col-medium">{{tag.Item.ParentId}}</td>
 											<td class="vs-col-large">
 												<span *ngFor="let path of tag.Item.Properties.Paths; let fst = first" title="{{path.Id}}">
-                                                <i class="fa fa-chevron-right" *ngIf="!fst"></i>
+                                                <i class="fa fa-angle-right" *ngIf="!fst"></i>
                                                 {{path.Name}}
                                             </span>
 											</td>

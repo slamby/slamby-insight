@@ -36,6 +36,14 @@ html, body {
     }
 }
 
+.table-interactive {
+    tbody {
+        tr {
+            cursor: pointer;
+        }
+    }
+}
+
 .selected-row,
 .table-striped>tbody>tr:nth-of-type(even).selected-row,
 .table-striped>tbody>tr:nth-of-type(odd).selected-row {
@@ -84,6 +92,11 @@ html, body {
     padding-right: $scrollbar-size-large;
     table {
         margin-bottom: 0;
+        thead {
+            input {
+                width: 100%;
+            }
+        }
     }
 }
 

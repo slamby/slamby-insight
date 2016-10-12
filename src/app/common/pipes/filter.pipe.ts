@@ -2,10 +2,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 import * as _ from 'lodash';
 
 @Pipe({
-    name: 'filterBy'
+    name: 'filter'
 })
 
-export class FilterByPipe implements PipeTransform {
+export class FilterPipe implements PipeTransform {
     transform(value: any, args: any): any {
         if (args && Array.isArray(value)) {
             return value.filter(item => _.isMatchWith(item, args, this.customizer));

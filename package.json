@@ -65,6 +65,7 @@
     "jsonfile": "^2.4.0",
     "lodash": "^4.15.0",
     "material-design-icons": "^3.0.1",
+    "node-natural-sort": "^0.8.6",
     "ng2-slim-loading-bar": "^2.0.4",
     "ng2-toastr": "^1.0.1",
     "ng2-toasty": "^2.0.2",

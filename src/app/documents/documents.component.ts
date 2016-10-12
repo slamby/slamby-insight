@@ -33,6 +33,7 @@ import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { CommonHelper } from '../common/helpers/common.helper';
 
 import * as _ from 'lodash';
+const naturalSort = require('node-natural-sort');
 
 @Component({
     template: require('./documents.component.html'),
@@ -68,18 +69,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     newDocumentFormIsCollapsed = true;
     newTagFormIsCollapsed = true;
     pendingDocument: DocumentWrapper;
-    defaultDocument: DocumentWrapper;
     tags: Array<SelectedItem<ITag>> = [];
-    defaultTag: TagWrapper = {
-        Tag: {
-            Name: '',
-            Id: '',
-            ParentId: ''
-        },
-        IsNew: true,
-        Id: ''
-    };
-    pendingTag: TagWrapper = JSON.parse(JSON.stringify(this.defaultTag, null, 4));
+    pendingTag: TagWrapper = this.getDefaultTag();
 
     // filter and sampling
     fields: Array<SelectedItem<any>> = [];
@@ -119,12 +110,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     ngAfterContentInit() {
-        this.defaultDocument = {
-            Document: this._dataset.SampleDocument ? JSON.stringify(this._dataset.SampleDocument, null, 4) : JSON.stringify({}, null, 4),
-            IsNew: true,
-            Id: ''
-        };
-        this.pendingDocument = JSON.parse(JSON.stringify(this.defaultDocument));
+        this.pendingDocument = this.getDefaultDocument(this._dataset.SampleDocument);
     }
 
     setFields() {
@@ -142,6 +128,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     private LoadTags() {
         this._tagService.getTags(this._dataset.Name).subscribe(
             (tags: Array<ITag>) => {
+                let comparator = naturalSort({caseSensitive: false});
+                tags = tags.sort((a: ITag, b: ITag) => comparator(a.Id, b.Id));
                 this.tags = tags.map<SelectedItem<ITag>>(t => { return { IsSelected: false, Item: t }; });
                 this.tagsForFilter = tags.map<SelectedItem<ITag>>(t => {
                     return {
@@ -722,7 +710,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     collapsePendingDocument() {
         this.newDocumentFormIsCollapsed = !this.newDocumentFormIsCollapsed;
         if (this.newDocumentFormIsCollapsed) {
-            this.pendingDocument = JSON.parse(JSON.stringify(this.defaultDocument));
+            this.pendingDocument = this.getDefaultDocument(this._dataset.SampleDocument);
         }
     }
 
@@ -837,10 +825,13 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         error => this.handleError(error)
                     );
 
-                    this._messenger.sendMessage({ message: 'addOrSelectTab', arg: {
-                        type: ProcessesComponent,
-                        title: ProcessesComponent.pageTitle,
-                        parameter: {} } });
+                    this._messenger.sendMessage({
+                        message: 'addOrSelectTab', arg: {
+                            type: ProcessesComponent,
+                            title: ProcessesComponent.pageTitle,
+                            parameter: {}
+                        }
+                    });
                 }
             },
             error => this.handleError(error)
@@ -876,7 +867,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     collapsePendingTag() {
         this.newTagFormIsCollapsed = !this.newTagFormIsCollapsed;
         if (this.newTagFormIsCollapsed) {
-            this.pendingTag = _.cloneDeep(this.defaultTag);
+            this.pendingTag = this.getDefaultTag();
         }
     }
 
@@ -926,6 +917,26 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this._scrollId = null;
         this.filterIsActive = false;
         this.LoadDocuments();
+    }
+
+    getDefaultDocument(sampleDocument: any): any {
+        return {
+            Document: sampleDocument ? JSON.stringify(sampleDocument, null, 4) : JSON.stringify({}, null, 4),
+            IsNew: true,
+            Id: ''
+        };
+    }
+
+    getDefaultTag(): TagWrapper {
+        return {
+            Tag: {
+                Name: '',
+                Id: '',
+                ParentId: ''
+            },
+            IsNew: true,
+            Id: ''
+        };
     }
 
     handleError(response: Response) {

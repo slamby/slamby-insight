@@ -8,7 +8,7 @@
     <div *ngIf="model.ErrorMessage">
         <p>{{model.ErrorMessage}}</p>
     </div>
-    <form (submit)="ok(); c()">
+    <form (submit)="ok()">
         <div class="modal-body">
             <textarea [rows]="getRowNumber(_json)" name="jsonText" [(ngModel)]="_json"></textarea>
         </div>

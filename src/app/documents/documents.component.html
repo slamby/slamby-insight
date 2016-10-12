@@ -5,6 +5,7 @@
 	<document-details-dialog></document-details-dialog>
 	<input-dialog></input-dialog>
 	<confirm-dialog></confirm-dialog>
+	<taglist-selector-dialog #filterTagListSelector></taglist-selector-dialog>
 	<div class='panel-body'>
 		<div class='has-error' *ngIf='errorMessage'>{{errorMessage}}</div>
 		<div>
@@ -73,29 +74,7 @@
 										<div class="card-block">
 											<form (submit)="filter()">
 												<div class="form-group">
-													<button type="button" class="btn  btn-outline-primary" (click)="filterTagsIsCollapsed = !filterTagsIsCollapsed">Select tags</button>
-													<br role="separator" class="divider">
-													<br>
-													<div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
-														<table class='table table-striped collapse' [ngbCollapse]="filterTagsIsCollapsed">
-															<thead>
-																<th><input type="checkbox" [checked]="getSelectedItemsCount(tagsForFilter) == tagsForFilter.length" name="checkAll"
-																		(change)="checkFilterTag($event)" style="margin: 3px;"></th>
-																<th>Name</th>
-																<th>Id</th>
-															</thead>
-															<tbody *vsFor="tagsForFilter; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection">
-																<tr *ngFor='let tag of _items'>
-																	<td><input type="checkbox" [checked]="tag.IsSelected" name="check" (change)="checkFilterTag($event, tag)"></td>
-																	<!--<td><input type="checkbox" [(checked)]="tag.IsSelected"></td>-->
-																	<td>{{tag.Name}}</td>
-																	<td>{{tag.Id}}</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-													<p>{{ getSelectedItems(tagsForFilter) }} item(s) selected
-													</p>
+													<button type="button" class="btn btn-primary" (click)="selectFilterTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForFilter.length}})</button>
 												</div>
 												<div class="form-group">
 													<label>Query </label>
@@ -124,28 +103,7 @@
 										<div class="card-block">
 											<form (submit)="getSample()">
 												<div class="form-group">
-													<button type="button" class="btn  btn-outline-primary" (click)="sampleTagsIsCollapsed = !sampleTagsIsCollapsed">Select tags</button>
-													<br role="separator" class="divider">
-													<br/>
-													<div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
-														<table class='table table-striped collapse' [ngbCollapse]="sampleTagsIsCollapsed">
-															<thead>
-																<th><input type="checkbox" [checked]="getSelectedItemsCount(tagsForSample) == tagsForSample.length" (change)="checkSampleTag($event)"
-																		name="checkAll" style="margin: 3px;"></th>
-																<th>Name</th>
-																<th>Id</th>
-															</thead>
-															<tbody *vsFor="tagsForSample; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection">
-																<tr *ngFor='let tag of _items'>
-																	<td><input type="checkbox" [checked]="tag.IsSelected" name="check" (change)="checkSampleTag($event, tag)"></td>
-																	<td>{{tag.Name}}</td>
-																	<td>{{tag.Id}}</td>
-																</tr>
-															</tbody>
-														</table>
-													</div>
-													<p>{{ getSelectedItems(tagsForSample) }} item(s) selected
-													</p>
+													<button type="button" class="btn btn-primary" (click)="selectSampleTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForSample.length}})</button>
 												</div>
 												<div class="form-group">
 													<input type="checkbox" name="isFix" [(ngModel)]="sampleSettings.IsFix">Fix Size
@@ -234,7 +192,9 @@
 					<template ngbTabContent>
 						<br/>
 						<div class="row">
-							<button type="button" class="btn  btn-outline-primary" (click)="collapsePendingTag()">Add New Tag</button>
+							<div class="col-sm-12">
+								<button type="button" class="btn  btn-outline-primary" (click)="collapsePendingTag()">Add New Tag</button>
+							</div>
 						</div>
 						<br/>
 						<div class="row">
@@ -268,21 +228,17 @@
 								<br/>
 							</div>
 						</div>
-						<br/>
-
 						<hr role="separator" class="divider">
 						<!--bulk actions-->
-						<div class="button-container">
-							<button type="button" class="btn btn-default" (click)="exportWords()">Export Words</button>
-							<button type="button" class="btn btn-default" (click)="deleteTagConfirm()">Delete</button>
+						<div class="row">
+							<div class="col-sm-12 button-container">
+								<button type="button" class="btn btn-default" (click)="exportWords()">Export Words</button>
+								<button type="button" class="btn btn-default" (click)="deleteTagConfirm()">Delete</button>
+							</div>
 						</div>
+						
 						<br role="separator" class="divider">
 						<p>{{getSelectedItemsCount(tags)}} item(s) selected</p>
-                        <div class="row">
-                            <!--<div class="col-md-2">Filter by:</div>
-                            <div class="col-md-4"><input type="text" #idFilter (keyup)="0" /></div>
-							<div class="col-md-4"><input type="text" #nameFilter (keyup)="0" /></div>-->
-                        </div>
 						<div>
 							<div class="vs-table-header">
 								<table class="table">
@@ -296,7 +252,7 @@
 											</th>
 											<th class="vs-col-medium">Id</th>
 											<th>Name</th>
-											<th class="vs-col-medium">ParentId</th>
+											<th class="vs-col-medium">Parent Id</th>
 											<th class="vs-col-large">Path</th>
 											<th class="vs-col-short">Leaf</th>
 											<th class="vs-col-short">Level</th>

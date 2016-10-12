@@ -1,0 +1,66 @@
+<template #template let-c="close" let-d="dismiss">
+	<div class="modal-header">
+		<button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+		<h4 class="modal-title">Tag Selector ({{selectedTagIds.length}}/{{tags.length}})</h4>
+	</div>
+	<div class="modal-body">
+		<div>
+			<button class="btn btn-default" (click)="selectAll()"><i class="fa fa-check-square-o"></i></button>
+			<button class="btn btn-default" (click)="selectNone()"><i class="fa fa-square-o"></i></button>
+			<div class="vs-table-header">
+				<table class="table">
+					<thead>
+						<tr>
+							<th class="vs-col-short">
+								<div>
+									<!--<input type="checkbox" [checked]="getSelectedItemsCount(tags) == tags.length" (change)="checkTag($event)" style="margin: 3px;">-->
+								</div>
+							</th>
+							<th class="vs-col-medium">Id</th>
+							<th>Name</th>
+							<th class="vs-col-medium">Parent Id</th>
+							<th class="vs-col-short">Leaf</th>
+							<th class="vs-col-short">Level</th>
+							<th class="vs-col-medium">Document Count</th>
+							<th class="vs-col-medium">Word Count</th>
+						</tr>
+						<tr>
+							<th></th>
+							<th><input type="text" class="form-control input-sm" #idFilter (keyup)="0" placeholder="Id Filter" /></th>
+							<th><input type="text" class="form-control input-sm" #nameFilter (keyup)="0" placeholder="Name Filter" /></th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+			<div class="vs-table-body">
+				<table class='table table-striped'>
+					<tbody *vsFor="tags | filter:{Id:idFilter.value} | filter:{Name:nameFilter.value}; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+						<tr *ngFor='let tag of _items; let i = index'>
+							<td class="vs-col-short text-center">
+								<input type="checkbox" [checked]="isSelected(tag)" (change)="check(tag, $event)">
+							</td>
+							<td class="vs-col-medium">{{tag.Id}}</td>
+							<td>{{tag.Name}}</td>
+							<td class="vs-col-medium">{{tag.ParentId}}</td>
+							<td class="vs-col-short">{{tag.Properties.IsLeaf}}</td>
+							<td class="vs-col-short">{{tag.Properties.Level}}</td>
+							<td class="vs-col-medium">{{tag.Properties.DocumentCount}}</td>
+							<td class="vs-col-medium">{{tag.Properties.WordCount}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-secondary" (click)="c('OK')">OK</button>
+        <button type="button" class="btn btn-secondary" (click)="c('Cancel')">Cancel</button>
+	</div>
+</template>

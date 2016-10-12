@@ -35,6 +35,7 @@ import { APPERROR_HANDLER_PROVIDERS } from './common/services/apperror.handler';
 import { DocumentDetailsDialogComponent } from './documents/document-details.dialog.component';
 import { DocumentDetailsComponent } from './documents/document-details.component';
 import { LogonComponent } from './logon/logon.component';
+import { TagListSelectorDialogComponent } from './documents/taglist-selector-dialog.component';
 
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -75,6 +76,7 @@ import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
         DIRECTIVES_DECLARATIONS,
         PIPES_DECLARATIONS,
         ConfirmDialogComponent,
+        TagListSelectorDialogComponent,
 
         SafeJsonPipe,
         PrettyJsonPipe,

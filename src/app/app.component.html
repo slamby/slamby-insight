@@ -1,5 +1,5 @@
 <template ngbModalContainer></template>
-<settings-dialog #settingsDialog></settings-dialog>
+<settings-dialog></settings-dialog>
 <div *ngIf="optionService.currentEndpoint" class="body-wrapper">
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
@@ -25,7 +25,7 @@
                         </a>
                     </li>
                     <li>
-                        <a class="btn" (click)="settingsDialog.open()" title="Settings">
+                        <a class="btn" (click)="settingsDialogOpen()" title="Settings">
                             <i class="fa fa-cogs"></i>
                         </a>
                     </li>

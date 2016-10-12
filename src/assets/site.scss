@@ -105,3 +105,8 @@ html, body {
     overflow-x: auto; 
     max-height: 500px;
 }
+.xl-dialog {
+    .modal, .modal-dialog {
+        width: 1100px;
+    }
+}

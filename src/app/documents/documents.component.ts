@@ -21,6 +21,7 @@ import { TagSelectorModel } from './tag-selector.model';
 import { DocumentDetailsComponent } from './document-details.component';
 import { ProcessesComponent } from '../processes/processes.component';
 import { Messenger } from '../common/services/messenger.service';
+import { TagListSelectorDialogComponent } from './taglist-selector-dialog.component';
 import { IDocumentFilterSettings, IDataSet, ITag, IDocumentSampleSettings, IProcess, ITagsExportWordsSettings } from 'slamby-sdk-angular2';
 import { Observable, Observer } from 'rxjs';
 
@@ -58,6 +59,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     @ViewChild(DocumentDetailsDialogComponent) documentDetailsDialog: DocumentDetailsDialogComponent;
     @ViewChild(CommonInputDialogComponent) inputDialog: CommonInputDialogComponent;
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
+    @ViewChild('filterTagListSelector') tagListSelectorDialog: TagListSelectorDialogComponent;
 
     documentDetails = DocumentDetailsComponent;
 
@@ -74,8 +76,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
     // filter and sampling
     fields: Array<SelectedItem<any>> = [];
-    filterTagsIsCollapsed: boolean = true;
-    tagsForFilter: Array<SelectedItem<ITag>> = [];
+    // filterTagsIsCollapsed: boolean = true;
+    tagsForFilter: Array<string> = [];
     filterIsActive: boolean = true;
     filterSettings: IDocumentFilterSettings = {
         Pagination: {
@@ -88,8 +90,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         },
         FieldList: []
     };
-    sampleTagsIsCollapsed: boolean = true;
-    tagsForSample: Array<SelectedItem<ITag>> = [];
+    // sampleTagsIsCollapsed: boolean = true;
+    tagsForSample: Array<string> = [];
     sampleSettings = {
         Settings: {
             Id: CommonHelper.guid(),
@@ -128,23 +130,9 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     private LoadTags() {
         this._tagService.getTags(this._dataset.Name).subscribe(
             (tags: Array<ITag>) => {
-                let comparator = naturalSort({caseSensitive: false});
+                let comparator = naturalSort({ caseSensitive: false });
                 tags = tags.sort((a: ITag, b: ITag) => comparator(a.Id, b.Id));
                 this.tags = tags.map<SelectedItem<ITag>>(t => { return { IsSelected: false, Item: t }; });
-                this.tagsForFilter = tags.map<SelectedItem<ITag>>(t => {
-                    return {
-                        Id: t.Id,
-                        Name: t.Name,
-                        IsSelected: false
-                    };
-                });
-                this.tagsForSample = tags.map<SelectedItem<ITag>>(t => {
-                    return {
-                        Id: t.Id,
-                        Name: t.Name,
-                        IsSelected: false
-                    };
-                });
             },
             error => this.errorMessage = <any>error
         );
@@ -153,7 +141,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     private LoadDocuments() {
         this.documents = [];
         if (this.filterIsActive) {
-            this.filterSettings.Filter.TagIdList = this.tagsForFilter.filter(t => t.IsSelected).map(t => t.Id);
+            this.filterSettings.Filter.TagIdList = this.tagsForFilter.slice();
             this._documentService.getDocumentsByFilter(this.dataset.Name, null, this.filterSettings)
                 .subscribe(paginated => {
                     this._scrollId = paginated.ScrollId;
@@ -171,7 +159,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             let settings: IDocumentSampleSettings = JSON.parse(JSON.stringify(this.sampleSettings.Settings));
             settings.Size = this.sampleSettings.IsFix ? settings.Size : 0;
             settings.Percent = this.sampleSettings.IsFix ? 0 : settings.Percent;
-            settings.TagIdList = this.tagsForSample.filter(t => t.IsSelected).map(t => t.Id);
+            settings.TagIdList = this.tagsForSample.slice();
             this._documentService.getDocumentsBySample(this.dataset.Name, settings)
                 .subscribe(paginated => {
                     this.documents = paginated.Items.map<SelectedItem<any>>(d => {
@@ -189,11 +177,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     ngOnInit(): void {
-        // this.route.params.subscribe(params => {
-        //     if (params['name'] !== undefined) {
-        //     this.dataset = decodeURIComponent(params['name']);
-        //     }
-        // });
     }
 
     setHeaders() {
@@ -397,8 +380,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         settings.Size = 0;
         settings.Percent = 100;
         settings.TagIdList = this.filterIsActive
-            ? this.tagsForFilter.filter(t => t.IsSelected).map(t => t.Id)
-            : this.tagsForSample.filter(t => t.IsSelected).map(t => t.Id);
+            ? this.tagsForFilter.slice()
+            : this.tagsForSample.slice();
         settings.FieldList = [idField];
         this._documentService.getDocumentsBySample(this.dataset.Name, settings)
             .subscribe(paginated => {
@@ -454,8 +437,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         settings.Size = 0;
         settings.Percent = 100;
         settings.TagIdList = this.filterIsActive
-            ? this.tagsForFilter.filter(t => t.IsSelected).map(t => t.Id)
-            : this.tagsForSample.filter(t => t.IsSelected).map(t => t.Id);
+            ? this.tagsForFilter.slice()
+            : this.tagsForSample.slice();
         settings.FieldList = [idField];
         this._documentService.getDocumentsBySample(this.dataset.Name, settings)
             .subscribe(paginated => {
@@ -774,10 +757,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         source.subscribe(
             (t: SelectedItem<ITag>) => {
                 this.tags = _.without(this.tags, t);
-                let tagtoRemove = this.tagsForFilter.find(t1 => t1.Id === t.Item.Id);
-                this.tagsForFilter = _.without(this.tagsForFilter, tagtoRemove);
-                tagtoRemove = this.tagsForSample.find(t1 => t1.Id === t.Item.Id);
-                this.tagsForSample = _.without(this.tagsForSample, tagtoRemove);
+                let index = this.tagsForFilter.indexOf(t.Item.Id);
+                if (index > -1) {
+                    this.tagsForFilter.splice(index, 1);
+                }
+                index = this.tagsForSample.indexOf(t.Item.Id);
+                if (index > -1) {
+                    this.tagsForSample.splice(index, 1);
+                }
                 dialogModel.Done += 1;
                 dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
             },
@@ -881,16 +868,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         }
     }
 
-    checkFilterTag(e, tag?: SelectedItem<any>) {
-        if (tag) {
-            this.tagsForFilter[this.tagsForFilter.indexOf(tag)].IsSelected = e.target.checked;
-        } else {
-            this.tagsForFilter.forEach(t => {
-                t.IsSelected = e.target.checked;
-            });
-        }
-    }
-
     fieldFilter() {
         this.filterSettings.FieldList = _.union(this.fields.filter(f => f.IsSelected).map(s => s.Name), [this._dataset.IdField]);
         this.sampleSettings.Settings.FieldList = _.union(this.fields.filter(f => f.IsSelected).map(s => s.Name), [this._dataset.IdField]);
@@ -901,16 +878,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     filter() {
         this.filterIsActive = true;
         this.LoadDocuments();
-    }
-
-    checkSampleTag(e, tag?: SelectedItem<any>) {
-        if (tag) {
-            this.tagsForSample[this.tagsForSample.indexOf(tag)].IsSelected = e.target.checked;
-        } else {
-            this.tagsForSample.forEach(t => {
-                t.IsSelected = e.target.checked;
-            });
-        }
     }
 
     getSample() {
@@ -937,6 +904,28 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             IsNew: true,
             Id: ''
         };
+    }
+
+    selectFilterTags() {
+        this.tagListSelectorDialog.tags = this.tags.map<ITag>(t => t.Item);
+        this.tagListSelectorDialog.selectedTagIds = this.tagsForFilter.slice();
+        this.tagListSelectorDialog.open().result.then((result) => {
+                if (result === 'OK') {
+                    this.tagsForFilter = this.tagListSelectorDialog.selectedTagIds.slice();
+                }
+            }, (reason) => {
+        });
+    }
+
+    selectSampleTags() {
+        this.tagListSelectorDialog.tags = this.tags.map<ITag>(t => t.Item);
+        this.tagListSelectorDialog.selectedTagIds = this.tagsForSample.slice();
+        this.tagListSelectorDialog.open().result.then((result) => {
+                if (result === 'OK') {
+                    this.tagsForSample = this.tagListSelectorDialog.selectedTagIds.slice();
+                }
+            }, (reason) => {
+        });
     }
 
     handleError(response: Response) {

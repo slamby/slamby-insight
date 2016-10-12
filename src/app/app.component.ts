@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 
 import { Endpoint } from './models/endpoint';
 import { Globals } from './models/globals';
@@ -10,6 +10,7 @@ import { ProcessesComponent } from './processes/processes.component';
 import { ImportComponent } from './import/import.component';
 import { ResourcesComponent } from './resources/resources.component';
 import { NotificationComponent } from './notifications/notification.component';
+import { SettingsDialogComponent } from './settings/settings.dialog.component';
 
 import { OptionService } from './common/services/option.service';
 import { IpcHelper } from './common/helpers/ipc.helper';
@@ -29,6 +30,7 @@ export class AppComponent implements OnInit {
     version: string = 'v0.0.0';
     pageTitle: string = 'Slamby Insight';
 
+    @ViewChild(SettingsDialogComponent) settingsDialog: SettingsDialogComponent;
     menuItems = [WelcomeComponent, DatasetsComponent, ImportComponent, ServicesComponent,
         ProcessesComponent, ResourcesComponent, NotificationComponent];
     defaultTab = WelcomeComponent;
@@ -94,5 +96,11 @@ export class AppComponent implements OnInit {
 
     checkUpdates() {
         IpcHelper.checkForUpdates();
+    }
+
+    settingsDialogOpen() {
+        this.settingsDialog.open().result.then((result) => {
+        }, (reason) => {
+        });
     }
 }

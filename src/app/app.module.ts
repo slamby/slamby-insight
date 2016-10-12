@@ -85,7 +85,7 @@ import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
         BrowserModule,
         FormsModule,
         HttpModule,
-        NgbModule,
+        NgbModule.forRoot(),
         ToastModule,
         MaterialModule.forRoot(),
         SlimLoadingBarModule.forRoot(),

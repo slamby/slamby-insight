@@ -49,4 +49,8 @@ export module IpcHelper {
      export function checkForUpdates(): any {
         return ipcRenderer.sendSync('check-for-updates');
     }
+
+    export function downloadAndInstallUpdates(): any {
+        ipcRenderer.send('install-updates');
+    }
 }

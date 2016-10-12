@@ -19,6 +19,12 @@ html, body {
     overflow: hidden;
 }
 
+.progress.active .progress-bar {
+    -webkit-transition: none !important;
+    transition: none !important;
+    transition-duration:50ms
+}
+
 .dropdown {
     ul.dropdown-menu {
         li > a {
@@ -26,6 +32,14 @@ html, body {
         }
         li.disabled > a {
             cursor: not-allowed;
+        }
+    }
+}
+
+.table-interactive {
+    tbody {
+        tr {
+            cursor: pointer;
         }
     }
 }
@@ -45,13 +59,13 @@ html, body {
 */
 
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: $scrollbar-size-large;
+    height: $scrollbar-size-large;
 }
 
 .slim-scrollbar::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: $scrollbar-size-small;
+    height: $scrollbar-size-small;
 }
 
 ::-webkit-scrollbar-track {
@@ -60,4 +74,34 @@ html, body {
 
 ::-webkit-scrollbar-thumb {
     background: #666; 
+}
+
+.vs-col-short {
+    width: 60px;
+}
+
+.vs-col-medium {
+    width: 120px;
+}
+
+.vs-col-large {
+    width: 320px;
+}
+
+.vs-table-header {
+    padding-right: $scrollbar-size-large;
+    table {
+        margin-bottom: 0;
+        thead {
+            input {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.vs-table-body {
+    overflow-y: auto; 
+    overflow-x: auto; 
+    max-height: 500px;
 }

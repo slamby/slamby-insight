@@ -2,7 +2,7 @@ import { Component, OnInit, Input, AfterContentInit, ViewChild, NgZone } from '@
 import { Response } from '@angular/http';
 
 import { DialogResult } from '../models/dialog-result';
-import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component'
+import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component';
 import { ConfirmModel } from '../models/confirm.model';
 
 import { DocumentService } from '../common/services/document.service';
@@ -19,6 +19,7 @@ import { TagSelectorDialogComponent } from './tag-selector.dialog.component';
 import { DocumentDetailsDialogComponent } from './document-details.dialog.component';
 import { TagSelectorModel } from './tag-selector.model';
 import { DocumentDetailsComponent } from './document-details.component';
+import { ProcessesComponent } from '../processes/processes.component';
 import { Messenger } from '../common/services/messenger.service';
 import { IDocumentFilterSettings, IDataSet, ITag, IDocumentSampleSettings, IProcess, ITagsExportWordsSettings } from 'slamby-sdk-angular2';
 import { Observable, Observer } from 'rxjs';
@@ -32,6 +33,7 @@ import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { CommonHelper } from '../common/helpers/common.helper';
 
 import * as _ from 'lodash';
+const naturalSort = require('node-natural-sort');
 
 @Component({
     template: require('./documents.component.html'),
@@ -67,18 +69,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     newDocumentFormIsCollapsed = true;
     newTagFormIsCollapsed = true;
     pendingDocument: DocumentWrapper;
-    defaultDocument: DocumentWrapper;
     tags: Array<SelectedItem<ITag>> = [];
-    defaultTag: TagWrapper = {
-        Tag: {
-            Name: '',
-            Id: '',
-            ParentId: ''
-        },
-        IsNew: true,
-        Id: ''
-    };
-    pendingTag: TagWrapper = JSON.parse(JSON.stringify(this.defaultTag, null, 4));
+    pendingTag: TagWrapper = this.getDefaultTag();
 
     // filter and sampling
     fields: Array<SelectedItem<any>> = [];
@@ -118,12 +110,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     ngAfterContentInit() {
-        this.defaultDocument = {
-            Document: this._dataset.SampleDocument ? JSON.stringify(this._dataset.SampleDocument, null, 4) : JSON.stringify({}, null, 4),
-            IsNew: true,
-            Id: ''
-        };
-        this.pendingDocument = JSON.parse(JSON.stringify(this.defaultDocument));
+        this.pendingDocument = this.getDefaultDocument(this._dataset.SampleDocument);
     }
 
     setFields() {
@@ -141,6 +128,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     private LoadTags() {
         this._tagService.getTags(this._dataset.Name).subscribe(
             (tags: Array<ITag>) => {
+                let comparator = naturalSort({caseSensitive: false});
+                tags = tags.sort((a: ITag, b: ITag) => comparator(a.Id, b.Id));
                 this.tags = tags.map<SelectedItem<ITag>>(t => { return { IsSelected: false, Item: t }; });
                 this.tagsForFilter = tags.map<SelectedItem<ITag>>(t => {
                     return {
@@ -259,14 +248,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     deleteConfirm(selectedItems?: Array<SelectedItem<any>>) {
         let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
         let model: ConfirmModel = {
-            Header: "Delete documents",
-            Message: "Are you sure to remove " + selectedDocs.length + " document(s)",
-            Buttons: ["yes", "no"]
+            Header: 'Delete documents',
+            Message: 'Are you sure to remove ' + selectedDocs.length + ' document(s)',
+            Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
         this.confirmDialog.dialogClosed.subscribe(
             (result: ConfirmModel) => {
-                if (result.Result == DialogResult.Yes) {
+                if (result.Result === DialogResult.Yes) {
                     this.deleteDocuments(selectedItems);
                 }
             },
@@ -334,14 +323,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
     clearTagsConfirm(selectedItems?: Array<SelectedItem<any>>) {
         let model: ConfirmModel = {
-            Header: "Clear tags",
-            Message: "Are you sure to clear tags?",
-            Buttons: ["yes", "no"]
+            Header: 'Clear tags',
+            Message: 'Are you sure to clear tags?',
+            Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
         this.confirmDialog.dialogClosed.subscribe(
             (result: ConfirmModel) => {
-                if (result.Result == DialogResult.Yes) {
+                if (result.Result === DialogResult.Yes) {
                     this.clearTags(selectedItems);
                 }
             },
@@ -492,7 +481,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         this.dialogService.close();
                     },
                     () => {
-                        var docsToRemove = this.documents.filter(d => docIdsToMove.indexOf(d.Item[this.dataset.IdField]) > -1);
+                        let docsToRemove = this.documents.filter(d => docIdsToMove.indexOf(d.Item[this.dataset.IdField]) > -1);
                         this.documents = _.without(this.documents, ...docsToRemove);
                         this.dialogService.close();
                     }
@@ -721,15 +710,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     collapsePendingDocument() {
         this.newDocumentFormIsCollapsed = !this.newDocumentFormIsCollapsed;
         if (this.newDocumentFormIsCollapsed) {
-            this.pendingDocument = JSON.parse(JSON.stringify(this.defaultDocument));
+            this.pendingDocument = this.getDefaultDocument(this._dataset.SampleDocument);
         }
     }
 
     checkTag(e, tag?: SelectedItem<ITag>) {
         if (tag) {
             this.tags[this.tags.indexOf(tag)].IsSelected = e.target.checked;
-        }
-        else {
+        } else {
             this.tags.forEach(t => {
                 t.IsSelected = e.target.checked;
             });
@@ -739,14 +727,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     deleteTagConfirm(selectedItems?: Array<SelectedItem<ITag>>) {
         let selectedTags = selectedItems ? selectedItems : this.tags.filter(d => d.IsSelected);
         let model: ConfirmModel = {
-            Header: "Delete tags",
-            Message: "Are you sure to remove " + selectedTags.length + " tag(s)",
-            Buttons: ["yes", "no"]
+            Header: 'Delete tags',
+            Message: 'Are you sure to remove ' + selectedTags.length + ' tag(s)',
+            Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
         this.confirmDialog.dialogClosed.subscribe(
             (result: ConfirmModel) => {
-                if (result.Result == DialogResult.Yes) {
+                if (result.Result === DialogResult.Yes) {
                     this.deleteTag(selectedItems);
                 }
             },
@@ -786,9 +774,9 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         source.subscribe(
             (t: SelectedItem<ITag>) => {
                 this.tags = _.without(this.tags, t);
-                var tagtoRemove = this.tagsForFilter.find(t1 => t1.Id == t.Item.Id);
+                let tagtoRemove = this.tagsForFilter.find(t1 => t1.Id === t.Item.Id);
                 this.tagsForFilter = _.without(this.tagsForFilter, tagtoRemove);
-                tagtoRemove = this.tagsForSample.find(t1 => t1.Id == t.Item.Id);
+                tagtoRemove = this.tagsForSample.find(t1 => t1.Id === t.Item.Id);
                 this.tagsForSample = _.without(this.tagsForSample, tagtoRemove);
                 dialogModel.Done += 1;
                 dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
@@ -816,7 +804,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     exportWords(selectedItems?: Array<SelectedItem<ITag>>) {
-        var tagIdList = selectedItems ? selectedItems.map(t => t.Item.Id) : this.tags.filter(t => t.IsSelected).map(t => t.Item.Id);
+        let tagIdList = selectedItems ? selectedItems.map(t => t.Item.Id) : this.tags.filter(t => t.IsSelected).map(t => t.Item.Id);
 
         let settings: ITagsExportWordsSettings = {
             NGramList: _.range(1, this._dataset.NGramCount + 1),
@@ -836,6 +824,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         },
                         error => this.handleError(error)
                     );
+
+                    this._messenger.sendMessage({
+                        message: 'addOrSelectTab', arg: {
+                            type: ProcessesComponent,
+                            title: ProcessesComponent.pageTitle,
+                            parameter: {}
+                        }
+                    });
                 }
             },
             error => this.handleError(error)
@@ -871,7 +867,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     collapsePendingTag() {
         this.newTagFormIsCollapsed = !this.newTagFormIsCollapsed;
         if (this.newTagFormIsCollapsed) {
-            this.pendingTag = _.cloneDeep(this.defaultTag);
+            this.pendingTag = this.getDefaultTag();
         }
     }
 
@@ -921,6 +917,26 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this._scrollId = null;
         this.filterIsActive = false;
         this.LoadDocuments();
+    }
+
+    getDefaultDocument(sampleDocument: any): any {
+        return {
+            Document: sampleDocument ? JSON.stringify(sampleDocument, null, 4) : JSON.stringify({}, null, 4),
+            IsNew: true,
+            Id: ''
+        };
+    }
+
+    getDefaultTag(): TagWrapper {
+        return {
+            Tag: {
+                Name: '',
+                Id: '',
+                ParentId: ''
+            },
+            IsNew: true,
+            Id: ''
+        };
     }
 
     handleError(response: Response) {

@@ -36,6 +36,14 @@ export class TabsComponent implements AfterContentInit {
                 if (m.message === 'addTab') {
                     this.addTab(m.arg.type, m.arg.title, m.arg.parameter);
                 }
+                if (m.message === 'addOrSelectTab') {
+                    let tabsByType = this.getTabByType(m.arg.type);
+                    if (tabsByType.length === 0) {
+                        this.addTab(m.arg.type, m.arg.title, m.arg.parameter);
+                    } else {
+                        this.selectTab(tabsByType[0]);
+                    }
+                }
             });
         }
         if (this.tabs.length === 0 && this.defaultType) {
@@ -62,6 +70,10 @@ export class TabsComponent implements AfterContentInit {
         }
     }
 
+    getTabByType(type: any): ITab[] {
+        return this.tabs.filter(t => t.type === type);
+    }
+
     closeTab(tab: ITab) {
 
         let index = this.tabs.findIndex((t) => {
@@ -73,6 +85,7 @@ export class TabsComponent implements AfterContentInit {
             if (this.tabs.length === 0) {
                 this.addTab(this.defaultType);
             } else {
+                this.tabs.forEach(t => t.active = false);
                 index === 0 ? this.tabs[index].active = true : this.tabs[index - 1].active = true;
             }
         }

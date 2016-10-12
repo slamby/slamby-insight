@@ -9,7 +9,7 @@ import { DocumentsComponent } from '../documents/documents.component';
 
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
-import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component'
+import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component';
 import { ConfirmModel } from '../models/confirm.model';
 import { DialogResult } from '../models/dialog-result';
 
@@ -99,14 +99,14 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
 
     deleteConfirm(selected: IDataSet) {
         let model: ConfirmModel = {
-            Header: "Delete dataset",
-            Message: "Are you sure to remove the following data set: " + selected.Name,
-            Buttons: ["yes", "no"]
+            Header: 'Delete dataset',
+            Message: 'Are you sure to remove the following data set: ' + selected.Name,
+            Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
         this.confirmDialog.dialogClosed.subscribe(
             (result: ConfirmModel) => {
-                if (result.Result == DialogResult.Yes) {
+                if (result.Result === DialogResult.Yes) {
                     this.deleteDataSet(selected);
                 }
             },

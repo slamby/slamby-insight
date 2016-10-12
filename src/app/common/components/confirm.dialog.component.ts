@@ -35,10 +35,10 @@ export class ConfirmDialogComponent {
     private _model;
     @Input() set model(model: ConfirmModel) {
         this._model = model;
-        this.okButtonIsVisibile = model.Buttons.indexOf("ok") > -1;
-        this.cancelButtonIsVisibile = model.Buttons.indexOf("cancel") > -1;
-        this.yesButtonIsVisibile = model.Buttons.indexOf("yes") > -1;
-        this.noButtonIsVisibile = model.Buttons.indexOf("no") > -1;
+        this.okButtonIsVisibile = model.Buttons.indexOf('ok') > -1;
+        this.cancelButtonIsVisibile = model.Buttons.indexOf('cancel') > -1;
+        this.yesButtonIsVisibile = model.Buttons.indexOf('yes') > -1;
+        this.noButtonIsVisibile = model.Buttons.indexOf('no') > -1;
     }
     get model() {
         return this._model;
@@ -62,16 +62,16 @@ export class ConfirmDialogComponent {
 
     close(result: string) {
         switch (result) {
-            case "ok":
+            case 'ok':
                 this.model.Result = DialogResult.Ok;
                 break;
-            case "yes":
+            case 'yes':
                 this.model.Result = DialogResult.Yes;
                 break;
-            case "no":
+            case 'no':
                 this.model.Result = DialogResult.No;
                 break;
-            case "cancel":
+            case 'cancel':
                 this.model.Result = DialogResult.Cancel;
                 break;
 

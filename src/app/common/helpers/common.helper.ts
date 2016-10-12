@@ -8,4 +8,9 @@ export module CommonHelper {
 
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
     }
+
+    export function escapeJson(jsonString: string): string {
+        var escaped = jsonString.replace(/[\n]/g, ' ').replace(/[\r]/g, '');
+        return escaped;
+    }
 }

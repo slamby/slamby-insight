@@ -20,7 +20,7 @@ import { DialogResult } from '../models/dialog-result';
 import { ProgressDialogModel } from '../models/progress-dialog-model';
 import { DialogComponent } from '../common/components/dialog.component';
 
-import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component'
+import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component';
 import { ConfirmModel } from '../models/confirm.model';
 
 import { NotificationService } from '../common/services/notification.service';
@@ -72,14 +72,14 @@ export class ServicesComponent implements OnInit {
 
     deleteConfirm(selected: IService | IPrcService | IClassifierService) {
         let model: ConfirmModel = {
-            Header: "Delete service",
-            Message: "Are you sure to remove the following service: " + selected.Name,
-            Buttons: ["yes", "no"]
+            Header: 'Delete service',
+            Message: 'Are you sure to remove the following service: ' + selected.Name,
+            Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
         this.confirmDialog.dialogClosed.subscribe(
             (result: ConfirmModel) => {
-                if (result.Result == DialogResult.Yes) {
+                if (result.Result === DialogResult.Yes) {
                     this.delete(selected);
                 }
             },
@@ -410,6 +410,9 @@ export class ServicesComponent implements OnInit {
         if (!selected) {
             return;
         }
+        this.dialogService.progressModel = {
+            Header: "Waiting for recommendation result"
+        }
         if (selected.Type === IService.ITypeEnum.Classifier) {
             let model: IClassifierRecommendationRequest = {
                 Text: '',
@@ -425,8 +428,10 @@ export class ServicesComponent implements OnInit {
             this.inputDialog.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
+                        this.dialogService.openDialog("indeterminateprogress");
                         this._classifierService.recommend(selected.Id, model.Model).subscribe(
                             (results: Array<IClassifierRecommendationResult>) => {
+                                this.dialogService.close();
                                 this.resultDialog.model = {
                                     Header: 'Classifier recommendation result',
                                     OutputObject: {
@@ -435,7 +440,10 @@ export class ServicesComponent implements OnInit {
                                 };
                                 this.resultDialog.open();
                             },
-                            error => this.handleError(error)
+                            error => {
+                                this.dialogService.close();
+                                this.handleError(error);
+                            }
                         );
                     }
                 },
@@ -460,8 +468,10 @@ export class ServicesComponent implements OnInit {
             this.inputDialog.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
+                        this.dialogService.openDialog("indeterminateprogress");
                         this._prcService.recommend(selected.Id, model.Model).subscribe(
                             (results: Array<IPrcRecommendationResult>) => {
+                                this.dialogService.close();
                                 this.resultDialog.model = {
                                     Header: 'Prc recommendation result',
                                     OutputObject: {
@@ -470,7 +480,10 @@ export class ServicesComponent implements OnInit {
                                 };
                                 this.resultDialog.open();
                             },
-                            error => this.handleError(error)
+                            error => {
+                                this.dialogService.close();
+                                this.handleError(error);
+                            }
                         );
                     }
                 },
@@ -526,6 +539,9 @@ export class ServicesComponent implements OnInit {
         if (!selected || selected.Type === IService.ITypeEnum.Classifier) {
             return;
         }
+        this.dialogService.progressModel = {
+            Header: "Waiting for recommendation result"
+        }
         let request: IPrcRecommendationByIdRequest = {
             DocumentId: '',
             Query: '',
@@ -542,8 +558,10 @@ export class ServicesComponent implements OnInit {
         this.inputDialog.dialogClosed.subscribe(
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
+                    this.dialogService.openDialog("indeterminateprogress");
                     this._prcService.recommendById(selected.Id, model.Model).subscribe(
                         (results: Array<IPrcRecommendationResult>) => {
+                            this.dialogService.close();
                             this.resultDialog.model = {
                                 Header: 'Prc recommendation result',
                                 OutputObject: {
@@ -552,7 +570,10 @@ export class ServicesComponent implements OnInit {
                             };
                             this.resultDialog.open();
                         },
-                        error => this.handleError(error)
+                        error => {
+                            this.dialogService.close();
+                            this.handleError(error);
+                        }
                     );
                 }
             },

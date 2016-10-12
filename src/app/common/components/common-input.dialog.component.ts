@@ -2,6 +2,7 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { DialogResult } from '../../models/dialog-result';
 import { CommonInputModel } from '../../models/common-input.model';
 import { Subject } from 'rxjs';
+import { CommonHelper } from '../helpers/common.helper';
 
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
@@ -13,6 +14,7 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 export class CommonInputDialogComponent {
     private _json: string;
     private _type: any;
+    private _modalRef: any;
     @Input() model: CommonInputModel;
     @ViewChild('template') template;
     modalOptions: NgbModalOptions = {
@@ -29,7 +31,7 @@ export class CommonInputDialogComponent {
     open() {
         this._json = JSON.stringify(this.model.Model, null, 4);
         this._type = typeof this.model.Model;
-        this.modal.open(this.template, this.modalOptions);
+        this._modalRef = this.modal.open(this.template, this.modalOptions);
     }
 
     cancel() {
@@ -41,7 +43,7 @@ export class CommonInputDialogComponent {
 
     ok() {
         try {
-            this.model.Model = JSON.parse(this._json);
+            this.model.Model = JSON.parse(CommonHelper.escapeJson(this._json));
             // if (typeof this.model.Model != this.model.Type)
             //     throw "Invalid Type";
         } catch (error) {
@@ -52,6 +54,7 @@ export class CommonInputDialogComponent {
             this.dialogClosedEventSource.next(this.model);
             this.dialogClosedEventSource = new Subject<CommonInputModel>();
             this.dialogClosed = this.dialogClosedEventSource.asObservable();
+            this._modalRef.close();
         }
     }
 

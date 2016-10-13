@@ -125,19 +125,36 @@ function createWindow() {
     });
 
     mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
-        mainWindow.webContents.send('download-start');
-        item.on('updated', (event, state) => {
-            mainWindow.webContents.send('download-progress', {
-                done: Math.floor((item.getReceivedBytes() / item.getTotalBytes()) * 100),
-                state: item.isPaused() ? "paused" : state
+        if (item.getURL().indexOf(nutsUrl) !== -1){
+            //linux installer download
+            var filePath = `${app.getPath("temp")}\\${item.getFilename()}`;
+            item.setSavePath(filePath);
+            item.once('done', (event, state) => {
+                const execFile = require('child_process').execFile;
+                logger.debug(filePath);
+                const child = execFile(filePath, (error, stdout, stderr) => {
+                    if (error) {
+                        logger.error(error);
+                    }
+                });
+                app.quit();
+            })
+
+        } else {
+            mainWindow.webContents.send('download-start');
+            item.on('updated', (event, state) => {
+                mainWindow.webContents.send('download-progress', {
+                    done: Math.floor((item.getReceivedBytes() / item.getTotalBytes()) * 100),
+                    state: item.isPaused() ? "paused" : state
+                });
             });
-        })
-        item.once('done', (event, state) => {
-            mainWindow.webContents.send('download-progress', {
-                done: 100,
-                state: state
+            item.once('done', (event, state) => {
+                mainWindow.webContents.send('download-progress', {
+                    done: 100,
+                    state: state
+                });
             });
-        })
+        }
     });
 }
 
@@ -204,10 +221,11 @@ function registerIpcEvents() {
         logger.debug(`set autoupdater url to: ${feedURL}`);
         
         if (os.platform() == "linux"){
-            var downloadURL = `${nutsUrl}/download/${globals.version}/${os.platform()}`;
-            if (electron.shell.openExternal(downloadURL, {activate: true})) app.quit();
+            var downloadURL = `${nutsUrl}/download/${globals.version}/${os.platform()}_${os.arch()}`;
+            //var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/linux_${os.arch()}`;
+            mainWindow.webContents.downloadURL(downloadURL);
+            //if (electron.shell.openExternal(downloadURL, {activate: true})) app.quit();
         } else {
-
             autoUpdater.setFeedURL(feedURL);
             autoUpdater.checkForUpdates();
         }

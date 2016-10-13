@@ -304,7 +304,19 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this.collapsePendingDocument();
     }
 
+    checkTagFieldIsSelected(): boolean {
+        var isChecked = this.fields.findIndex(f => f.Name == this._dataset.TagField && f.IsSelected) > -1;
+        if (!isChecked) {
+            this.confirmDialog.model = { Header: "Warning!", Message: `To modyfiy tag field please check the ${this._dataset.IdField} field!`, Buttons: ["ok"] };
+            this.confirmDialog.open();
+        }
+        return isChecked;
+    }
+
     clearTagsConfirm(selectedItems?: Array<SelectedItem<any>>) {
+        if (!this.checkTagFieldIsSelected()) {
+            return;
+        }
         let model: ConfirmModel = {
             Header: 'Clear tags',
             Message: 'Are you sure to clear tags?',
@@ -486,6 +498,9 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     addTags(selectedItems?: Array<SelectedItem<any>>) {
+        if (!this.checkTagFieldIsSelected()) {
+            return;
+        }
         let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
         let tagFieldIsSimple = !_.isArray(selectedDocs[0].Item[this._dataset.TagField]);
         let tagsForDocs = selectedDocs.map(d => tagFieldIsSimple ? [d.Item[this._dataset.TagField]] : d.Item[this._dataset.TagField]);
@@ -569,6 +584,9 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     removeTags(selectedItems?: Array<SelectedItem<any>>) {
+        if (!this.checkTagFieldIsSelected()) {
+            return;
+        }
         let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
         let tagFieldIsSimple = !_.isArray(selectedDocs[0].Item[this._dataset.TagField]);
         let tagsForDocs = selectedDocs.map(d => tagFieldIsSimple ? [d.Item[this._dataset.TagField]] : d.Item[this._dataset.TagField]);
@@ -577,13 +595,26 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             commonTags = _.intersection(commonTags, tagsForDocs[i]);
         }
         let tagSelectorModel: TagSelectorModel = {
-            Tags: commonTags.length >= 0 ? this.tags.filter(t => commonTags.indexOf(t.Item.Id) > -1).map(t => {
+            Tags: commonTags.length > 0 ? this.tags.filter(t => commonTags.findIndex(c => c.toString() == t.Item.Id) > -1).map(t => {
                 let sm = _.cloneDeep(t);
                 sm.IsSelected = false;
                 return sm;
             }) : [],
             IsMultiselectAllowed: true
         };
+        //if the tag missing from database
+        if (commonTags.length > tagSelectorModel.Tags.length) {
+            var difference = _.difference(commonTags, tagSelectorModel.Tags.map(t => t.Item.Id));
+            tagSelectorModel.Tags.push(...difference.map(tid => {
+                let sm = {
+                    IsSelected: false,
+                    Item: {
+                        Id: tid
+                    }
+                }
+                return sm;
+            }))
+        }
         this.tagSelector.dialogClosed.subscribe(
             (model: TagSelectorModel) => {
                 let selectedTagIds = model.Tags.filter(t => t.IsSelected).map(t => t.Item.Id);
@@ -910,10 +941,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this.tagListSelectorDialog.tags = this.tags.map<ITag>(t => t.Item);
         this.tagListSelectorDialog.selectedTagIds = this.tagsForFilter.slice();
         this.tagListSelectorDialog.open().result.then((result) => {
-                if (result === 'OK') {
-                    this.tagsForFilter = this.tagListSelectorDialog.selectedTagIds.slice();
-                }
-            }, (reason) => {
+            if (result === 'OK') {
+                this.tagsForFilter = this.tagListSelectorDialog.selectedTagIds.slice();
+            }
+        }, (reason) => {
         });
     }
 
@@ -921,10 +952,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this.tagListSelectorDialog.tags = this.tags.map<ITag>(t => t.Item);
         this.tagListSelectorDialog.selectedTagIds = this.tagsForSample.slice();
         this.tagListSelectorDialog.open().result.then((result) => {
-                if (result === 'OK') {
-                    this.tagsForSample = this.tagListSelectorDialog.selectedTagIds.slice();
-                }
-            }, (reason) => {
+            if (result === 'OK') {
+                this.tagsForSample = this.tagListSelectorDialog.selectedTagIds.slice();
+            }
+        }, (reason) => {
         });
     }
 

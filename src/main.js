@@ -199,10 +199,19 @@ function registerIpcEvents() {
     });
 
     ipcMain.on('install-updates', (event, arg) => {
-        feedURL = `${nutsUrl}/update/${os.platform()}_${os.arch()}/${globals.latestVersion}`;
+        var versionToSend = os.platform() != "darwin" ? globals.latestVersion : globals.version; 
+        feedURL = `${nutsUrl}/update/${os.platform()}_${os.arch()}/${versionToSend}`;
         logger.debug(`set autoupdater url to: ${feedURL}`);
-        autoUpdater.setFeedURL(feedURL);
-        autoUpdater.checkForUpdates();
+        
+        if (os.platform() == "linux"){
+            var downloadURL = `${nutsUrl}/download/${globals.version}/${os.platform()}`;
+            if (electron.shell.openExternal(downloadURL, {activate: true})) app.quit();
+        } else {
+
+            autoUpdater.setFeedURL(feedURL);
+            autoUpdater.checkForUpdates();
+        }
+        
     });
 }
 

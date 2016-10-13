@@ -36,7 +36,7 @@ import { DocumentDetailsDialogComponent } from './documents/document-details.dia
 import { DocumentDetailsComponent } from './documents/document-details.component';
 import { LogonComponent } from './logon/logon.component';
 import { TagListSelectorDialogComponent } from './documents/taglist-selector-dialog.component';
-
+import { TagListSelectorComponent } from './documents/taglist-selector.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
@@ -77,6 +77,7 @@ import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
         PIPES_DECLARATIONS,
         ConfirmDialogComponent,
         TagListSelectorDialogComponent,
+        TagListSelectorComponent,
 
         SafeJsonPipe,
         PrettyJsonPipe,

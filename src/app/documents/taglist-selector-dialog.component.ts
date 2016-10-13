@@ -1,14 +1,14 @@
-import { Component, ViewChild, Input, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, Input, ChangeDetectionStrategy, AfterViewInit, ContentChild } from '@angular/core';
 import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { ITag } from 'slamby-sdk-angular2';
+import { TagListSelectorComponent } from './taglist-selector.component';
 
 @Component({
     selector: 'taglist-selector-dialog',
     template: require('./taglist-selector-dialog.component.html'),
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TagListSelectorDialogComponent {
-
+export class TagListSelectorDialogComponent implements AfterViewInit {
     @Input() tags: ITag[] = [];
     @Input() selectedTagIds: string[] = [];
 
@@ -20,42 +20,19 @@ export class TagListSelectorDialogComponent {
         windowClass: 'xl-dialog'
     };
 
-    constructor(private modal: NgbModal, private cd: ChangeDetectorRef) {
+    constructor(private modal: NgbModal) {
+    }
+
+    ngAfterViewInit() {
+        // this.taglistSelector.tags = this.tags;
+        // this.taglistSelector.selectedTagIds = this.selectedTagIds;
     }
 
     open(): NgbModalRef {
         return this.modal.open(this.template, this.modalOptions);
     }
 
-    isSelected(tag: ITag): boolean {
-        return this.findIndex(tag) > -1;
-    }
-
-    findIndex(tag: ITag): number {
-        return this.selectedTagIds.findIndex((id: string) => id === tag.Id);
-    }
-
-    selectAll() {
-        this.selectedTagIds = this.tags.map<string>(t => t.Id);
-        this.cd.detectChanges();
-    }
-
-    selectNone() {
-        this.selectedTagIds = [];
-        this.cd.detectChanges();
-    }
-
-    check(tag: ITag, event) {
-        let index = this.findIndex(tag);
-
-        if (event.target.checked && index === -1) {
-            this.selectedTagIds.push(tag.Id);
-        } else {
-            if (index > -1) {
-                this.selectedTagIds.splice(index, 1);
-            }
-        }
-
-        this.cd.detectChanges();
+    selectionChanged(selectedTagIds: string[]) {
+        this.selectedTagIds = selectedTagIds.slice();
     }
 }

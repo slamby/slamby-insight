@@ -25,6 +25,10 @@ export class TagListSelectorComponent implements AfterContentInit  {
         this.filteredTags = this.filter();
     }
 
+    modelChange(value: string) {
+        this.filteredTags = this.filter();
+    }
+
     isSelected(tag: ITag): boolean {
         return this.findIndex(tag) > -1;
     }
@@ -43,7 +47,7 @@ export class TagListSelectorComponent implements AfterContentInit  {
     }
 
     selectFiltered() {
-        this.selectedTagIds = this.getFilteredIds(); 
+        this.selectedTagIds = this.getFilteredIds();
         this.emitChanges();
     }
 
@@ -76,9 +80,9 @@ export class TagListSelectorComponent implements AfterContentInit  {
         this.selectionChanged.emit(this.selectedTagIds);
     }
 
-    filterInputKeyUp(event) {
-        this.filteredTags = this.filter();
-    }
+    // filterInputKeyUp(event) {
+    //     this.filteredTags = this.filter();
+    // }
 
     filter(): ITag[] {
         if (!this.idFilter && !this.nameFilter) {

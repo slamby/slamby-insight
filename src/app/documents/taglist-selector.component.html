@@ -12,7 +12,7 @@
 							<!--<input type="checkbox" [checked]="getSelectedItemsCount(tags) == tags.length" (change)="checkTag($event)" style="margin: 3px;">-->
 						</div>
 					</th>
-					<th class="vs-col-medium">Id</th>
+					<th class="vs-col-medium">Id {{idFilter}}</th>
 					<th>Name</th>
 					<th class="vs-col-medium">Parent Id</th>
 					<th class="vs-col-short">Leaf</th>
@@ -22,10 +22,9 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th><input type="text" class="form-control input-sm" [(ngModel)]="idFilter" (keyup)="filterInputKeyUp($event)" placeholder="Id Filter"
-						/></th>
-					<th><input type="text" class="form-control input-sm" [(ngModel)]="nameFilter" (keyup)="filterInputKeyUp($event)" placeholder="Name Filter"
-						/></th>
+					<th><input type="text" class="form-control input-sm" [(ngModel)]="idFilter" (ngModelChange)="modelChange($event)" placeholder="Id Filter" clearBox /></th>
+					<th><input type="text" class="form-control input-sm" [(ngModel)]="nameFilter" (ngModelChange)="modelChange($event)" placeholder="Name Filter"
+						clearBox /></th>
 					<th></th>
 					<th></th>
 					<th></th>

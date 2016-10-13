@@ -221,7 +221,7 @@ function registerIpcEvents() {
         logger.debug(`set autoupdater url to: ${feedURL}`);
         
         if (os.platform() == "linux"){
-            var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/${os_platform()}_${os.arch()}`;
+            var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/${os.platform()}_${os.arch()}`;
             //var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/linux_${os.arch()}`;
             mainWindow.webContents.downloadURL(downloadURL);
             //if (electron.shell.openExternal(downloadURL, {activate: true})) app.quit();

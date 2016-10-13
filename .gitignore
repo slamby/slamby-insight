@@ -5,5 +5,6 @@ packager/
 .vscode/
 typings/
 installer/
+insight.log
 
 src/css/site.css

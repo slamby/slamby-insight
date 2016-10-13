@@ -2,7 +2,7 @@ import { Component, AfterContentInit, Input, ViewChild } from '@angular/core';
 
 import { ITab } from '../../models/itab';
 import { Messenger } from './../services/messenger.service';
-import { HorizontalScrollDirective } from '../directives/horizontal.scroll.derective';
+import { HorizontalScrollDirective } from '../directives/horizontal.scroll.directive';
 
 @Component({
     selector: 'tabs',

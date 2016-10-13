@@ -199,7 +199,7 @@ function registerIpcEvents() {
     });
 
     ipcMain.on('install-updates', (event, arg) => {
-        var versionToSend = os.platform() == "darwin" ? globals.latestVersion : globals.version; 
+        var versionToSend = os.platform() != "darwin" ? globals.latestVersion : globals.version; 
         feedURL = `${nutsUrl}/update/${os.platform()}_${os.arch()}/${versionToSend}`;
         logger.debug(`set autoupdater url to: ${feedURL}`);
         

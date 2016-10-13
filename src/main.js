@@ -127,7 +127,7 @@ function createWindow() {
     mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
         if (item.getURL().indexOf(nutsUrl) !== -1){
             //linux installer download
-            var filePath = `${app.getPath("downloads")}\\${item.getFilename()}`;
+            var filePath = `${app.getPath("downloads")}/${item.getFilename()}`;
             item.setSavePath(filePath);
             item.once('done', (event, state) => {
                 var realFilePath = item.getSavePath();

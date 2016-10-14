@@ -5,36 +5,47 @@ import { NgModel } from '@angular/forms';
     selector: 'input[clearBox]'
 })
 export class ClearBoxDirective {
+    wrapper: HTMLDivElement;
+    icon: HTMLSpanElement;
 
     @Output() ngModelChange: EventEmitter<any> = new EventEmitter(false);
 
     constructor(private element: ElementRef,
         private viewContainer: ViewContainerRef, private model: NgModel) {
         let el = this.viewContainer.element.nativeElement;
-
         let wrapper = document.createElement('div');
         wrapper.style.position = 'relative';
 
         let icon = document.createElement('span');
-        icon.className = 'fa fa-times-circle-o';
-        icon.style.position = 'absolute';
-        icon.style.right = '7px';
-        icon.style.top = '8px';
-        icon.style.bottom = '0';
+        icon.className = 'fa fa-times-circle-o form-control-feedback';
+        icon.style.fontSize = '14px';
+        icon.style.color = '#888';
         icon.style.cursor = 'pointer';
         icon.style.pointerEvents = 'auto';
         icon.onclick = () => {
             this.model.valueAccessor.writeValue('');
             this.ngModelChange.emit('');
+            element.nativeElement.focus();
         };
+
+        if (!this.model.value) {
+            icon.classList.add('hidden');
+        }
 
         this.wrap(el, wrapper);
 
         el.parentNode.insertBefore(icon, el.nextSibling);
+
+        this.wrapper = wrapper;
+        this.icon = icon;
     }
 
     @HostListener('ngModelChange', ['$event']) onChange(event) {
-        console.log('change');
+        if (!event) {
+            this.icon.classList.add('hidden');
+        } else {
+            this.icon.classList.remove('hidden');
+        }
     }
 
     wrap(toWrap, wrapper) {

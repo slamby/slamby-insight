@@ -113,9 +113,9 @@ function createWindow() {
     loadIndexHtml();
     mainWindow.show();
 
-    //if (isDevelopment) {
+    if (isDevelopment) {
         mainWindow.webContents.openDevTools();
-    //}
+    }
 
     // Emitted when the window is closed.
     mainWindow.on('closed', () => {
@@ -215,9 +215,8 @@ function registerIpcEvents() {
         feedURL = `${nutsUrl}/update/${os.platform()}_${os.arch()}/${versionToSend}`;
         logger.debug(`set autoupdater url to: ${feedURL}`);
         
-        if (true || os.platform() == "linux"){
-            //var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/${os.platform()}_${os.arch()}`;
-            var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/linux_${os.arch()}`;
+        if (os.platform() == "linux"){
+            var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/${os.platform()}_${os.arch()}`;
             mainWindow.webContents.downloadURL(downloadURL);
         } else {
             autoUpdater.setFeedURL(feedURL);

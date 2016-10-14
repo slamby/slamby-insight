@@ -10,7 +10,7 @@
     </div>
     <form (submit)="ok()">
         <div class="modal-body">
-            <textarea [rows]="getRowNumber(_json)" name="jsonText" [(ngModel)]="_json"></textarea>
+            <textarea [rows]="getRowNumber(_json)" [cols]="cols" name="jsonText" [(ngModel)]="_json"></textarea>
         </div>
         <div class="modal-footer">
             <button type="submit" class="btn btn-primary">OK</button>

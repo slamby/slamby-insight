@@ -1,0 +1,70 @@
+<template #template let-c="close" let-d="dismiss">
+	<div class="modal-header">
+		<button type="button" class="close" aria-label="Close" (click)="cancel(); d('Cross click')">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+		<h4 class="modal-title">{{model.Header}}</h4>
+	</div>
+	<div *ngIf="model.ErrorMessage">
+		<p>{{model.ErrorMessage}}</p>
+	</div>
+	<form (submit)="ok()" #f="ngForm" class="form-horizontal">
+		<div class="modal-body">
+			<div class="form-group">
+				<label for="name" class="col-sm-2 control-label">Name</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" [(ngModel)]="model.dataSet.Name" name="name" required>
+				</div>
+			</div>
+			<div *ngIf="model.IsNew">
+				<div class="form-group">
+					<label for="nGramCount" class="col-sm-2 control-label">NGram Count</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" [(ngModel)]="model.dataSet.NGramCount" name="nGramCount" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="idField" class="col-sm-2 control-label">Id Field</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" [(ngModel)]="model.dataSet.IdField" name="idField" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="tagField" class="col-sm-2 control-label">Tag Field</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" [(ngModel)]="model.dataSet.TagField" name="tagField" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="interpretedFields" class="col-sm-2 control-label">Interpreted Fields</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" [(ngModel)]="model.dataSet.InterpretedFields" name="interpretedFields" required>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<md-slide-toggle [checked]="model.sampleDocumentChecked" (change)="model.sampleDocumentChecked=!model.sampleDocumentChecked" color="primary">
+							Use Sample Document
+						</md-slide-toggle>
+					</div>
+				</div>
+				<div class="form-group" [ngbCollapse]="!model.sampleDocumentChecked">
+					<label for="sample" class="col-sm-2 control-label">Sample Document</label>
+					<div class="col-sm-10">
+						<textarea class="form-control" [(ngModel)]="model.dataSet.SampleDocument" name="sample" class="col-sm-12 sample-json"></textarea>
+					</div>
+				</div>
+				<div class="form-group" [ngbCollapse]="model.sampleDocumentChecked" [hidden]="!model.IsNew">
+					<label for="schema" class="col-sm-2 control-label">Schema</label>
+					<div class="col-sm-10">
+						<textarea class="form-control" [(ngModel)]="model.dataSet.Schema" name="schema" class="col-sm-12 sample-json"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" class="btn btn-success" [disabled]="!f.valid">OK</button>
+			<button type="button" class="btn btn-warning" (click)="cancel(); c('Close click')">Close</button>
+		</div>
+	</form>
+</template>

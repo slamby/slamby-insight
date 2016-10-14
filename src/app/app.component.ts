@@ -128,7 +128,7 @@ export class AppComponent implements OnInit {
         } else {
             let model: ConfirmModel = {
                     Header: 'Version check',
-                    Message: `There is a new version: ${returnObject.version}. Do you want to install it now?`,
+                    Message: `There is a new version: <b>${returnObject.version}</b>. Do you want to install it now?`,
                     Buttons: ['yes', 'no']
             };
             this.confirmDialog.model = model;

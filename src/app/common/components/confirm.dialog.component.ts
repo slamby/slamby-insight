@@ -15,7 +15,7 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
                 </button>
                 <h4 class="modal-title">{{model.Header}}</h4>
             </div>
-            <p class="lead">{{model.Message}}</p>
+            <div class="modal-body" [innerHTML]=model.Message></div>
             <div class="modal-footer">
                 <div class="btn-group">
                     <button class="btn btn-primary" *ngIf='yesButtonIsVisibile' (click)='close("yes"); c()'>Yes</button>

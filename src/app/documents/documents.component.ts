@@ -296,9 +296,13 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     checkTagFieldIsSelected(): boolean {
-        var isChecked = this.fields.findIndex(f => f.Name == this._dataset.TagField && f.IsSelected) > -1;
+        let isChecked = this.fields.findIndex(f => f.Name === this._dataset.TagField && f.IsSelected) > -1;
         if (!isChecked) {
-            this.confirmDialog.model = { Header: "Warning!", Message: `To modyfiy tag field please check the ${this._dataset.IdField} field!`, Buttons: ["ok"] };
+            this.confirmDialog.model = {
+                Header: 'Warning!',
+                Message: `To modify tag field please check the ${this._dataset.IdField} field!`,
+                Buttons: ['ok']
+            };
             this.confirmDialog.open();
         }
         return isChecked;
@@ -586,25 +590,26 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             commonTags = _.intersection(commonTags, tagsForDocs[i]);
         }
         let tagSelectorModel: TagSelectorModel = {
-            Tags: commonTags.length > 0 ? this.tags.filter(t => commonTags.findIndex(c => c.toString() == t.Item.Id) > -1).map(t => {
+            Tags: commonTags.length > 0 ? this.tags.filter(t => commonTags.findIndex(c => c.toString() === t.Item.Id) > -1).map(t => {
                 let sm = _.cloneDeep(t);
                 sm.IsSelected = false;
                 return sm;
             }) : [],
             IsMultiselectAllowed: true
         };
-        //if the tag missing from database
+        // if the tag missing from database
         if (commonTags.length > tagSelectorModel.Tags.length) {
-            var difference = _.difference(commonTags, tagSelectorModel.Tags.map(t => t.Item.Id));
+            let difference = _.difference(commonTags, tagSelectorModel.Tags.map(t => t.Item.Id));
             tagSelectorModel.Tags.push(...difference.map(tid => {
                 let sm = {
                     IsSelected: false,
-                    Item: {
-                        Id: tid
+                    Item: <ITag>{
+                        Id: tid,
+                        Name: ''
                     }
-                }
+                };
                 return sm;
-            }))
+            }));
         }
         this.tagSelector.dialogClosed.subscribe(
             (model: TagSelectorModel) => {

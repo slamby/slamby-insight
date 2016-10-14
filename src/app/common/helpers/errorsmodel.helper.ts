@@ -17,6 +17,26 @@ export module ErrorsModelHelper {
         return { Errors: [] };
     }
 
+    export function getFromResponseWithHttpInfo(response: Response): IErrorsModel {
+        let emptyResult = { Errors: [] };
+
+        let model: any = {};
+        try {
+            model = (<any> response)._body;
+            if (!model) {
+                return emptyResult;
+            }
+        } catch (error) {
+            return { Errors: ['Invalid JSON response!'] };
+        }
+
+        if ((<IErrorsModel>model).Errors) {
+            return <IErrorsModel>model;
+        }
+
+        return emptyResult;
+    }
+
     export function getFirstError(model: IErrorsModel): string {
         if (!model || model.Errors.length === 0) {
             return '';

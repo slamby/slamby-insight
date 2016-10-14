@@ -17,7 +17,7 @@ export class TagService extends BaseService<TagApi> {
         super(new TagApi(_http, optionService.currentEndpoint.ApiBaseEndpoint), optionService.currentEndpoint);
     }
 
-    getTags(dataset: string, withDetails = true): Observable<ITag> {
+    getTags(dataset: string, withDetails = true): Observable<ITag[]> {
         this.clearContentTypeHeader();
         this.setDataSetHeader(dataset);
         return this.apiService.getTags(withDetails);

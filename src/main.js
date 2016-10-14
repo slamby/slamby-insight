@@ -35,6 +35,7 @@ var isDevelopment = process.env.NODE_ENV === 'development';
 var updateFeed = 'http://localhost:1337/updates/latest';
 var feedURL = '';
 var nutsUrl = 'https://insight.slamby.com'
+var linuxPackageFilePath = '';
 
 // Main entry point
 main();
@@ -125,19 +126,30 @@ function createWindow() {
     });
 
     mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
-        mainWindow.webContents.send('download-start');
+        if (item.getURL().indexOf(nutsUrl) !== -1){
+            //linux installer download
+            var filePath = `${app.getPath("downloads")}/${item.getFilename()}`;
+            item.setSavePath(filePath);
+            item.once('done', (event, state) => {
+                linuxPackageFilePath = item.getSavePath();
+                let msg = `Version ${globals.latestVersion} is downloaded and the package installer will start automatically on Exit. Do you want to Exit now?`
+                mainWindow.webContents.send('update-message', 'update-downloaded', msg);
+            });
+        } else {
+            mainWindow.webContents.send('download-start');
+            item.once('done', (event, state) => {
+                mainWindow.webContents.send('download-progress', {
+                    done: 100,
+                    state: state
+                });
+            });
+        }
         item.on('updated', (event, state) => {
-            mainWindow.webContents.send('download-progress', {
-                done: Math.floor((item.getReceivedBytes() / item.getTotalBytes()) * 100),
-                state: item.isPaused() ? "paused" : state
+                mainWindow.webContents.send('download-progress', {
+                    done: Math.floor((item.getReceivedBytes() / item.getTotalBytes()) * 100),
+                    state: item.isPaused() ? "paused" : state
+                });
             });
-        })
-        item.once('done', (event, state) => {
-            mainWindow.webContents.send('download-progress', {
-                done: 100,
-                state: state
-            });
-        })
     });
 }
 
@@ -199,10 +211,30 @@ function registerIpcEvents() {
     });
 
     ipcMain.on('install-updates', (event, arg) => {
-        feedURL = `${nutsUrl}/update/${os.platform()}_${os.arch()}/${globals.latestVersion}`;
+        var versionToSend = os.platform() != "darwin" ? globals.latestVersion : globals.version; 
+        feedURL = `${nutsUrl}/update/${os.platform()}_${os.arch()}/${versionToSend}`;
         logger.debug(`set autoupdater url to: ${feedURL}`);
-        autoUpdater.setFeedURL(feedURL);
-        autoUpdater.checkForUpdates();
+        
+        if (os.platform() == "linux"){
+            var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/${os.platform()}_${os.arch()}`;
+            mainWindow.webContents.downloadURL(downloadURL);
+        } else {
+            autoUpdater.setFeedURL(feedURL);
+            autoUpdater.checkForUpdates();
+        }
+        
+    });
+
+    ipcMain.on('install-restart', (event, arg) => {
+        if (os.platform() == "linux"){
+            const exec = require('child_process').exec;
+            const child = exec(`xdg-open ${linuxPackageFilePath}`, (error, stdout, stderr) => {
+                if (error) { logger.error(error); }
+            });
+        } else {
+            app.relaunch();
+        }
+        app.quit();
     });
 }
 
@@ -212,14 +244,14 @@ function registerAutoUpdateEvents() {
     }
 
     autoUpdater.addListener("update-available", function (event) {
-        let msg = "Downloading update in the background.";
+        let msg = "Downloading update in the background";
         logger.debug(msg);
         if (mainWindow) {
             mainWindow.webContents.send('update-message', 'update-available', msg);
         }
     });
     autoUpdater.addListener("update-downloaded", function (event, releaseNotes, releaseName, releaseDate, updateURL) {
-        let msg = `Version ${releaseName} is downloaded and will be automatically installed on Quit`;
+        let msg = `Version ${releaseName} is downloaded and will be automatically installed on Exit. Do you want to relaunch the application now?`;
         logger.debug("A new update is ready to install", msg);
         if (mainWindow) {
             mainWindow.webContents.send('update-message', 'update-downloaded', msg);
@@ -227,8 +259,9 @@ function registerAutoUpdateEvents() {
     });
     autoUpdater.addListener("error", function (error) {
         logger.error(error);
+        let msg = `There was an error during the update process`;
         if (mainWindow) {
-            mainWindow.webContents.send('update-message', 'update-error', error);
+            mainWindow.webContents.send('update-message', 'update-error', msg);
         }
     });
     autoUpdater.addListener("checking-for-update", function (event) {

@@ -53,4 +53,8 @@ export module IpcHelper {
     export function downloadAndInstallUpdates(): any {
         ipcRenderer.send('install-updates');
     }
+
+    export function restartForUpdates(): any {
+        ipcRenderer.send('install-restart');
+    }
 }

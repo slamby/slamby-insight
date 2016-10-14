@@ -231,10 +231,10 @@ function registerIpcEvents() {
             const child = exec(`xdg-open ${linuxPackageFilePath}`, (error, stdout, stderr) => {
                 if (error) { logger.error(error); }
             });
+            app.quit();
         } else {
-            app.relaunch();
+            autoUpdater.quitAndInstall();
         }
-        app.quit();
     });
 }
 

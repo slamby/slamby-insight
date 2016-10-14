@@ -63,13 +63,14 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                 dataSetToSave.SampleDocument = JSON.parse(this.newDataSet.dataSet.SampleDocument);
                 dataSetToSave.Schema = null;
                 this._datasetService.createDatasetWithSampleDocument(dataSetToSave).subscribe(
-                    error => this.handleError(error),
                     () => {
                         dataSetToSave.Statistics = { DocumentsCount: 0 };
                         this.dataSets = _.concat(this.dataSets, [_.cloneDeep(dataSetToSave)]);
                         this.newDataSetFormIsCollapsed = true;
                         this.newDataSet = this.getDefaultDataSet();
-                    });
+                    },
+                    error => this.handleError(error)
+                    );
             } else {
                 dataSetToSave.Schema = JSON.parse(this.newDataSet.dataSet.Schema);
                 dataSetToSave.SampleDocument = null;

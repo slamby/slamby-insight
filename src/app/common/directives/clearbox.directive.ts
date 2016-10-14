@@ -17,7 +17,7 @@ export class ClearBoxDirective {
         wrapper.style.position = 'relative';
 
         let icon = document.createElement('span');
-        icon.className = 'fa fa-times-circle-o form-control-feedback';
+        icon.className = 'fa fa-times form-control-feedback';
         icon.style.fontSize = '14px';
         icon.style.color = '#888';
         icon.style.cursor = 'pointer';

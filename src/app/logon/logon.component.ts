@@ -43,7 +43,7 @@ export class LogonComponent implements OnInit {
             (response) => {
                 let model = ErrorsModelHelper.getFromResponse(response);
                 let errors = ErrorsModelHelper.concatErrors(model);
-                alert(errors);
+                alert(errors ? errors : 'Server not found');
                 this.busy = false;
             });
     }

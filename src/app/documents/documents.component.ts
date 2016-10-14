@@ -28,6 +28,9 @@ import { Observable, Observer } from 'rxjs';
 import { CommonInputDialogComponent } from '../common/components/common-input.dialog.component';
 import { CommonInputModel } from '../models/common-input.model';
 
+import { DocumentEditorDialogComponent } from './document-editor.dialog.component';
+import { TagEditorDialogComponent } from './tag-editor.dialog.component';
+
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 
@@ -59,6 +62,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     @ViewChild(DocumentDetailsDialogComponent) documentDetailsDialog: DocumentDetailsDialogComponent;
     @ViewChild(CommonInputDialogComponent) inputDialog: CommonInputDialogComponent;
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
+    @ViewChild(DocumentEditorDialogComponent) documentEditorDialog: DocumentEditorDialogComponent;
+    @ViewChild(TagEditorDialogComponent) tagEditorDialog: TagEditorDialogComponent;
     @ViewChild('filterTagListSelector') tagListSelectorDialog: TagListSelectorDialogComponent;
 
     documentDetails = DocumentDetailsComponent;
@@ -68,11 +73,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     headers: Array<any> = [];
     selectedDocument: any;
     private _scrollId: string;
-    newDocumentFormIsCollapsed = true;
-    newTagFormIsCollapsed = true;
-    pendingDocument: DocumentWrapper;
     tags: Array<SelectedItem<ITag>> = [];
-    pendingTag: TagWrapper = this.getDefaultTag();
 
     // filter and sampling
     fields: Array<SelectedItem<any>> = [];
@@ -112,7 +113,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     ngAfterContentInit() {
-        this.pendingDocument = this.getDefaultDocument(this._dataset.SampleDocument);
     }
 
     setFields() {
@@ -293,15 +293,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             }
         );
         dialogModel.IsDone = true;
-    }
-
-    editDocument(selected: SelectedItem<any>) {
-        this.pendingDocument = {
-            Document: JSON.stringify(selected.Item, null, 4),
-            IsNew: false,
-            Id: selected.Item[this._dataset.IdField]
-        };
-        this.collapsePendingDocument();
     }
 
     checkTagFieldIsSelected(): boolean {
@@ -694,38 +685,47 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this._messenger.sendMessage({ message: 'addTab', arg: { type: type, title: title, parameter: parameter } });
     }
 
-    saveDocument() {
-        let docToSave = JSON.parse(this.pendingDocument.Document);
-        if (this.pendingDocument.IsNew) {
-            this._documentService.createDocument(this.dataset.Name, docToSave).subscribe(
-                error => this.errorMessage = <any>error,
-                () => {
-                    this.documents = _.concat(this.documents, [<SelectedItem<any>>_.cloneDeep({
-                        IsSelected: false,
-                        Item: docToSave
-                    })]);
-                    this.setHeaders();
-                    this.collapsePendingDocument();
+    saveOrEditDocument(selected: SelectedItem<any>) {
+        let pendingDocument;
+        if (selected) {
+            pendingDocument = {
+                Document: JSON.stringify(selected.Item, null, 4),
+                IsNew: false,
+                Id: selected.Item[this._dataset.IdField],
+                Header: "Edit document"
+            };
+        }
+        else {
+            pendingDocument = this.getDefaultDocument(this._dataset.SampleDocument);
+        }
+        this.documentEditorDialog.model = pendingDocument;
+        this.documentEditorDialog.dialogClosed.subscribe((model: DocumentWrapper) => {
+            if (model.Result == DialogResult.Ok) {
+                let docToSave = JSON.parse(model.Document);
+                if (model.IsNew) {
+                    this._documentService.createDocument(this.dataset.Name, docToSave).subscribe(
+                        () => {
+                            this.documents = _.concat(this.documents, [<SelectedItem<any>>_.cloneDeep({
+                                IsSelected: false,
+                                Item: docToSave
+                            })]);
+                            this.setHeaders();
+                        },
+                        error => this.errorMessage = <any>error
+                    );
+                } else {
+                    this._documentService.updateDocument(this.dataset.Name, model.Id, docToSave).subscribe(
+                        updatedDoc => {
+                            let idField = this._dataset.IdField;
+                            let index = this.documents.indexOf(this.documents.find(d => d.Item[idField] === model.Id));
+                            this.documents[index].Item = updatedDoc;
+                        },
+                        error => this.errorMessage = <any>error
+                    );
                 }
-            );
-        } else {
-            this._documentService.updateDocument(this.dataset.Name, this.pendingDocument.Id, docToSave).subscribe(
-                updatedDoc => {
-                    let idField = this._dataset.IdField;
-                    let index = this.documents.indexOf(this.documents.find(d => d.Item[idField] === this.pendingDocument.Id));
-                    this.documents[index].Item = updatedDoc;
-                    this.collapsePendingDocument();
-                },
-                error => this.errorMessage = <any>error
-            );
-        }
-    }
-
-    collapsePendingDocument() {
-        this.newDocumentFormIsCollapsed = !this.newDocumentFormIsCollapsed;
-        if (this.newDocumentFormIsCollapsed) {
-            this.pendingDocument = this.getDefaultDocument(this._dataset.SampleDocument);
-        }
+            }
+        });
+        this.documentEditorDialog.open();
     }
 
     checkTag(e, tag?: SelectedItem<ITag>) {
@@ -812,15 +812,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         dialogModel.IsDone = true;
     }
 
-    editTag(selected: SelectedItem<ITag>) {
-        this.pendingTag = {
-            Tag: JSON.parse(JSON.stringify(selected.Item)),
-            IsNew: false,
-            Id: selected.Id
-        };
-        this.collapsePendingTag();
-    }
-
     exportWords(selectedItems?: Array<SelectedItem<ITag>>) {
         let tagIdList = selectedItems ? selectedItems.map(t => t.Item.Id) : this.tags.filter(t => t.IsSelected).map(t => t.Item.Id);
 
@@ -857,36 +848,45 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this.inputDialog.open();
     }
 
-    saveTag() {
-        let tagToSave = _.cloneDeep(this.pendingTag.Tag);
-        if (this.pendingTag.IsNew) {
-            this._tagService.createTag(this.dataset.Name, tagToSave).subscribe(
-                (newTag: ITag) => {
-                    this.tags = _.concat(this.tags, [{
-                        IsSelected: false,
-                        Item: _.cloneDeep(newTag)
-                    }]);
-                    this.collapsePendingTag();
-                },
-                error => this.errorMessage = <any>error
-            );
-        } else {
-            this._tagService.updateTag(this.dataset.Name, this.pendingTag.Id, tagToSave).subscribe(
-                error => this.errorMessage = <any>error,
-                () => {
-                    let index = this.tags.indexOf(this.tags.find(d => d.Item.Id === this.pendingTag.Id));
-                    this.tags[index].Item = _.cloneDeep(this.pendingTag.Tag);
-                    this.collapsePendingTag();
+    saveOrEditTag(selected: SelectedItem<ITag>) {
+        let pendingTag;
+        if (selected) {
+            pendingTag = {
+                Header: "Edit tag",
+                Tag: _.cloneDeep(selected.Item),
+                IsNew: false,
+                Id: selected.Item.Id,
+            }
+        }
+        else {
+            pendingTag = this.getDefaultTag();
+        }
+        this.tagEditorDialog.model = pendingTag;
+        this.tagEditorDialog.dialogClosed.subscribe((model: TagWrapper) => {
+            if (model.Result == DialogResult.Ok) {
+                let tagToSave = _.cloneDeep(model.Tag);
+                if (pendingTag.IsNew) {
+                    this._tagService.createTag(this.dataset.Name, tagToSave).subscribe(
+                        (newTag: ITag) => {
+                            this.tags = _.concat(this.tags, [{
+                                IsSelected: false,
+                                Item: _.cloneDeep(newTag)
+                            }]);
+                        },
+                        error => this.errorMessage = <any>error
+                    );
+                } else {
+                    this._tagService.updateTag(this.dataset.Name, pendingTag.Id, tagToSave).subscribe(
+                        () => {
+                            let index = this.tags.indexOf(this.tags.find(d => d.Item.Id === pendingTag.Id));
+                            this.tags[index].Item = _.cloneDeep(tagToSave);
+                        },
+                        error => this.errorMessage = <any>error
+                    );
                 }
-            );
-        }
-    }
-
-    collapsePendingTag() {
-        this.newTagFormIsCollapsed = !this.newTagFormIsCollapsed;
-        if (this.newTagFormIsCollapsed) {
-            this.pendingTag = this.getDefaultTag();
-        }
+            }
+        })
+        this.tagEditorDialog.open();
     }
 
     checkField(e, field?: SelectedItem<any>) {
@@ -921,7 +921,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         return {
             Document: sampleDocument ? JSON.stringify(sampleDocument, null, 4) : JSON.stringify({}, null, 4),
             IsNew: true,
-            Id: ''
+            Id: '',
+            Header: "Add new document"
         };
     }
 
@@ -933,7 +934,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 ParentId: ''
             },
             IsNew: true,
-            Id: ''
+            Id: '',
+            Header: "Edit tag",
         };
     }
 

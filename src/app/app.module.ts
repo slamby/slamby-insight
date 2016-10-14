@@ -16,11 +16,14 @@ import { ConfirmDialogComponent } from './common/components/confirm.dialog.compo
 
 import { ImportComponent } from './import/import.component';
 import { DatasetsComponent } from './datasets/datasets.component';
+import { DatasetEditorDialogComponent } from './datasets/dataset-editor.dialog.component';
 import { ResourcesComponent } from './resources/resources.component';
 import { ServicesComponent } from './services/services.component';
 import { ProcessesComponent } from './processes/processes.component';
 import { WelcomeComponent } from './home/welcome.component';
 import { DocumentsComponent } from './documents/documents.component';
+import { DocumentEditorDialogComponent } from './documents/document-editor.dialog.component';
+import { TagEditorDialogComponent } from './documents/tag-editor.dialog.component';
 import { EndpointComponent } from './settings/settings-menu-items/endpoint/endpoint.component';
 import { EndpointDialogComponent } from './settings/settings-menu-items/endpoint/endpoint.dialog.component';
 import { NotificationIconComponent } from './notifications/notificationicon.component';
@@ -68,8 +71,11 @@ import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
         NotificationIconComponent,
         NotificationComponent,
         DocumentDetailsDialogComponent,
+        DatasetEditorDialogComponent,
         LogonComponent,
         DocumentDetailsComponent,
+        DocumentEditorDialogComponent,
+        TagEditorDialogComponent,
         ServicesComponent,
         ProcessesComponent,
         COMPONENTS_DECLARATIONS,

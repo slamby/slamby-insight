@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { CommonHelper } from '../helpers/common.helper';
 
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'input-dialog',
@@ -12,6 +13,7 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
     styles: [require('./common-input.dialog.component.scss')]
 })
 export class CommonInputDialogComponent {
+    cols = 120;
     private _json: string;
     private _type: any;
     private _modalRef: any;
@@ -59,7 +61,12 @@ export class CommonInputDialogComponent {
     }
 
     getRowNumber(text: string) {
-        let numberOfLineBreaks = (text.match(/\n/g) || []).length;
+        var splittedText = _.split(text, /\n/g);
+        let numberOfLineBreaks = splittedText.length;
+        splittedText.forEach(l => {
+            numberOfLineBreaks += _.floor((l.length / this.cols));
+        });
         return numberOfLineBreaks + 1;
     }
+
 }

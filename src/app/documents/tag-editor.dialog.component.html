@@ -1,0 +1,38 @@
+<template #template let-c="close" let-d="dismiss">
+	<div class="modal-header">
+		<button type="button" class="close" aria-label="Close" (click)="cancel(); d('Cross click')">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+		<h4 class="modal-title">{{model.Header}}</h4>
+	</div>
+	<div *ngIf="model.ErrorMessage">
+		<p>{{model.ErrorMessage}}</p>
+	</div>
+	<form (submit)="ok()" #f="ngForm" class="form-horizontal">
+		<div class="modal-body">
+			<div class="form-group">
+				<label for="id" class="col-sm-2 control-label">Id</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" [(ngModel)]="model.Tag.Id" name="id" placeholder="Tag Id" required/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="name" class="col-sm-2 control-label">Name</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" [(ngModel)]="model.Tag.Name" name="name" placeholder="Tag Name" required/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="parentId" class="col-sm-2 control-label">Parent Id</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" [(ngModel)]="model.Tag.ParentId" name="parentId" placeholder="Tag ParentId"
+					/>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" class="btn btn-success" [disabled]="!f.valid">OK</button>
+			<button type="button" class="btn btn-warning" (click)="cancel(); c('Close click')">Close</button>
+		</div>
+	</form>
+</template>

@@ -12,6 +12,7 @@ import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component';
 import { ConfirmModel } from '../models/confirm.model';
 import { DialogResult } from '../models/dialog-result';
+import { DatasetEditorDialogComponent } from './dataset-editor.dialog.component';
 
 import * as _ from 'lodash';
 
@@ -23,12 +24,11 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
     static pageTitle: string = 'Datasets';
     static pageIcon: string = 'fa-database';
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
+    @ViewChild(DatasetEditorDialogComponent) editorDialog: DatasetEditorDialogComponent;
 
     dataSets: IDataSet[];
     selectedDataSet: IDataSet;
     docComponent = DocumentsComponent;
-    newDataSetFormIsCollapsed = true;
-    newDataSet: DataSetWrapper = this.getDefaultDataSet();
 
     constructor(private _datasetService: DatasetService,
         private messenger: Messenger,
@@ -55,42 +55,61 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         this.messenger.sendMessage({ message: 'addTab', arg: { type: type, title: title, parameter: parameter } });
     }
 
-    save() {
-        let dataSetToSave: IDataSet = _.cloneDeep(this.newDataSet.dataSet);
-        if (this.newDataSet.IsNew) {
-            dataSetToSave.InterpretedFields = dataSetToSave.InterpretedFields.toString().split(',');
-            if (this.newDataSet.sampleDocumentChecked) {
-                dataSetToSave.SampleDocument = JSON.parse(this.newDataSet.dataSet.SampleDocument);
-                dataSetToSave.Schema = null;
-                this._datasetService.createDatasetWithSampleDocument(dataSetToSave).subscribe(
-                    error => this.handleError(error),
-                    () => {
-                        dataSetToSave.Statistics = { DocumentsCount: 0 };
-                        this.dataSets = _.concat(this.dataSets, [_.cloneDeep(dataSetToSave)]);
-                        this.newDataSetFormIsCollapsed = true;
-                        this.newDataSet = this.getDefaultDataSet();
-                    });
-            } else {
-                dataSetToSave.Schema = JSON.parse(this.newDataSet.dataSet.Schema);
-                dataSetToSave.SampleDocument = null;
-                this._datasetService.createDatasetWithSchema(dataSetToSave).subscribe(
-                    error => this.handleError(error),
-                    () => {
-                        this.dataSets = _.concat(this.dataSets, [_.cloneDeep(this.newDataSet.dataSet)]);
-                        this.newDataSetFormIsCollapsed = true;
-                        this.newDataSet = this.getDefaultDataSet();
-                    });
+    addOrEdit(selected?: IDataSet) {
+        let pendingDataset: DataSetWrapper;
+        if (selected) {
+            pendingDataset = {
+                Header: 'Rename Dataset',
+                dataSet: _.cloneDeep(selected),
+                sampleDocumentChecked: selected.SampleDocument ? true : false,
+                IsNew: false,
+                Name: selected.Name
             }
-        } else {
-            this._datasetService.renameDataset(this.newDataSet.Name.toString(), dataSetToSave.Name).subscribe(
-                error => this.handleError(error),
-                () => {
-                    let index = this.dataSets.indexOf(this.dataSets.find(d => d.Name === this.newDataSet.Name));
-                    this.dataSets[index].Name = this.newDataSet.dataSet.Name;
-                    this.newDataSetFormIsCollapsed = true;
-                    this.newDataSet = this.getDefaultDataSet();
-                });
         }
+        else {
+            pendingDataset = this.getDefaultDataSet();
+        }
+        this.editorDialog.model = pendingDataset;
+        this.editorDialog.dialogClosed.subscribe(
+            (model: DataSetWrapper) => {
+                if (model.Result === DialogResult.Ok) {
+                    let dataSetToSave = _.cloneDeep(model.dataSet);
+                    if (model.IsNew) {
+                        dataSetToSave.InterpretedFields = dataSetToSave.InterpretedFields.toString().split(',');
+                        if (model.sampleDocumentChecked) {
+                            dataSetToSave.SampleDocument = JSON.parse(model.dataSet.SampleDocument);
+                            dataSetToSave.Schema = null;
+                            this._datasetService.createDatasetWithSampleDocument(dataSetToSave).subscribe(
+                                () => {
+                                    dataSetToSave.Statistics = { DocumentsCount: 0 };
+                                    this.dataSets = _.concat(this.dataSets, [_.cloneDeep(dataSetToSave)]);
+                                    model = this.getDefaultDataSet();
+                                },
+                                error => this.handleError(error));
+                        } else {
+                            dataSetToSave.Schema = JSON.parse(model.dataSet.Schema);
+                            dataSetToSave.SampleDocument = null;
+                            this._datasetService.createDatasetWithSchema(dataSetToSave).subscribe(
+                                () => {
+                                    this.dataSets = _.concat(this.dataSets, [_.cloneDeep(model.dataSet)]);
+                                    model = this.getDefaultDataSet();
+                                },
+                                error => this.handleError(error));
+                        }
+                    } else {
+                        this._datasetService.renameDataset(model.Name.toString(), dataSetToSave.Name).subscribe(
+                            () => {
+                                let index = this.dataSets.indexOf(this.dataSets.find(d => d.Name === model.Name));
+                                this.dataSets[index].Name = model.dataSet.Name;
+                                model = this.getDefaultDataSet();
+                            },
+                            error => this.handleError(error));
+                    }
+                }
+            },
+            error => this.handleError(error)
+        );
+        this.editorDialog.open();
     }
 
     select(selected: IDataSet) {
@@ -125,29 +144,22 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
             });
     }
 
-    renameDataSet(selected: IDataSet) {
-        this.newDataSet.dataSet = _.cloneDeep(selected);
-        this.newDataSet.Name = selected.Name;
-        this.newDataSet.IsNew = false;
-        this.newDataSetFormIsCollapsed = false;
-    }
-
     cloneDataSet(selected: IDataSet) {
-        this.newDataSet.dataSet = _.cloneDeep(selected);
-        this.newDataSet.sampleDocumentChecked = selected.SampleDocument != null;
-        if (this.newDataSet.sampleDocumentChecked) {
-            this.newDataSet.dataSet.SampleDocument = JSON.stringify(selected.SampleDocument, null, 4);
-            this.newDataSet.dataSet.Schema = this.getDefaultDataSet().dataSet.Schema;
+        let datasetToClone = _.cloneDeep(selected);
+        if (selected.SampleDocument) {
+            datasetToClone.SampleDocument = JSON.stringify(selected.SampleDocument, null, 4);
+            datasetToClone.Schema = this.getDefaultDataSet().dataSet.Schema;
         } else {
-            this.newDataSet.dataSet.Schema = JSON.stringify(selected.Schema);
-            this.newDataSet.dataSet.SampleDocument = this.getDefaultDataSet().dataSet.SampleDocument;
+            datasetToClone.Schema = JSON.stringify(selected.Schema);
+            datasetToClone.SampleDocument = this.getDefaultDataSet().dataSet.SampleDocument;
         }
-        this.newDataSet.dataSet.Name = '';
-        this.newDataSetFormIsCollapsed = false;
+        datasetToClone.Name = '';
+        this.addOrEdit(datasetToClone);
     }
 
     getDefaultDataSet(): DataSetWrapper {
         return {
+            Header: 'Add New Dataset',
             dataSet: {
                 Name: '',
                 NGramCount: 3,

@@ -35,6 +35,7 @@ var isDevelopment = process.env.NODE_ENV === 'development';
 var updateFeed = 'http://localhost:1337/updates/latest';
 var feedURL = '';
 var nutsUrl = 'https://insight.slamby.com'
+var linuxPackageFilePath = '';
 
 // Main entry point
 main();
@@ -112,9 +113,9 @@ function createWindow() {
     loadIndexHtml();
     mainWindow.show();
 
-    if (isDevelopment) {
+    //if (isDevelopment) {
         mainWindow.webContents.openDevTools();
-    }
+    //}
 
     // Emitted when the window is closed.
     mainWindow.on('closed', () => {
@@ -130,15 +131,9 @@ function createWindow() {
             var filePath = `${app.getPath("downloads")}/${item.getFilename()}`;
             item.setSavePath(filePath);
             item.once('done', (event, state) => {
-                var realFilePath = item.getSavePath();
-                const exec = require('child_process').exec;
-                logger.debug(realFilePath);
-                const child = exec(`xdg-open ${realFilePath}`, (error, stdout, stderr) => {
-                    if (error) {
-                        logger.error(error);
-                    }
-                });
-                app.quit();
+                linuxPackageFilePath = item.getSavePath();
+                let msg = `Version ${globals.latestVersion} is downloaded and the package installer will start automatically on Exit. Do you want to Exit now?`
+                mainWindow.webContents.send('update-message', 'update-downloaded', msg);
             });
         } else {
             mainWindow.webContents.send('download-start');
@@ -220,16 +215,27 @@ function registerIpcEvents() {
         feedURL = `${nutsUrl}/update/${os.platform()}_${os.arch()}/${versionToSend}`;
         logger.debug(`set autoupdater url to: ${feedURL}`);
         
-        if (os.platform() == "linux"){
-            var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/${os.platform()}_${os.arch()}`;
-            //var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/linux_${os.arch()}`;
+        if (true || os.platform() == "linux"){
+            //var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/${os.platform()}_${os.arch()}`;
+            var downloadURL = `${nutsUrl}/download/version/${globals.latestVersion}/linux_${os.arch()}`;
             mainWindow.webContents.downloadURL(downloadURL);
-            //if (electron.shell.openExternal(downloadURL, {activate: true})) app.quit();
         } else {
             autoUpdater.setFeedURL(feedURL);
             autoUpdater.checkForUpdates();
         }
         
+    });
+
+    ipcMain.on('install-restart', (event, arg) => {
+        if (os.platform() == "linux"){
+            const exec = require('child_process').exec;
+            const child = exec(`xdg-open ${linuxPackageFilePath}`, (error, stdout, stderr) => {
+                if (error) { logger.error(error); }
+            });
+        } else {
+            app.relaunch();
+        }
+        app.quit();
     });
 }
 
@@ -239,14 +245,14 @@ function registerAutoUpdateEvents() {
     }
 
     autoUpdater.addListener("update-available", function (event) {
-        let msg = "Downloading update in the background.";
+        let msg = "Downloading update in the background";
         logger.debug(msg);
         if (mainWindow) {
             mainWindow.webContents.send('update-message', 'update-available', msg);
         }
     });
     autoUpdater.addListener("update-downloaded", function (event, releaseNotes, releaseName, releaseDate, updateURL) {
-        let msg = `Version ${releaseName} is downloaded and will be automatically installed on Quit`;
+        let msg = `Version ${releaseName} is downloaded and will be automatically installed on Exit. Do you want to relaunch the application now?`;
         logger.debug("A new update is ready to install", msg);
         if (mainWindow) {
             mainWindow.webContents.send('update-message', 'update-downloaded', msg);
@@ -254,8 +260,9 @@ function registerAutoUpdateEvents() {
     });
     autoUpdater.addListener("error", function (error) {
         logger.error(error);
+        let msg = `There was an error during the update process`;
         if (mainWindow) {
-            mainWindow.webContents.send('update-message', 'update-error', error);
+            mainWindow.webContents.send('update-message', 'update-error', msg);
         }
     });
     autoUpdater.addListener("checking-for-update", function (event) {

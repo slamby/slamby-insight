@@ -15,9 +15,7 @@
 	</div>
 	<form (submit)="ok()" #f="ngForm" class="form-horizontal">
 		<div class="modal-body">
-			<p>
-				<textarea [(ngModel)]="model.Document" name="document" [cols]="cols" [rows]="getRowNumber(model.Document)" style="{min-height: 300px; min-width: 400px;}"></textarea>
-			</p>
+			<json-editor [(ngModel)]="model.Document" name="document" height="400px"></json-editor>
 		</div>
 		<div class="modal-footer">
 			<button type="submit" class="btn btn-success" [disabled]="!f.valid">OK</button>

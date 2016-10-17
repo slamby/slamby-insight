@@ -9,26 +9,10 @@ import * as _ from 'lodash';
 @Component({
     selector: 'document-editor-dialog',
     template: require('./document-editor.dialog.component.html'),
-    styles: [`
-            .sample-json {
-            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-            height: 300px;
-            min-height: 200px;
-            resize: vertical;
-            }
-            .progress-bar.indeterminate {
-                position: relative;
-                animation: progress-indeterminate 3s linear infinite;
-            }
-
-            @keyframes progress-indeterminate {
-                from { left: -25%; width: 25%; }
-                to { left: 100%; width: 25%;}
-            }`]
+    styles: [require('./document-editor.dialog.component.scss')]
 })
 export class DocumentEditorDialogComponent {
     private _modalRef: any;
-    cols = 120;
     @Input() model: DocumentWrapper;
     @ViewChild('template') template;
     modalOptions: NgbModalOptions = {
@@ -59,15 +43,6 @@ export class DocumentEditorDialogComponent {
         this.showProgress = true;
         this.model.Result = DialogResult.Ok;
         this.dialogClosedEventSource.next(this.model);
-    }
-
-    getRowNumber(text: string) {
-        let splittedText = _.split(text, /\n/g);
-        let numberOfLineBreaks = splittedText.length;
-        splittedText.forEach(l => {
-            numberOfLineBreaks += _.floor((l.length / this.cols));
-        });
-        return numberOfLineBreaks + 1;
     }
 
     unsubscribeAndClose() {

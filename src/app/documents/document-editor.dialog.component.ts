@@ -53,7 +53,7 @@ export class DocumentEditorDialogComponent {
     }
 
     getRowNumber(text: string) {
-        var splittedText = _.split(text, /\n/g);
+        let splittedText = _.split(text, /\n/g);
         let numberOfLineBreaks = splittedText.length;
         splittedText.forEach(l => {
             numberOfLineBreaks += _.floor((l.length / this.cols));

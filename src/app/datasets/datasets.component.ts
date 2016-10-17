@@ -64,11 +64,11 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                 sampleDocumentChecked: selected.SampleDocument ? true : false,
                 IsNew: false,
                 Name: selected.Name
-            }
-        }
-        else {
+            };
+        } else {
             pendingDataset = this.getDefaultDataSet();
         }
+
         this.editorDialog.model = pendingDataset;
         this.editorDialog.dialogClosed.subscribe(
             (model: DataSetWrapper) => {

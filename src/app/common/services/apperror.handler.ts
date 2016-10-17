@@ -6,7 +6,7 @@ export interface AppErrorHandlerOptions {
     unwrapError: boolean;
 }
 
-export var APPERROR_HANDLER_OPTIONS: AppErrorHandlerOptions = {
+export let APPERROR_HANDLER_OPTIONS: AppErrorHandlerOptions = {
     rethrowError: false,
     unwrapError: true
 };

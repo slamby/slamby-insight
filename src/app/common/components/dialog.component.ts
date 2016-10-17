@@ -7,48 +7,8 @@ import * as _ from 'lodash';
 
 @Component({
     selector: 'CommonTemplates',
-    template: `
-    <div>
-        <template #progressTemplate let-c="close" let-d="dismiss">
-            <div class="modal-header">
-                <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">{{progressModel.Header}}</h4>
-            </div>
-            <div class="modal-body">
-                <ngb-progressbar [type]="progressModel.IsDone? 'success': 'info'" [value]=progressModel.Percent></ngb-progressbar>
-                <div>
-                    {{progressModel.Done}} / {{progressModel.All}}
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" (click)="c('Close click')" *ngIf="progressModel.IsDone">Close</button>
-            </div>
-        </template>
-        <template #indeterminateProgressTemplate>
-            <div class="modal-header">
-                <h4 class="modal-title">{{progressModel.Header}}</h4>
-            </div>
-            <div class="modal-body">
-                <div class="progress" style="position: relative;">
-                    <div class="progress-bar indeterminate"></div>
-                </div>
-            </div>
-        </template>
-    </div>
-    `,
-    styles: [`
-    .progress-bar.indeterminate {
-        position: relative;
-        animation: progress-indeterminate 3s linear infinite;
-    }
-
-    @keyframes progress-indeterminate {
-        from { left: -25%; width: 25%; }
-        to { left: 100%; width: 25%;}
-    }
-    `]
+    template: require('./dialog.component.html'),
+    styles: [require('./dialog.component.scss')]
 })
 export class DialogComponent {
 

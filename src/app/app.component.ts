@@ -56,9 +56,9 @@ export class AppComponent implements OnInit {
             if (method === 'checking-for-update') {
                 return;
             }
-            if (method === 'update-downloaded'){
+            if (method === 'update-downloaded') {
                 this.zone.run(() => this.updateInstallationQuestion(msg));
-            }else {
+            } else {
                 this.zone.run(() => this._notificationService.info(msg));
             }
         });
@@ -103,10 +103,13 @@ export class AppComponent implements OnInit {
         return this.optionService.currentEndpoint.ApiBaseEndpoint;
     }
 
-    checkUpdates(noteEverything : boolean) {
+    checkUpdates(noteEverything: boolean) {
         let returnObject = IpcHelper.checkForUpdates();
         if (!returnObject.isSuccessful) {
-            if (!noteEverything) return;
+            if (!noteEverything) {
+                return;
+            }
+
             let model: ConfirmModel = {
                 Header: 'Version check failed',
                 Message: returnObject.msg,
@@ -118,7 +121,10 @@ export class AppComponent implements OnInit {
         }
 
         if (returnObject.version == null) {
-            if (!noteEverything) return;
+            if (!noteEverything) {
+                return;
+            }
+
             let model: ConfirmModel = {
                 Header: 'Version check',
                 Message: `Congratulations! You already have the latest version!`,
@@ -127,12 +133,12 @@ export class AppComponent implements OnInit {
             this.confirmDialog.model = model;
         } else {
             let model: ConfirmModel = {
-                    Header: 'Version check',
-                    Message: `There is a new version: <b>${returnObject.version}</b>. Do you want to install it now?`,
-                    Buttons: ['yes', 'no']
+                Header: 'Version check',
+                Message: `There is a new version: <b>${returnObject.version}</b>. Do you want to install it now?`,
+                Buttons: ['yes', 'no']
             };
             this.confirmDialog.model = model;
-            this.confirmDialog.dialogClosed.subscribe (
+            this.confirmDialog.dialogClosed.subscribe(
                 (result: ConfirmModel) => {
                     if (result.Result === DialogResult.Yes) {
                         IpcHelper.downloadAndInstallUpdates();
@@ -143,14 +149,14 @@ export class AppComponent implements OnInit {
         this.confirmDialog.open();
     }
 
-    updateInstallationQuestion(msg : string) {
+    updateInstallationQuestion(msg: string) {
         let model: ConfirmModel = {
-                Header: 'Install now?',
-                Message: msg,
-                Buttons: ['yes', 'no']
+            Header: 'Install now?',
+            Message: msg,
+            Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
-        this.confirmDialog.dialogClosed.subscribe (
+        this.confirmDialog.dialogClosed.subscribe(
             (result: ConfirmModel) => {
                 if (result.Result === DialogResult.Yes) {
                     IpcHelper.restartForUpdates();
@@ -162,6 +168,6 @@ export class AppComponent implements OnInit {
 
     settingsDialogOpen() {
         this.settingsDialog.open().result.then((result) => {
-            }, (reason) => {});
+        }, (reason) => { });
     }
 }

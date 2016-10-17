@@ -697,15 +697,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 Document: JSON.stringify(selected.Item, null, 4),
                 IsNew: false,
                 Id: selected.Item[this._dataset.IdField],
-                Header: "Edit document"
+                Header: 'Edit document'
             };
-        }
-        else {
+        } else {
             pendingDocument = this.getDefaultDocument(this._dataset.SampleDocument);
         }
         this.documentEditorDialog.model = pendingDocument;
         this.documentEditorDialog.dialogClosed.subscribe((model: DocumentWrapper) => {
-            if (model.Result == DialogResult.Ok) {
+            if (model.Result === DialogResult.Ok) {
                 let docToSave = JSON.parse(model.Document);
                 if (model.IsNew) {
                     this._documentService.createDocument(this.dataset.Name, docToSave).subscribe(
@@ -857,18 +856,17 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         let pendingTag;
         if (selected) {
             pendingTag = {
-                Header: "Edit tag",
+                Header: 'Edit tag',
                 Tag: _.cloneDeep(selected.Item),
                 IsNew: false,
                 Id: selected.Item.Id,
-            }
-        }
-        else {
+            };
+        } else {
             pendingTag = this.getDefaultTag();
         }
         this.tagEditorDialog.model = pendingTag;
         this.tagEditorDialog.dialogClosed.subscribe((model: TagWrapper) => {
-            if (model.Result == DialogResult.Ok) {
+            if (model.Result === DialogResult.Ok) {
                 let tagToSave = _.cloneDeep(model.Tag);
                 if (pendingTag.IsNew) {
                     this._tagService.createTag(this.dataset.Name, tagToSave).subscribe(
@@ -890,7 +888,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                     );
                 }
             }
-        })
+        });
         this.tagEditorDialog.open();
     }
 
@@ -927,7 +925,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             Document: sampleDocument ? JSON.stringify(sampleDocument, null, 4) : JSON.stringify({}, null, 4),
             IsNew: true,
             Id: '',
-            Header: "Add new document"
+            Header: 'Add new document'
         };
     }
 
@@ -940,7 +938,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             },
             IsNew: true,
             Id: '',
-            Header: "Edit tag",
+            Header: 'Edit tag',
         };
     }
 

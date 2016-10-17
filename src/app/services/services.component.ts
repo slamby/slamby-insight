@@ -411,8 +411,8 @@ export class ServicesComponent implements OnInit {
             return;
         }
         this.dialogService.progressModel = {
-            Header: "Waiting for recommendation result"
-        }
+            Header: 'Waiting for recommendation result'
+        };
         if (selected.Type === IService.ITypeEnum.Classifier) {
             let model: IClassifierRecommendationRequest = {
                 Text: '',
@@ -428,7 +428,7 @@ export class ServicesComponent implements OnInit {
             this.inputDialog.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
-                        this.dialogService.openDialog("indeterminateprogress");
+                        this.dialogService.openDialog('indeterminateprogress');
                         this._classifierService.recommend(selected.Id, model.Model).subscribe(
                             (results: Array<IClassifierRecommendationResult>) => {
                                 this.dialogService.close();
@@ -468,7 +468,7 @@ export class ServicesComponent implements OnInit {
             this.inputDialog.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
-                        this.dialogService.openDialog("indeterminateprogress");
+                        this.dialogService.openDialog('indeterminateprogress');
                         this._prcService.recommend(selected.Id, model.Model).subscribe(
                             (results: Array<IPrcRecommendationResult>) => {
                                 this.dialogService.close();
@@ -540,8 +540,8 @@ export class ServicesComponent implements OnInit {
             return;
         }
         this.dialogService.progressModel = {
-            Header: "Waiting for recommendation result"
-        }
+            Header: 'Waiting for recommendation result'
+        };
         let request: IPrcRecommendationByIdRequest = {
             DocumentId: '',
             Query: '',
@@ -558,7 +558,7 @@ export class ServicesComponent implements OnInit {
         this.inputDialog.dialogClosed.subscribe(
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
-                    this.dialogService.openDialog("indeterminateprogress");
+                    this.dialogService.openDialog('indeterminateprogress');
                     this._prcService.recommendById(selected.Id, model.Model).subscribe(
                         (results: Array<IPrcRecommendationResult>) => {
                             this.dialogService.close();

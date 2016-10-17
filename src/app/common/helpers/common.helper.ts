@@ -10,7 +10,7 @@ export module CommonHelper {
     }
 
     export function escapeJson(jsonString: string): string {
-        var escaped = jsonString.replace(/[\n]/g, ' ').replace(/[\r]/g, '');
+        let escaped = jsonString.replace(/[\n]/g, ' ').replace(/[\r]/g, '');
         return escaped;
     }
 }

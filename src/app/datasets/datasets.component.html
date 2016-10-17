@@ -41,6 +41,6 @@
 		</table>
 		<div *ngIf="selectedDataSet?.SampleDocument" class="label label-info">Sample Document</div>
 		<div *ngIf="selectedDataSet?.Scheme" class="label label-default">Scheme</div>
-		<textarea *ngIf="selectedDataSet" class="col-sm-12 sample-json" readonly>{{selectedDataSetJson()}}</textarea>
+		<json-editor *ngIf="selectedDataSet" [ngModel]="selectedDataSetJson()" readonly="true" height="300px" minHeight="200px"></json-editor>
 	</div>
 </div>

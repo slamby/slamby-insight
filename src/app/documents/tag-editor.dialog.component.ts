@@ -7,14 +7,7 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'tag-editor-dialog',
-    template: require('./tag-editor.dialog.component.html'),
-    styles: [`
-    .sample-json {
-    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-    height: 300px;
-    min-height: 200px;
-    resize: vertical;
-}`]
+    template: require('./tag-editor.dialog.component.html')
 })
 export class TagEditorDialogComponent {
     private _modalRef: any;

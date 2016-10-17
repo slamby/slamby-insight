@@ -26,6 +26,7 @@ export class CommonInputDialogComponent {
     };
     private dialogClosedEventSource = new Subject<CommonInputModel>();
     dialogClosed = this.dialogClosedEventSource.asObservable();
+    showProgress = false;
 
     constructor(private modal: NgbModal) {
     }
@@ -34,29 +35,29 @@ export class CommonInputDialogComponent {
         this._json = JSON.stringify(this.model.Model, null, 4);
         this._type = typeof this.model.Model;
         this._modalRef = this.modal.open(this.template, this.modalOptions);
+        this.showProgress = false;
     }
 
     cancel() {
         this.model.Result = DialogResult.Cancel;
         this.dialogClosedEventSource.next(this.model);
-        this.dialogClosedEventSource = new Subject<CommonInputModel>();
-        this.dialogClosed = this.dialogClosedEventSource.asObservable();
+        this.unsubscribeAndClose();
     }
 
     ok() {
+        let isParseError = false;
         try {
             this.model.Model = JSON.parse(CommonHelper.escapeJson(this._json));
             // if (typeof this.model.Model != this.model.Type)
             //     throw "Invalid Type";
         } catch (error) {
             this.model.ErrorMessage = error;
+            isParseError = true;
         }
-        if (!this.model.ErrorMessage) {
+        if (!isParseError) {
+            this.showProgress = true;
             this.model.Result = DialogResult.Ok;
             this.dialogClosedEventSource.next(this.model);
-            this.dialogClosedEventSource = new Subject<CommonInputModel>();
-            this.dialogClosed = this.dialogClosedEventSource.asObservable();
-            this._modalRef.close();
         }
     }
 
@@ -67,5 +68,11 @@ export class CommonInputDialogComponent {
             numberOfLineBreaks += _.floor((l.length / this.cols));
         });
         return numberOfLineBreaks + 1;
+    }
+
+    unsubscribeAndClose() {
+        this.dialogClosedEventSource = new Subject<CommonInputModel>();
+        this.dialogClosed = this.dialogClosedEventSource.asObservable();
+        this._modalRef.close();
     }
 }

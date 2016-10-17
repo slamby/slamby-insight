@@ -714,8 +714,13 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                                 Item: docToSave
                             })]);
                             this.setHeaders();
+                            this.documentEditorDialog.unsubscribeAndClose();
                         },
-                        error => this.errorMessage = <any>error
+                        error => {
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.documentEditorDialog.showProgress = false;
+                        }
                     );
                 } else {
                     this._documentService.updateDocument(this.dataset.Name, model.Id, docToSave).subscribe(
@@ -723,8 +728,13 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                             let idField = this._dataset.IdField;
                             let index = this.documents.indexOf(this.documents.find(d => d.Item[idField] === model.Id));
                             this.documents[index].Item = updatedDoc;
+                            this.documentEditorDialog.unsubscribeAndClose();
                         },
-                        error => this.errorMessage = <any>error
+                        error => {
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.documentEditorDialog.showProgress = false;
+                        }
                     );
                 }
             }
@@ -834,8 +844,13 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                     this._tagService.exportWords(this._dataset.Name, model.Model).subscribe(
                         (process: IProcess) => {
                             this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
+                            this.inputDialog.unsubscribeAndClose();
                         },
-                        error => this.handleError(error)
+                        error => {
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.inputDialog.showProgress = false;
+                        }
                     );
 
                     this._messenger.sendMessage({
@@ -846,8 +861,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         }
                     });
                 }
-            },
-            error => this.handleError(error)
+            }
         );
         this.inputDialog.open();
     }
@@ -875,16 +889,26 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                                 IsSelected: false,
                                 Item: _.cloneDeep(newTag)
                             }]);
+                            this.tagEditorDialog.unsubscribeAndClose();
                         },
-                        error => this.errorMessage = <any>error
+                        error => {
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.tagEditorDialog.showProgress = false;
+                        }
                     );
                 } else {
                     this._tagService.updateTag(this.dataset.Name, pendingTag.Id, tagToSave).subscribe(
                         () => {
                             let index = this.tags.indexOf(this.tags.find(d => d.Item.Id === pendingTag.Id));
                             this.tags[index].Item = _.cloneDeep(tagToSave);
+                            this.tagEditorDialog.unsubscribeAndClose();
                         },
-                        error => this.errorMessage = <any>error
+                        error => {
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.tagEditorDialog.showProgress = false;
+                        }
                     );
                 }
             }
@@ -964,9 +988,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         });
     }
 
-    handleError(response: Response) {
+    handleError(response: Response): string {
         let model = ErrorsModelHelper.getFromResponse(response);
         let errors = ErrorsModelHelper.concatErrors(model);
         this._notificationService.error(`${errors}`, `DataSet error (${response.status})`);
+        return errors;
     }
 }

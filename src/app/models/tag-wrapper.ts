@@ -6,4 +6,5 @@ export interface TagWrapper {
     Id: string;
     Header: string;
     Result?: DialogResult;
+    ErrorMessage?: string;
 }

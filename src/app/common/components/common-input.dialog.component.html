@@ -1,20 +1,25 @@
-<template #template let-c="close" let-d="dismiss">
-    <div class="modal-header">
-        <button type="button" class="close" aria-label="Close" (click)="cancel(); d('Cross click')">
+<template #template>
+	<div class="modal-header">
+		<button type="button" class="close" aria-label="Close" (click)="cancel()">
                     <span aria-hidden="true">&times;</span>
                 </button>
-        <h4 class="modal-title">{{model.Header}}</h4>
-    </div>
-    <div *ngIf="model.ErrorMessage">
-        <p>{{model.ErrorMessage}}</p>
-    </div>
-    <form (submit)="ok()">
-        <div class="modal-body">
-            <textarea [rows]="getRowNumber(_json)" [cols]="cols" name="jsonText" [(ngModel)]="_json"></textarea>
-        </div>
-        <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">OK</button>
-            <button type="button" class="btn btn-secondary" (click)="cancel(); c('Close click')">Close</button>
-        </div>
-    </form>
+		<h4 class="modal-title">{{model.Header}}</h4>
+	</div>
+	<div class="modal-body" *ngIf="model.ErrorMessage">
+		<font size="3" color="red">{{model.ErrorMessage}}</font>
+	</div>
+	<div class="modal-body">
+		<div class="progress" style="position: relative;" *ngIf="showProgress">
+			<div class="progress-bar indeterminate"></div>
+		</div>
+	</div>
+	<form (submit)="ok()">
+		<div class="modal-body">
+			<textarea [rows]="getRowNumber(_json)" [cols]="cols" name="jsonText" [(ngModel)]="_json"></textarea>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" class="btn btn-primary">OK</button>
+			<button type="button" class="btn btn-secondary" (click)="cancel()">Close</button>
+		</div>
+	</form>
 </template>

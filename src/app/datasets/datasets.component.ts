@@ -84,8 +84,13 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                                     dataSetToSave.Statistics = { DocumentsCount: 0 };
                                     this.dataSets = _.concat(this.dataSets, [_.cloneDeep(dataSetToSave)]);
                                     model = this.getDefaultDataSet();
+                                    this.editorDialog.unsubscribeAndClose();
                                 },
-                                error => this.handleError(error));
+                                error => {
+                                    let errors = this.handleError(error);
+                                    model.ErrorMessage = errors;
+                                    this.editorDialog.showProgress = false;
+                                });
                         } else {
                             dataSetToSave.Schema = JSON.parse(model.dataSet.Schema);
                             dataSetToSave.SampleDocument = null;
@@ -93,8 +98,13 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                                 () => {
                                     this.dataSets = _.concat(this.dataSets, [_.cloneDeep(model.dataSet)]);
                                     model = this.getDefaultDataSet();
+                                    this.editorDialog.unsubscribeAndClose();
                                 },
-                                error => this.handleError(error));
+                                error => {
+                                    let errors = this.handleError(error);
+                                    model.ErrorMessage = errors;
+                                    this.editorDialog.showProgress = false;
+                                });
                         }
                     } else {
                         this._datasetService.renameDataset(model.Name.toString(), dataSetToSave.Name).subscribe(
@@ -102,9 +112,17 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                                 let index = this.dataSets.indexOf(this.dataSets.find(d => d.Name === model.Name));
                                 this.dataSets[index].Name = model.dataSet.Name;
                                 model = this.getDefaultDataSet();
+                                this.editorDialog.unsubscribeAndClose();
                             },
-                            error => this.handleError(error));
+                            error => {
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.editorDialog.showProgress = false;
+                            });
                     }
+                }
+                else {
+                    this.editorDialog.unsubscribeAndClose();
                 }
             },
             error => this.handleError(error)
@@ -126,21 +144,24 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         this.confirmDialog.dialogClosed.subscribe(
             (result: ConfirmModel) => {
                 if (result.Result === DialogResult.Yes) {
-                    this.deleteDataSet(selected);
+                    this.deleteDataSet(selected, result);
                 }
-            },
-            error => this.handleError(error)
+            }
         );
         this.confirmDialog.open();
     }
 
-    deleteDataSet(selected: IDataSet) {
+    deleteDataSet(selected: IDataSet, confirmModel: ConfirmModel) {
         this._datasetService
             .deleteDataset(selected.Name)
             .subscribe(
-            error => this.handleError(error),
+            error => {
+                this.handleError(error);
+                this.confirmDialog.unsubscribeAndClose();
+            },
             () => {
                 this.dataSets = _.without(this.dataSets, selected);
+                this.confirmDialog.unsubscribeAndClose();
             });
     }
 
@@ -191,9 +212,10 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         };
     }
 
-    handleError(response: Response) {
+    handleError(response: Response): string {
         let model = ErrorsModelHelper.getFromResponse(response);
         let errors = ErrorsModelHelper.concatErrors(model);
         this._notificationService.error(`${errors}`, `DataSet error (${response.status})`);
+        return errors;
     }
 }

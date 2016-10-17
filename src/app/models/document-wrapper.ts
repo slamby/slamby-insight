@@ -5,4 +5,5 @@ export interface DocumentWrapper {
     Id: string;
     Header: string;
     Result?: DialogResult;
+    ErrorMessage?: string;
 }

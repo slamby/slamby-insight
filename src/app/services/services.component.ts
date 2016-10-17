@@ -115,12 +115,16 @@ export class ServicesComponent implements OnInit {
                         (service: IService) => {
                             this.services = _.concat(this.services, [service]);
                             this.refresh(service);
+                            this.inputDialog.unsubscribeAndClose();
                         },
-                        error => this.handleError(error)
+                        error => {
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.inputDialog.showProgress = false;
+                        }
                     );
                 }
-            },
-            error => this.handleError(error)
+            }
         );
         this.inputDialog.open();
     }
@@ -239,12 +243,16 @@ export class ServicesComponent implements OnInit {
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
+                                this.inputDialog.unsubscribeAndClose();
                             },
-                            error => this.handleError(error)
+                            error => {
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.inputDialog.showProgress = false;
+                            }
                         );
                     }
-                },
-                error => this.handleError(error)
+                }
             );
             this.inputDialog.open();
 
@@ -267,12 +275,16 @@ export class ServicesComponent implements OnInit {
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
+                                this.inputDialog.unsubscribeAndClose();
                             },
-                            error => this.handleError(error)
+                            error => {
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.inputDialog.showProgress = false;
+                            }
                         );
                     }
-                },
-                error => this.handleError(error)
+                }
             );
             this.inputDialog.open();
         }
@@ -310,12 +322,16 @@ export class ServicesComponent implements OnInit {
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
+                                this.inputDialog.unsubscribeAndClose();
                             },
-                            error => this.handleError(error)
+                            error => {
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.inputDialog.showProgress = false;
+                            }
                         );
                     }
-                },
-                error => this.handleError(error)
+                }
             );
             this.inputDialog.open();
 
@@ -335,12 +351,16 @@ export class ServicesComponent implements OnInit {
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
+                                this.inputDialog.unsubscribeAndClose();
                             },
-                            error => this.handleError(error)
+                            error => {
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.inputDialog.showProgress = false;
+                            }
                         );
                     }
-                },
-                error => this.handleError(error)
+                }
             );
             this.inputDialog.open();
         }
@@ -368,21 +388,30 @@ export class ServicesComponent implements OnInit {
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
+                                this.inputDialog.unsubscribeAndClose();
                             },
-                            error => this.handleError(error)
+                            error => {
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.inputDialog.showProgress = false;
+                            }
                         );
                     } else {
                         this._prcService.exportDictionary(selected.Id, model.Model).subscribe(
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
+                                this.inputDialog.unsubscribeAndClose();
                             },
-                            error => this.handleError(error)
+                            error => {
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.inputDialog.showProgress = false;
+                            }
                         );
                     }
                 }
-            },
-            error => this.handleError(error)
+            }
         );
         this.inputDialog.open();
     }
@@ -428,7 +457,6 @@ export class ServicesComponent implements OnInit {
             this.inputDialog.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
-                        this.dialogService.openDialog('indeterminateprogress');
                         this._classifierService.recommend(selected.Id, model.Model).subscribe(
                             (results: Array<IClassifierRecommendationResult>) => {
                                 this.dialogService.close();
@@ -438,16 +466,17 @@ export class ServicesComponent implements OnInit {
                                         RecommendationResult: results
                                     }
                                 };
+                                this.inputDialog.unsubscribeAndClose();
                                 this.resultDialog.open();
                             },
                             error => {
-                                this.dialogService.close();
-                                this.handleError(error);
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.inputDialog.showProgress = false;
                             }
                         );
                     }
-                },
-                error => this.handleError(error)
+                }
             );
             this.inputDialog.open();
 
@@ -468,7 +497,6 @@ export class ServicesComponent implements OnInit {
             this.inputDialog.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
-                        this.dialogService.openDialog('indeterminateprogress');
                         this._prcService.recommend(selected.Id, model.Model).subscribe(
                             (results: Array<IPrcRecommendationResult>) => {
                                 this.dialogService.close();
@@ -478,16 +506,17 @@ export class ServicesComponent implements OnInit {
                                         RecommendationResult: results
                                     }
                                 };
+                                this.inputDialog.unsubscribeAndClose();
                                 this.resultDialog.open();
                             },
                             error => {
-                                this.dialogService.close();
-                                this.handleError(error);
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.inputDialog.showProgress = false;
                             }
                         );
                     }
-                },
-                error => this.handleError(error)
+                }
             );
             this.inputDialog.open();
         }
@@ -512,12 +541,16 @@ export class ServicesComponent implements OnInit {
                         (process: IProcess) => {
                             this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                             this.refresh(selected);
+                            this.inputDialog.unsubscribeAndClose();
                         },
-                        error => this.handleError(error)
+                        error => {
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.inputDialog.showProgress = false;
+                        }
                     );
                 }
-            },
-            error => this.handleError(error)
+            }
         );
         this.inputDialog.open();
     }
@@ -558,7 +591,6 @@ export class ServicesComponent implements OnInit {
         this.inputDialog.dialogClosed.subscribe(
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
-                    this.dialogService.openDialog('indeterminateprogress');
                     this._prcService.recommendById(selected.Id, model.Model).subscribe(
                         (results: Array<IPrcRecommendationResult>) => {
                             this.dialogService.close();
@@ -568,23 +600,25 @@ export class ServicesComponent implements OnInit {
                                     RecommendationResult: results
                                 }
                             };
+                            this.inputDialog.unsubscribeAndClose();
                             this.resultDialog.open();
                         },
                         error => {
-                            this.dialogService.close();
-                            this.handleError(error);
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.inputDialog.showProgress = false;
                         }
                     );
                 }
-            },
-            error => this.handleError(error)
+            }
         );
         this.inputDialog.open();
     }
 
-    handleError(response: Response) {
+    handleError(response: Response): string {
         let model = ErrorsModelHelper.getFromResponse(response);
         let errors = ErrorsModelHelper.concatErrors(model);
         this._notificationService.error(`${errors}`, `DataSet error (${response.status})`);
+        return errors;
     }
 }

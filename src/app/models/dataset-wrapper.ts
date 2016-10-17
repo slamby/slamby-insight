@@ -1,5 +1,5 @@
 import { IDataSet } from 'slamby-sdk-angular2';
-import {DialogResult} from '../models/dialog-result';
+import { DialogResult } from '../models/dialog-result';
 export interface DataSetWrapper {
     Header: string;
     dataSet: IDataSet;
@@ -7,4 +7,5 @@ export interface DataSetWrapper {
     IsNew: boolean;
     Name: string;
     Result?: DialogResult;
+    ErrorMessage?: string;
 }

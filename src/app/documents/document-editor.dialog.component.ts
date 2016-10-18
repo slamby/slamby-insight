@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { DocumentWrapper } from '../models/document-wrapper';
 
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { CommonHelper } from '../common/helpers/common.helper';
 
 @Component({
     selector: 'document-editor-dialog',
@@ -39,9 +40,17 @@ export class DocumentEditorDialogComponent {
     }
 
     ok() {
-        this.showProgress = true;
-        this.model.Result = DialogResult.Ok;
-        this.dialogClosedEventSource.next(this.model);
+        let isParseError = false;
+        try {
+            JSON.parse(CommonHelper.escapeJson(this.model.Document));
+        } catch (error) {
+            this.model.ErrorMessage = error;
+            isParseError = true;
+        }
+        if (!isParseError) {
+            this.model.Result = DialogResult.Ok;
+            this.dialogClosedEventSource.next(this.model);
+        }
     }
 
     unsubscribeAndClose() {

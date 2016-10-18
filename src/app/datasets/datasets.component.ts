@@ -120,8 +120,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                                 this.editorDialog.showProgress = false;
                             });
                     }
-                }
-                else {
+                } else {
                     this.editorDialog.unsubscribeAndClose();
                 }
             },
@@ -141,6 +140,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
             Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
+        this.confirmDialog.modalOptions.windowClass = 'md-dialog';
         this.confirmDialog.dialogClosed.subscribe(
             (result: ConfirmModel) => {
                 if (result.Result === DialogResult.Yes) {
@@ -155,12 +155,12 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         this._datasetService
             .deleteDataset(selected.Name)
             .subscribe(
-            error => {
-                this.handleError(error);
-                this.confirmDialog.unsubscribeAndClose();
-            },
             () => {
                 this.dataSets = _.without(this.dataSets, selected);
+                this.confirmDialog.unsubscribeAndClose();
+            },
+            error => {
+                this.handleError(error);
                 this.confirmDialog.unsubscribeAndClose();
             });
     }

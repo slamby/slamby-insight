@@ -105,8 +105,23 @@ html, body {
     overflow-x: auto; 
     max-height: 500px;
 }
+.md-dialog {
+    .modal, .modal-dialog {
+        width: 600px;
+    }
+}
 .xl-dialog {
     .modal, .modal-dialog {
         width: 1100px;
     }
+}
+
+.progress-bar.indeterminate {
+    position: relative;
+    animation: progress-indeterminate 3s linear infinite;
+}
+
+@keyframes progress-indeterminate {
+    from { left: -25%; width: 25%; }
+    to { left: 100%; width: 25%;}
 }

@@ -7,40 +7,8 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'confirm-dialog',
-    template: `
-        <template #template>
-            <div class="modal-header">
-                <button type="button" class="close" aria-label="Close" (click)='close("cancel")'>
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">{{model.Header}}</h4>
-            </div>
-            <div class="modal-body">
-            <div class="progress" style="position: relative;" *ngIf="showProgress">
-				<div class="progress-bar indeterminate"></div>
-			</div>
-            <div [innerHTML]=model.Message></div>
-            </div>
-            <div class="modal-footer">
-                <div class="btn-group">
-                    <button class="btn btn-primary" *ngIf='yesButtonIsVisibile' (click)='close("yes");'>Yes</button>
-                    <button class="btn btn-secondary" *ngIf='noButtonIsVisibile' (click)='close("no");'>No</button>
-                    <button class="btn btn-primary" *ngIf='okButtonIsVisibile' (click)='close("ok");'>Ok</button>
-                    <button class="btn btn-secondary" *ngIf='cancelButtonIsVisibile' (click)='close("cancel");'>Cancel</button>
-                </div>
-            </div>
-        </template>
-    `,
-    styles: [`
-                .progress-bar.indeterminate {
-                position: relative;
-                animation: progress-indeterminate 3s linear infinite;
-            }
-
-            @keyframes progress-indeterminate {
-                from { left: -25%; width: 25%; }
-                to { left: 100%; width: 25%;}
-            }`]
+    template: require('./confirm.dialog.component.html'),
+    styles: []
 })
 export class ConfirmDialogComponent {
     okButtonIsVisibile = false;
@@ -65,7 +33,8 @@ export class ConfirmDialogComponent {
     modalOptions: NgbModalOptions = {
         backdrop: true,
         keyboard: true,
-        size: 'lg'
+        size: 'lg',
+        windowClass: ''
     };
     private dialogClosedEventSource = new Subject<ConfirmModel>();
     dialogClosed = this.dialogClosedEventSource.asObservable();

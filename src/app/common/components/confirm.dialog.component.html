@@ -1,0 +1,20 @@
+<template #template>
+	<div class="modal-header">
+		<button type="button" class="close" aria-label="Close" (click)='close("cancel")'>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+		<h4 class="modal-title">{{model.Header}}</h4>
+	</div>
+	<div class="modal-body">
+		<div class="progress" style="position: relative;" *ngIf="showProgress">
+			<div class="progress-bar indeterminate"></div>
+		</div>
+		<div [innerHTML]=model.Message></div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" *ngIf='yesButtonIsVisibile' (click)='close("yes");'>Yes</button>
+		<button class="btn btn-secondary" *ngIf='noButtonIsVisibile' (click)='close("no");'>No</button>
+		<button class="btn btn-primary" *ngIf='okButtonIsVisibile' (click)='close("ok");'>Ok</button>
+		<button class="btn btn-secondary" *ngIf='cancelButtonIsVisibile' (click)='close("cancel");'>Cancel</button>
+	</div>
+</template>

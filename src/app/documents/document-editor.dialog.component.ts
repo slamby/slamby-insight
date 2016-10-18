@@ -4,7 +4,6 @@ import { Subject } from 'rxjs';
 import { DocumentWrapper } from '../models/document-wrapper';
 
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import * as _ from 'lodash';
 
 @Component({
     selector: 'document-editor-dialog',

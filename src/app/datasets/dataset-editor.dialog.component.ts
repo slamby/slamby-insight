@@ -3,6 +3,7 @@ import { DialogResult } from '../models/dialog-result';
 import { Subject } from 'rxjs';
 import { DataSetWrapper } from '../models/dataset-wrapper';
 
+import { CommonHelper } from '../common/helpers/common.helper';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -38,9 +39,23 @@ export class DatasetEditorDialogComponent {
     }
 
     ok() {
-        this.showProgress = true;
-        this.model.Result = DialogResult.Ok;
-        this.dialogClosedEventSource.next(this.model);
+        let isParseError = false;
+        try {
+            if (this.model.sampleDocumentChecked) {
+                JSON.parse(CommonHelper.escapeJson(this.model.dataSet.SampleDocument));
+            }
+            else {
+                JSON.parse(CommonHelper.escapeJson(this.model.dataSet.Schema));
+            }
+        } catch (error) {
+            this.model.ErrorMessage = error;
+            isParseError = true;
+        }
+        if (!isParseError) {
+            this.showProgress = true;
+            this.model.Result = DialogResult.Ok;
+            this.dialogClosedEventSource.next(this.model);
+        }
     }
 
     unsubscribeAndClose() {

@@ -295,8 +295,8 @@ export class ServicesComponent implements OnInit {
             return;
         }
         this._processesService.cancel(selected.ActualProcessId).subscribe(
-            error => this.handleError(error),
-            () => this.refresh(selected)
+            () => this.refresh(selected),
+            error => this.handleError(error)
         );
     }
 
@@ -422,16 +422,16 @@ export class ServicesComponent implements OnInit {
         }
         if (selected.Type === IService.ITypeEnum.Classifier) {
             this._classifierService.deactivate(selected.Id).subscribe(
-                error => this.handleError(error),
                 () => {
                     this.refresh(selected);
-                });
+                },
+                error => this.handleError(error));
         } else {
             this._prcService.deactivate(selected.Id).subscribe(
-                error => this.handleError(error),
                 () => {
                     this.refresh(selected);
-                });
+                },
+                error => this.handleError(error));
         }
     }
 

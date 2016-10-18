@@ -109,8 +109,8 @@ export class ProcessesComponent implements OnInit {
             return;
         }
         this._processesService.cancel(selected.Id).subscribe(
-            error => this.handleError(error),
-            () => this.refresh(selected)
+            () => this.refresh(selected),
+            error => this.handleError(error)
         );
     }
 

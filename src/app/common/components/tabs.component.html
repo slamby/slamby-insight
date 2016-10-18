@@ -11,7 +11,7 @@
             </li>
         </ul>
     </div>
-    <div class="tab-content" [style.overflow]="contentOverflow()">
+    <div class="tab-content" [style.overflow]="contentOverflow">
         <div *ngFor="let tab of tabs" (click)="selectTab(tab)" class="tab-pane active">
             <dynamic-tab [tab]="tab"></dynamic-tab>
         </div>

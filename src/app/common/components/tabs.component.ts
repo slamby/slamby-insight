@@ -17,7 +17,9 @@ export class TabsComponent implements AfterContentInit {
     @Input() clipContent = false;
     @ViewChild(HorizontalScrollDirective) horizontalScroll: HorizontalScrollDirective;
 
-    contentOverflow = () => this.clipContent ? 'auto' : 'visible';
+    get contentOverflow(): string {
+        return this.clipContent ? 'auto' : 'visible';
+    }
 
     constructor(private messenger: Messenger) {
     }

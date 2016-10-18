@@ -70,6 +70,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         }
 
         this.editorDialog.model = pendingDataset;
+        this.editorDialog.modalOptions.windowClass = !pendingDataset.IsNew ? 'md-dialog' : '';
         this.editorDialog.dialogClosed.subscribe(
             (model: DataSetWrapper) => {
                 if (model.Result === DialogResult.Ok) {

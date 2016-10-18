@@ -1,0 +1,19 @@
+<div class="table-responsive">
+	<table>
+		<tbody>
+			<tr *ngFor='let property of properties'>
+				<td>
+					<label>{{property.Key}}: </label>
+				</td>
+				<td style="width: 100%">
+					<p *ngIf="!isMultiline(property.Value)">
+						{{property.Value}}
+					</p>
+                    <!--<prettyjson [obj]="document" [horizontalScroll]="'pre'"></prettyjson>-->
+					<pre *ngIf="isMultiline(property.Value)" [innerHtml]="replaceNewLines(property.Value)" style="width: 100%">
+					</pre>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

@@ -5,26 +5,8 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'output-dialog',
-    template: `
-        <template #template let-c="close" let-d="dismiss">
-            <div class="modal-header">
-                <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">{{model.Header}}</h4>
-            </div>
-            <div *ngIf="model.ErrorMessage">
-                <p>{{model.ErrorMessage}}</p>
-            </div>
-                <div class="modal-body">
-                        <DocumentDetails [document]="model.OutputObject">
-                        </DocumentDetails>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
-                </div>
-        </template>
-    `
+    template: require('./common-output.dialog.component.html'),
+    styles: [require('./common-output.dialog.component.scss')]
 })
 export class CommonOutputDialogComponent {
     @Input() model: CommonOutputModel;

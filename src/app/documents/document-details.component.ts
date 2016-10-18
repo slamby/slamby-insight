@@ -1,42 +1,9 @@
 import {Component, Input} from '@angular/core';
 
-//      <prettyjson [obj]="document" [horizontalScroll]="'pre'"></prettyjson>
 @Component({
     selector: 'DocumentDetails',
-    template: `
-    <div class="table-responsive">
-        <table >
-            <tbody>
-                <tr *ngFor='let property of properties'>
-                    <td>
-                        <label>{{property.Key}}: </label>
-                    </td>
-                    <td style="width: 100%">
-                        <p *ngIf="!isMultiline(property.Value)">
-                            {{property.Value}}
-                        </p>
-                        <pre *ngIf="isMultiline(property.Value)" [innerHtml]="replaceNewLines(property.Value)" style="width: 100%">
-                        </pre>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    `,
-styles: [`
-    pre {
-        background-color: inherit;
-        border: none;
-        font-family: inherit;
-        font-size: inherit;
-        padding: 0;
-    }
-    .string { color: green; }
-    .number { color: darkorange; }
-    .boolean { color: blue; }
-    .null { color: magenta; }
-    .key { color: red; }
-`]
+    template: require('./document-details.component.html'),
+    styles: [require('./document-details.component.scss')]
 })
 export class DocumentDetailsComponent {
     static pageTitle: string = 'DocumentDetails';

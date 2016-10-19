@@ -10,7 +10,6 @@ import { ImportModule } from '../../import/import.module';
 import { ProcessesModule } from '../../processes/processes.module';
 import { ResourcesModule } from '../../resources/resources.module';
 import { NotificationsModule } from '../../notifications/notifications.module';
-import { LogonModule } from '../../logon/logon.module';
 import { ITab } from '../../models/itab';
 import { Messenger } from './../services/messenger.service';
 
@@ -68,11 +67,8 @@ export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy 
             case "ResourcesComponent":
                 module = ResourcesModule;
                 break;
-            case "NotificationsComponent":
+            case "NotificationComponent":
                 module = NotificationsModule;
-                break;
-            case "LogonComponent":
-                module = LogonModule;
                 break;
             default:
                 break;

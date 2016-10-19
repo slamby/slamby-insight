@@ -1,8 +1,8 @@
 import { Component, Input, ViewChild } from '@angular/core';
-import {NgbModal,  NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal,  NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'document-details-dialog',
+    selector: 'sl-document-details-dialog',
     template: require('./document-details.dialog.component.html')
 })
 export class DocumentDetailsDialogComponent {

@@ -3,7 +3,7 @@ import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstr
 import { ITag } from 'slamby-sdk-angular2';
 
 @Component({
-    selector: 'taglist-selector-dialog',
+    selector: 'sl-taglist-selector-dialog',
     template: require('./taglist-selector-dialog.component.html'),
     changeDetection: ChangeDetectionStrategy.OnPush
 })

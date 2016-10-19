@@ -1,4 +1,5 @@
-import {DialogResult} from '../models/dialog-result';
+import { DialogResult } from '../models/dialog-result';
+
 export interface DocumentWrapper {
     Document: any;
     IsNew: boolean;

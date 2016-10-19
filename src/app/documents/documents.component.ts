@@ -64,7 +64,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
     @ViewChild(DocumentEditorDialogComponent) documentEditorDialog: DocumentEditorDialogComponent;
     @ViewChild(TagEditorDialogComponent) tagEditorDialog: TagEditorDialogComponent;
-    @ViewChild('filterTagListSelector') tagListSelectorDialog: TagListSelectorDialogComponent;
+    @ViewChild(TagListSelectorDialogComponent) tagListSelectorDialog: TagListSelectorDialogComponent;
 
     documentDetails = DocumentDetailsComponent;
 

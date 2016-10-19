@@ -4,7 +4,7 @@ import { ITag } from 'slamby-sdk-angular2';
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'taglist-selector',
+    selector: 'sl-taglist-selector',
     template: require('./taglist-selector.component.html')
 })
 export class TagListSelectorComponent implements AfterContentInit  {

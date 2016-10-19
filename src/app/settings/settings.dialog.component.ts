@@ -1,9 +1,9 @@
-import { Component, ViewChild} from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 
 import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'settings-dialog',
+    selector: 'sl-settings-dialog',
     template: require('./settings.dialog.component.html')
 })
 export class SettingsDialogComponent {

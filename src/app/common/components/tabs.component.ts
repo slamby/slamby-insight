@@ -5,7 +5,7 @@ import { Messenger } from './../services/messenger.service';
 import { HorizontalScrollDirective } from '../directives/horizontal.scroll.directive';
 
 @Component({
-    selector: 'tabs',
+    selector: 'sl-tabs',
     template: require('./tabs.component.html'),
     styles: [require('./tabs.component.scss')]
 })

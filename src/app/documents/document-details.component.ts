@@ -1,7 +1,7 @@
-import {Component, Input} from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
-    selector: 'DocumentDetails',
+    selector: 'sl-document-details',
     template: require('./document-details.component.html'),
     styles: [require('./document-details.component.scss')]
 })

@@ -1,5 +1,5 @@
 <template ngbModalContainer></template>
-<settings-dialog></settings-dialog>
+<sl-settings-dialog></sl-settings-dialog>
 <div *ngIf="optionService.currentEndpoint" class="body-wrapper">
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
@@ -17,7 +17,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <notification-icon></notification-icon>
+                        <sl-notification-icon></sl-notification-icon>
                     </li>
                     <li *ngIf="!globals.developmentMode">
                         <a class="btn" (click)="checkUpdates(true)" title="Check Updates">
@@ -48,7 +48,7 @@
                 </ul>
             </div>
             <div class="main">
-                <tabs #tabs [defaultType]="defaultTab" [listenMessages]=true [clipContent]=true></tabs>
+                <sl-tabs #tabs [defaultType]="defaultTab" [listenMessages]=true [clipContent]=true></sl-tabs>
             </div>
         </div>
         <ng2-toasty></ng2-toasty>
@@ -56,8 +56,6 @@
 </div>
 
 <div *ngIf="!optionService.currentEndpoint" class="endpoint-wrapper">
-
-    <logon (onSelected)="endpointSelected($event)"></logon>
-
+    <sl-logon (onSelected)="endpointSelected($event)"></sl-logon>
 </div>
-<confirm-dialog></confirm-dialog>
+<sl-confirm-dialog></sl-confirm-dialog>

@@ -1,12 +1,12 @@
-import { TemplateRef, Component, ViewChild, Input} from '@angular/core';
+import { TemplateRef, Component, ViewChild, Input } from '@angular/core';
 
-import {NgbModal, NgbModalOptions, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ProgressDialogModel } from '../../models/progress-dialog-model';
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'CommonTemplates',
+    selector: 'sl-common-templates',
     template: require('./dialog.component.html'),
     styles: [require('./dialog.component.scss')]
 })

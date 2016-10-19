@@ -4,7 +4,7 @@ import { CommonOutputModel } from '../../models/common-output.model';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'output-dialog',
+    selector: 'sl-output-dialog',
     template: require('./common-output.dialog.component.html'),
     styles: [require('./common-output.dialog.component.scss')]
 })

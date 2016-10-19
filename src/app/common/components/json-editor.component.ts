@@ -4,7 +4,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 // http://blog.thoughtram.io/angular/2016/07/27/custom-form-controls-in-angular-2.html
 
 @Component({
-    selector: 'json-editor',
+    selector: 'sl-json-editor',
     template: require('./json-editor.component.html'),
     styles: [require('./json-editor.component.scss')],
     providers: [
@@ -12,7 +12,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     ]
 })
 export class JsonEditorComponent implements ControlValueAccessor, OnChanges {
-    @Input('json') _json: string = '';
+    private _json: string = '';
     @Input() readonly: boolean = false;
     @Input() height: string = '200px';
 
@@ -20,7 +20,7 @@ export class JsonEditorComponent implements ControlValueAccessor, OnChanges {
         return this._json;
     }
 
-    set json(val) {
+    @Input() set json(val) {
         this._json = val;
         this.propagateChange(val);
     }

@@ -1,6 +1,6 @@
 <div class="tabs-container">
     <div class="tab-header">
-        <ul class="nav nav-tabs slim-scrollbar" horizontalScroll>
+        <ul class="nav nav-tabs slim-scrollbar" slHorizontalScroll>
             <li *ngFor="let tab of tabs" (click)="selectTab(tab)" [class.active]="tab.active" (mousedown)="tabMouseDown($event, tab)">
                 <a>
                     <i *ngIf="tab.icon" class="fa {{tab.icon}}"></i> {{tab.title}}&nbsp;
@@ -13,7 +13,7 @@
     </div>
     <div class="tab-content" [style.overflow]="contentOverflow">
         <div *ngFor="let tab of tabs" (click)="selectTab(tab)" class="tab-pane active">
-            <dynamic-tab [tab]="tab"></dynamic-tab>
+            <sl-dynamic-tab [tab]="tab"></sl-dynamic-tab>
         </div>
     </div>
 </div>

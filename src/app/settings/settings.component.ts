@@ -4,7 +4,7 @@ import { ITab } from '../models/itab';
 import { EndpointComponent } from './settings-menu-items/endpoint/endpoint.component';
 
 @Component({
-    selector: 'settings',
+    selector: 'sl-settings',
     template: require('./settings.component.html')
 })
 export class SettingsComponent {

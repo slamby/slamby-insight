@@ -2,7 +2,7 @@ import { Directive, ElementRef, HostListener, Output, EventEmitter, ViewContaine
 import { NgModel } from '@angular/forms';
 
 @Directive({
-    selector: 'input[clearBox]'
+    selector: '[slClearBox]'
 })
 export class ClearBoxDirective {
     wrapper: HTMLDivElement;
@@ -40,8 +40,8 @@ export class ClearBoxDirective {
         this.icon = icon;
     }
 
-    @HostListener('ngModelChange', ['$event']) onChange(event) {
-        if (!event) {
+    @HostListener('ngModelChange', ['$event']) onChange(value) {
+        if (!value) {
             this.icon.classList.add('hidden');
         } else {
             this.icon.classList.remove('hidden');

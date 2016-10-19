@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http } from '@angular/http';
 
 import { TagApi, IBulkResults, ITagBulkSettings, ITag, ITagsExportWordsSettings, IProcess } from 'slamby-sdk-angular2';
 
@@ -54,13 +54,5 @@ export class TagService extends BaseService<TagApi> {
         this.setContentTypeHeader();
         this.setDataSetHeader(dataset);
         return this.apiService.wordsExport(settings);
-    }
-
-
-    private handleError(error: Response) {
-        // in a real world app, we may send the server to some remote logging infrastructure
-        // instead of just logging it to the console
-        console.error(error);
-        return Observable.throw(error.json().error || 'Server error');
     }
 }

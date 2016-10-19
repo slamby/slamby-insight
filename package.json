@@ -3,6 +3,10 @@
   "description": "Slamby Insight Application",
   "version": "0.2.0-alpha1",
   "author": "Slamby",
+  "contributors": [
+    "Zsolt Illés <zsolt.illes@slamby.com>",
+    "Béla Soós <bela.soos@slamby.com>"
+  ],
   "main": "src/main.js",
   "homepage": "https://www.slamby.com",
   "scripts": {

@@ -41,8 +41,8 @@
         <div class="row">
             <div class="sidebar">
                 <ul class="nav nav-sidebar">
-                    <li *ngFor="let menuItem of menuItems" (dblclick)="tabs.addTab(menuItem)">
-                        <a>
+                    <li *ngFor="let menuItem of menuItems" (dblclick)="addTab(menuItem)" [style.cursor]="cursor">
+                        <a [style.cursor]="cursor">
                             <i class="fa {{menuItem.pageIcon}}"></i> {{menuItem.pageTitle}}
                         </a>
                     </li>

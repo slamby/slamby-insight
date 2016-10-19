@@ -23,6 +23,7 @@ import * as _ from 'lodash';
 export class DatasetsComponent implements OnInit, AfterContentInit {
     static pageTitle: string = 'Datasets';
     static pageIcon: string = 'fa-database';
+    cursor = "pointer";
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
     @ViewChild(DatasetEditorDialogComponent) editorDialog: DatasetEditorDialogComponent;
 
@@ -33,6 +34,13 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
     constructor(private _datasetService: DatasetService,
         private messenger: Messenger,
         private _notificationService: NotificationService) {
+        this.messenger.messageAvailable$.subscribe(
+            m => {
+                if (m.message === 'setCursor') {
+                    this.cursor = m.arg;
+                }
+            }
+        );
     }
 
     ngAfterContentInit() {
@@ -49,6 +57,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
     selectedDataSetJson = (): string => JSON.stringify(this.sampleOrSchema(this.selectedDataSet), null, 4);
 
     gotoDocuments(selected: IDataSet) {
+        this.cursor = "progress";
         let type = this.docComponent;
         let title = `${selected.Name} - Documents`;
         let parameter = selected;

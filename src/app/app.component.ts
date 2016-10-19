@@ -16,11 +16,13 @@ import { ConfirmModel } from './models/confirm.model';
 import { DialogResult } from './models/dialog-result';
 
 import { OptionService } from './common/services/option.service';
+import { Messenger } from './common/services/messenger.service';
 import { IpcHelper } from './common/helpers/ipc.helper';
 
 import { NotificationService } from './common/services/notification.service';
 import { SlimLoadingBarService } from 'ng2-slim-loading-bar';
 import { ToastyService } from 'ng2-toasty';
+import { TabsComponent } from './common/components/tabs.component';
 
 const { ipcRenderer } = require('electron');
 
@@ -32,8 +34,10 @@ const { ipcRenderer } = require('electron');
 export class AppComponent implements OnInit {
     version: string = 'v0.0.0';
     pageTitle: string = 'Slamby Insight';
-    @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
+    cursor = "pointer";
 
+    @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
+    @ViewChild("tabs") tabs: TabsComponent;
     @ViewChild(SettingsDialogComponent) settingsDialog: SettingsDialogComponent;
     menuItems = [WelcomeComponent, DatasetsComponent, ImportComponent, ServicesComponent,
         ProcessesComponent, ResourcesComponent, NotificationComponent];
@@ -44,6 +48,7 @@ export class AppComponent implements OnInit {
         private _notificationService: NotificationService,
         private slimLoadingBarService: SlimLoadingBarService,
         private toastyService: ToastyService,
+        private messenger: Messenger,
         private zone: NgZone) {
         ipcRenderer.on('download-start', (event) => {
             this.zone.run(() => this.downloadStart());
@@ -62,6 +67,18 @@ export class AppComponent implements OnInit {
                 this.zone.run(() => this._notificationService.info(msg));
             }
         });
+        this.messenger.messageAvailable$.subscribe(
+            m => {
+                if (m.message === 'setCursor') {
+                    this.cursor = m.arg;
+                }
+            }
+        );
+    }
+
+    addTab(menuItem: any) {
+        this.cursor = "progress";
+        setTimeout(() => this.tabs.addTab(menuItem));
     }
 
     downloadStart() {

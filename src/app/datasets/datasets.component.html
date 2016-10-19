@@ -17,7 +17,7 @@
 				</tr>
 			</thead>
 			<tbody *vsFor="dataSets; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
-				<tr *ngFor="let dataSet of _items; let i= index" (click)="select(dataSet)" (dblclick)="gotoDocuments(dataSet)" [class.selected-row]="dataSet==selectedDataSet">
+				<tr *ngFor="let dataSet of _items; let i= index" [style.cursor]="cursor" (click)="select(dataSet)" (dblclick)="gotoDocuments(dataSet)" [class.selected-row]="dataSet==selectedDataSet">
 					<td>{{ i + _startIndex + 1}}</td>
 					<td>{{ dataSet.Name }}</td>
 					<td>{{ dataSet.IdField }}</td>

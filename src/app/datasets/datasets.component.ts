@@ -158,6 +158,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
             .subscribe(
             () => {
                 this.dataSets = _.without(this.dataSets, selected);
+                this.selectedDataSet = null;
                 this.confirmDialog.unsubscribeAndClose();
             },
             error => {

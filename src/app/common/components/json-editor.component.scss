@@ -2,6 +2,12 @@
     display: block;
 }
 
+:host.ng-invalid {
+    textarea {
+        // background-color: #fbb;
+    }
+}
+
 textarea {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     width: 100%;

@@ -6,6 +6,11 @@ import { WelcomeModule } from '../../home/welcome.module';
 import { DatasetsModule } from '../../datasets/datasets.module';
 import { DocumentsModule } from '../../documents/documents.module';
 import { ServicesModule } from '../../services/services.module';
+import { ImportModule } from '../../import/import.module';
+import { ProcessesModule } from '../../processes/processes.module';
+import { ResourcesModule } from '../../resources/resources.module';
+import { NotificationsModule } from '../../notifications/notifications.module';
+import { LogonModule } from '../../logon/logon.module';
 import { ITab } from '../../models/itab';
 import { Messenger } from './../services/messenger.service';
 
@@ -53,6 +58,21 @@ export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy 
                 break;
             case "ServicesComponent":
                 module = ServicesModule;
+                break;
+            case "ImportComponent":
+                module = ImportModule;
+                break;
+            case "ProcessesComponent":
+                module = ProcessesModule;
+                break;
+            case "ResourcesComponent":
+                module = ResourcesModule;
+                break;
+            case "NotificationsComponent":
+                module = NotificationsModule;
+                break;
+            case "LogonComponent":
+                module = LogonModule;
                 break;
             default:
                 break;

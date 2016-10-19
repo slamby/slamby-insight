@@ -10,24 +10,21 @@ import { FormsModule } from '@angular/forms';
 import { SettingsComponent } from './settings/settings.component';
 import { SettingsDialogComponent } from './settings/settings.dialog.component';
 
-import { ImportComponent } from './import/import.component';
+import { ImportModule } from './import/import.module';
 import { DatasetsModule } from './datasets/datasets.module';
 import { DocumentsModule } from './documents/documents.module';
 import { ServicesModule } from './services/services.module';
-import { ResourcesComponent } from './resources/resources.component';
-import { ProcessesComponent } from './processes/processes.component';
+import { ResourcesModule } from './resources/resources.module';
+import { ProcessesModule } from './processes/processes.module';
 import { WelcomeModule } from './home/welcome.module';
-import { EndpointComponent } from './settings/settings-menu-items/endpoint/endpoint.component';
-import { EndpointDialogComponent } from './settings/settings-menu-items/endpoint/endpoint.dialog.component';
-import { NotificationIconComponent } from './notifications/notificationicon.component';
-import { NotificationComponent } from './notifications/notification.component';
+import { NotificationsModule } from './notifications/notifications.module';
 
 import { COMPONENTS_DECLARATIONS } from './common/components/components.module';
 import { DIRECTIVES_DECLARATIONS } from './common/directives/directives.module';
 import { SERVICE_PROVIDERS } from './common/services/services.module';
 import { APPERROR_HANDLER_PROVIDERS } from './common/services/apperror.handler';
 
-import { LogonComponent } from './logon/logon.component';
+import { LogonModule } from './logon/logon.module';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastModule } from 'ng2-toastr/ng2-toastr';
@@ -46,15 +43,6 @@ import { CommonComponentsModule } from './common/components/common-components.mo
 
         SettingsComponent,
         SettingsDialogComponent,
-        ImportComponent,
-        ResourcesComponent,
-
-        EndpointComponent,
-        EndpointDialogComponent,
-        NotificationIconComponent,
-        NotificationComponent,
-        LogonComponent,
-        ProcessesComponent,
         COMPONENTS_DECLARATIONS,
         DIRECTIVES_DECLARATIONS,
 
@@ -67,7 +55,13 @@ import { CommonComponentsModule } from './common/components/common-components.mo
         DatasetsModule,
         DocumentsModule,
         ServicesModule,
+        ImportModule,
+        ProcessesModule,
+        ResourcesModule,
+        NotificationsModule,
         CommonComponentsModule,
+        LogonModule,
+
         
         BrowserModule,
         FormsModule,

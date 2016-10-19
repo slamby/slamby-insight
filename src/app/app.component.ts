@@ -184,7 +184,9 @@ export class AppComponent implements OnInit {
     }
 
     settingsDialogOpen() {
-        this.settingsDialog.open().result.then((result) => {
-        }, (reason) => { });
+        this.cursor = "progress";
+        setTimeout(() => this.settingsDialog.open().result.then((result) => {
+            this.cursor = "pointer";
+        }, (reason) => { }));
     }
 }

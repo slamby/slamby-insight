@@ -9,6 +9,7 @@ import { CommonOutputDialogComponent } from './common-output.dialog.component';
 import { JsonEditorComponent } from './json-editor.component';
 import { ConfirmDialogComponent } from './confirm.dialog.component';
 import { DocumentDetailsComponent } from '../../documents/document-details.component';
+import { OverlayComponent } from './overlay.component';
 
 import { PIPES_DECLARATIONS } from '../pipes/pipes.module';
 
@@ -24,7 +25,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         ConfirmDialogComponent,
         DocumentDetailsComponent,
         VsFor,
-        PIPES_DECLARATIONS
+        PIPES_DECLARATIONS,
+        OverlayComponent
     ],
     imports: [
         BrowserModule,
@@ -39,14 +41,16 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         ConfirmDialogComponent,
         DocumentDetailsComponent,
         VsFor,
-        PIPES_DECLARATIONS
+        PIPES_DECLARATIONS,
+        OverlayComponent
     ],
     bootstrap: [
         DialogComponent,
         CommonInputDialogComponent,
         CommonOutputDialogComponent,
         JsonEditorComponent,
-        ConfirmDialogComponent
+        ConfirmDialogComponent,
+        OverlayComponent
     ]
 })
 export class CommonComponentsModule { }

@@ -3,7 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'endpoint-dialog',
+    selector: 'sl-endpoint-dialog',
     template: require('./endpoint.dialog.component.html'),
     styles: [require('./endpoint.dialog.component.scss')]
 })

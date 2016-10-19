@@ -1,10 +1,11 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 
 @Directive({
-    selector: '[horizontalScroll]'
+    selector: '[slHorizontalScroll]'
 })
 export class HorizontalScrollDirective {
-    @Input('horizontalScroll') selector: string = '';
+    @Input() selector: string = '';
+
     constructor(private element: ElementRef) {
     }
 
@@ -22,7 +23,7 @@ export class HorizontalScrollDirective {
     }
 
     getElement(): any {
-        let element =  this.selector
+        let element = this.selector
             ? this.element.nativeElement.querySelector(this.selector)
             : this.element.nativeElement;
 

@@ -15,7 +15,7 @@
 	</div>
 	<form (submit)="ok()" #f="ngForm" class="form-horizontal">
 		<div class="modal-body">
-			<json-editor [(ngModel)]="model.Document" name="document" height="400px"></json-editor>
+			<sl-json-editor [(ngModel)]="model.Document" name="document" height="400px"></sl-json-editor>
 		</div>
 		<div class="modal-footer">
 			<button type="submit" class="btn btn-success" [disabled]="!f.valid">OK</button>

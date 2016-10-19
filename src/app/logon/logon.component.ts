@@ -7,7 +7,7 @@ import { StatusService } from '../common/services/status.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 
 @Component({
-    selector: 'logon',
+    selector: 'sl-logon',
     template: require('./logon.component.html'),
     styles: [require('./logon.component.scss')]
 })

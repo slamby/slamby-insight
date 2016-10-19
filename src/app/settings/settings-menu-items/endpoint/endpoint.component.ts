@@ -11,7 +11,7 @@ import { ErrorsModelHelper } from '../../../common/helpers/errorsmodel.helper';
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'endpoint-editor',
+    selector: 'sl-endpoint-editor',
     template: require('./endpoint.component.html'),
     styles: [require('./endpoint.component.scss')]
 })

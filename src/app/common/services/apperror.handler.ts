@@ -37,7 +37,9 @@ export class AppErrorHandler implements ErrorHandler {
                 : error;
 
             this.notificationService.error(error.message, 'Internal Error');
+
             // TODO: send to main thread via Ipc
+            console.error(errorToSend);
         } catch (loggingError) {
             console.group('ErrorHandler');
             console.warn('Error when trying to log error to');

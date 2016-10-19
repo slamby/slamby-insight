@@ -57,6 +57,6 @@ export class ResourcesComponent implements OnInit {
         let model = ErrorsModelHelper.getFromResponse(response);
         let errors = ErrorsModelHelper.concatErrors(model);
         // TODO: más módon kellene jelezni, mert hamar teleszemetelődik a notification 
-        // this._notificationService.error(`${errors}`, `Status error (${response.status})`);
+        this._notificationService.error(`${errors}`, `Status error (${response.status})`);
     }
 }

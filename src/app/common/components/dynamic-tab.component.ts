@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild, ViewContainerRef, ComponentRef, ModuleWithComponentFactories } from '@angular/core';
+import { OnChanges, AfterViewInit, OnDestroy } from '@angular/core';
 import { RuntimeCompiler, COMPILER_PROVIDERS } from '@angular/compiler';
-// import { HttpModule } from '@angular/http';
 import { AppModule } from '../../app.module';
 import { WelcomeModule } from '../../home/welcome.module';
 import { DatasetsModule } from '../../datasets/datasets.module';
@@ -11,7 +11,7 @@ import { ITab } from '../../models/itab';
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'dynamic-tab',
+    selector: 'sl-dynamic-tab',
     styles: [`
     .pane{
       padding: 1em;
@@ -21,9 +21,9 @@ import * as _ from 'lodash';
       <div #target>
       </div>
     </div>`,
-    providers: [RuntimeCompiler, COMPILER_PROVIDERS/*,HttpModule*/]
+    providers: [RuntimeCompiler, COMPILER_PROVIDERS]
 })
-export class DynamicTabComponent {
+export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy {
     @ViewChild('target', { read: ViewContainerRef }) target;
     @Input() tab: ITab;
     cmpRef: ComponentRef<any>;

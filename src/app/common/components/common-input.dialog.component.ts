@@ -8,7 +8,7 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import * as _ from 'lodash';
 
 @Component({
-    selector: 'input-dialog',
+    selector: 'sl-input-dialog',
     template: require('./common-input.dialog.component.html'),
     styles: [require('./common-input.dialog.component.scss')]
 })

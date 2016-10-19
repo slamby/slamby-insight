@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-    selector: 'overlay',
+    selector: 'sl-overlay',
     template: require('./overlay.component.html'),
     styles: [require('./overlay.component.scss')]
 })

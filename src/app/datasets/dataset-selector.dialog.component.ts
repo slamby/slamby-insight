@@ -3,10 +3,10 @@ import { DatasetSelectorModel } from './dataset-selector.model';
 import { DialogResult } from '../models/dialog-result';
 import { Subject } from 'rxjs';
 
-import {NgbModal, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'dataset-selector',
+    selector: 'sl-dataset-selector',
     template: require('./dataset-selector.dialog.component.html')
 })
 export class DatasetSelectorDialogComponent {

@@ -5,7 +5,7 @@ import { Messenger } from './../services/messenger.service';
 import { HorizontalScrollDirective } from '../directives/horizontal.scroll.directive';
 
 @Component({
-    selector: 'tabs',
+    selector: 'sl-tabs',
     template: require('./tabs.component.html'),
     styles: [require('./tabs.component.scss')]
 })
@@ -17,7 +17,9 @@ export class TabsComponent implements AfterContentInit {
     @Input() clipContent = false;
     @ViewChild(HorizontalScrollDirective) horizontalScroll: HorizontalScrollDirective;
 
-    contentOverflow = () => this.clipContent ? 'auto' : 'visible';
+    get contentOverflow(): string {
+        return this.clipContent ? 'auto' : 'visible';
+    }
 
     constructor(private messenger: Messenger) {
     }

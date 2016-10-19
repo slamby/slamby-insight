@@ -1,6 +1,6 @@
 <div>
-	<confirm-dialog></confirm-dialog>
-	<dataset-editor-dialog></dataset-editor-dialog>
+	<sl-confirm-dialog></sl-confirm-dialog>
+	<sl-dataset-editor-dialog></sl-dataset-editor-dialog>
 	<button type="button" class="btn btn-primary" (click)="addOrEdit()">Add New DataSet</button>
 	<div *ngIf="dataSets && dataSets.length">
 		<table class="table table-striped table-hover table-interactive" contextmenu="contextmenu">
@@ -41,6 +41,6 @@
 		</table>
 		<div *ngIf="selectedDataSet?.SampleDocument" class="label label-info">Sample Document</div>
 		<div *ngIf="selectedDataSet?.Scheme" class="label label-default">Scheme</div>
-		<json-editor *ngIf="selectedDataSet" [ngModel]="selectedDataSetJson()" readonly="true" height="300px" minHeight="200px"></json-editor>
+		<sl-json-editor *ngIf="selectedDataSet" [ngModel]="selectedDataSetJson()" readonly="true" height="300px" minHeight="200px"></sl-json-editor>
 	</div>
 </div>

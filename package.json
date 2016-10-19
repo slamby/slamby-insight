@@ -3,6 +3,10 @@
   "description": "Slamby Insight Application",
   "version": "0.2.0-alpha1",
   "author": "Slamby",
+  "contributors": [
+    "Zsolt Illés <zsolt.illes@slamby.com>",
+    "Béla Soós <bela.soos@slamby.com>"
+  ],
   "main": "src/main.js",
   "homepage": "https://www.slamby.com",
   "scripts": {
@@ -15,7 +19,7 @@
     "watch": "webpack --watch --progress --profile --colors --display-error-details --display-cached",
     "electron": "electron . --enable-logging --remote-debugging-port=9222",
     "git:pull": "git pull && npm install",
-    "lint": "tslint -c tslint.json src/**/*.ts",
+    "lint": "node_modules/.bin/tslint -c tslint.json src/**/*.ts",
     "packager:prepare": "npm run build && node tasks/prepare-packager.js && cd packager/temp && npm i",
     "packager:cli": "node node_modules/electron-packager/cli.js packager/temp slambyinsight --out=packager --overwrite --prune=true --ignore=.vscode --ignore=src/app --ignore=tasks/ --icon=src/assets/icons/icon",
     "packager:win32:common": "npm run packager:cli -- --platform=win32 --win32metadata.CompanyName=\"Slamby\" --win32metadata.ProductName=\"Slamby Insight\" --win32metadata.FileDescription=\"Slamby Insight\"",
@@ -35,8 +39,7 @@
     "installer:redhat:x86": "electron-installer-redhat --src packager/slambyinsight-linux-ia32/ --dest installer/ --arch i386 --config linux-installer-config.json",
     "installer:redhat:x64": "electron-installer-redhat --src packager/slambyinsight-linux-x64/ --dest installer/ --arch amd64 --config linux-installer-config.json",
     "installer:redhat": "npm run installer:redhat:x86 && npm run installer:redhat:x64",
-    "installer": "npm run installer:win && npm run installer:debian",
-    "x": "npm run packager:prepare && npm run packager:win32:x64 && npm run installer:win"
+    "installer": "npm run installer:win && npm run installer:debian"
   },
   "license": "ISC",
   "dependencies": {
@@ -88,7 +91,7 @@
     "@types/node": "^6.0.40",
     "angular2-template-loader": "^0.5.0",
     "bower": "^1.7.9",
-    "codelyzer": "1.0.0-beta.0",
+    "codelyzer": "1.0.0-beta.2",
     "copy-webpack-plugin": "3.0.1",
     "cross-env": "^3.0.0",
     "css-loader": "^0.25.0",

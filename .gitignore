@@ -8,3 +8,5 @@ installer/
 insight.log
 
 src/css/site.css
+insight.log
+npm-debug.log

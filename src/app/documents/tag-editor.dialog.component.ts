@@ -6,7 +6,7 @@ import { TagWrapper } from '../models/tag-wrapper';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'tag-editor-dialog',
+    selector: 'sl-tag-editor-dialog',
     template: require('./tag-editor.dialog.component.html'),
     styles: [require('./tag-editor.dialog.component.scss')]
 })

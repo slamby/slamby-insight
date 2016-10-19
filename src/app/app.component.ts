@@ -25,7 +25,7 @@ import { ToastyService } from 'ng2-toasty';
 const { ipcRenderer } = require('electron');
 
 @Component({
-    selector: 'pm-app',
+    selector: 'sl-app',
     template: require('./app.component.html'),
     styles: [require('./app.component.scss')]
 })

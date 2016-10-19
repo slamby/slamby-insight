@@ -1,5 +1,6 @@
 import { IDataSet } from 'slamby-sdk-angular2';
 import { DialogResult } from '../models/dialog-result';
+
 export interface DataSetWrapper {
     Header: string;
     dataSet: IDataSet;

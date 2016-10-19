@@ -1,5 +1,5 @@
-import {IDataSet} from 'slamby-sdk-angular2';
-import {DialogResult} from '../models/dialog-result';
+import { IDataSet } from 'slamby-sdk-angular2';
+import { DialogResult } from '../models/dialog-result';
 
 export interface DatasetSelectorModel {
     Datasets: Array<IDataSet>;

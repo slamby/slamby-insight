@@ -6,7 +6,7 @@ import { Subject } from 'rxjs';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'confirm-dialog',
+    selector: 'sl-confirm-dialog',
     template: require('./confirm.dialog.component.html'),
     styles: []
 })

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { NotificationService, ReadNotification } from '../common/services/notification.service';
 
 @Component({
-    selector: 'notification-icon',
+    selector: 'sl-notification-icon',
     template: require('./notificationicon.component.html'),
     styles: [require('./notificationicon.component.scss')]
 })

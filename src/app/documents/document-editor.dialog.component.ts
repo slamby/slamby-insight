@@ -7,7 +7,7 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { CommonHelper } from '../common/helpers/common.helper';
 
 @Component({
-    selector: 'document-editor-dialog',
+    selector: 'sl-document-editor-dialog',
     template: require('./document-editor.dialog.component.html'),
     styles: [require('./document-editor.dialog.component.scss')]
 })

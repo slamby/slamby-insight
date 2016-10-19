@@ -7,7 +7,7 @@ import { CommonHelper } from '../common/helpers/common.helper';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'dataset-editor-dialog',
+    selector: 'sl-dataset-editor-dialog',
     template: require('./dataset-editor.dialog.component.html'),
     styles: [require('./dataset-editor.dialog.component.scss')]
 })
@@ -43,8 +43,7 @@ export class DatasetEditorDialogComponent {
         try {
             if (this.model.sampleDocumentChecked) {
                 JSON.parse(CommonHelper.escapeJson(this.model.dataSet.SampleDocument));
-            }
-            else {
+            } else {
                 JSON.parse(CommonHelper.escapeJson(this.model.dataSet.Schema));
             }
         } catch (error) {

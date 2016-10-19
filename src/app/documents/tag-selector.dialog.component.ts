@@ -5,10 +5,10 @@ import { DialogResult } from '../models/dialog-result';
 import { SelectedItem } from '../models/selected-item';
 import { Subject } from 'rxjs';
 
-import {NgbModal, NgbModalOptions} from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-    selector: 'tag-selector',
+    selector: 'sl-tag-selector',
     template: require('./tag-selector.dialog.component.html')
 })
 export class TagSelectorDialogComponent {

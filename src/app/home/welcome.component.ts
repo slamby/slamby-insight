@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IpcHelper } from '../common/helpers/ipc.helper';
+const {shell} = require('electron')
 
 @Component({
     template: require('./welcome.component.html')
@@ -11,5 +12,9 @@ export class WelcomeComponent implements OnInit {
 
     ngOnInit() {
         this.versions = IpcHelper.getVersions();
+    }
+
+    openDevSite() {
+        shell.openExternal("http://developers.slamby.com");
     }
 }

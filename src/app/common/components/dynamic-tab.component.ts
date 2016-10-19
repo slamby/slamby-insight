@@ -1,7 +1,11 @@
-import { Component, Input, ViewChild, ViewContainerRef, ComponentRef, ModuleWithComponentFactories} from '@angular/core';
-import { RuntimeCompiler, COMPILER_PROVIDERS}  from '@angular/compiler';
+import { Component, Input, ViewChild, ViewContainerRef, ComponentRef, ModuleWithComponentFactories } from '@angular/core';
+import { RuntimeCompiler, COMPILER_PROVIDERS } from '@angular/compiler';
 // import { HttpModule } from '@angular/http';
 import { AppModule } from '../../app.module';
+import { WelcomeModule } from '../../home/welcome.module';
+import { DatasetsModule } from '../../datasets/datasets.module';
+import { DocumentsModule } from '../../documents/documents.module';
+import { ServicesModule } from '../../services/services.module';
 import { ITab } from '../../models/itab';
 
 import * as _ from 'lodash';
@@ -34,8 +38,24 @@ export class DynamicTabComponent {
         if (this.cmpRef) {
             this.cmpRef.destroy();
         }
-
-        this.compiler.compileModuleAndAllComponentsAsync(AppModule).then(
+        let module = AppModule;
+        switch (this.tab.type.name) {
+            case "WelcomeComponent":
+                module = WelcomeModule;
+                break;
+            case "DatasetsComponent":
+                module = DatasetsModule;
+                break;
+            case "DocumentsComponent":
+                module = DocumentsModule;
+                break;
+            case "ServicesComponent":
+                module = ServicesModule;
+                break;
+            default:
+                break;
+        }
+        this.compiler.compileModuleAndAllComponentsAsync(module).then(
             (moduleWithFactories: ModuleWithComponentFactories<any>) => {
                 let factory = _.find(moduleWithFactories.componentFactories, { componentType: this.tab.type });
                 if (!factory) {

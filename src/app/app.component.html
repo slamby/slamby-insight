@@ -1,5 +1,6 @@
 <template ngbModalContainer></template>
 <settings-dialog></settings-dialog>
+<confirm-dialog></confirm-dialog>
 <div *ngIf="optionService.currentEndpoint" class="body-wrapper">
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
@@ -60,4 +61,3 @@
     <logon (onSelected)="endpointSelected($event)"></logon>
 
 </div>
-<confirm-dialog></confirm-dialog>

@@ -7,6 +7,7 @@ import { DatasetsModule } from '../../datasets/datasets.module';
 import { DocumentsModule } from '../../documents/documents.module';
 import { ServicesModule } from '../../services/services.module';
 import { ITab } from '../../models/itab';
+import { Messenger } from './../services/messenger.service';
 
 import * as _ from 'lodash';
 
@@ -29,7 +30,8 @@ export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy 
     cmpRef: ComponentRef<any>;
     private isViewInitialized: boolean = false;
 
-    constructor(private compiler: RuntimeCompiler) { }
+    constructor(private compiler: RuntimeCompiler,
+        private messenger: Messenger) { }
 
     updateComponent() {
         if (!this.isViewInitialized) {
@@ -70,6 +72,10 @@ export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy 
                 } else if (this.tab.type.name === 'DocumentDetailsComponent' && this.tab.parameter) {
                     this.cmpRef.instance.document = this.tab.parameter;
                 }
+                this.messenger.sendMessage({
+                    message: "setCursor",
+                    arg: "pointer"
+                });
             }
         );
     }

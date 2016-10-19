@@ -46,6 +46,7 @@ const naturalSort = require('node-natural-sort');
 export class DocumentsComponent implements OnInit, AfterContentInit {
     static pageTitle: string = 'Documents';
     static pageIcon: string = 'fa-archive';
+    cursor = "pointer";
 
     _dataset: IDataSet;
     @Input()
@@ -110,6 +111,13 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         private _messenger: Messenger,
         private _notificationService: NotificationService,
         private _zone: NgZone) {
+        this._messenger.messageAvailable$.subscribe(
+            m => {
+                if (m.message === 'setCursor') {
+                    this.cursor = m.arg;
+                }
+            }
+        );
     }
 
     ngAfterContentInit() {
@@ -684,6 +692,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     openDocument(selected: SelectedItem<any>) {
+        this.cursor = "progress";
         let type = this.documentDetails;
         let title = selected.Item[this._dataset.IdField];
         let parameter = selected.Item;

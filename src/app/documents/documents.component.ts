@@ -46,7 +46,7 @@ const naturalSort = require('node-natural-sort');
 export class DocumentsComponent implements OnInit, AfterContentInit {
     static pageTitle: string = 'Documents';
     static pageIcon: string = 'fa-archive';
-    cursor = "pointer";
+    cursor = 'pointer';
 
     _dataset: IDataSet;
     @Input()
@@ -692,7 +692,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     openDocument(selected: SelectedItem<any>) {
-        this.cursor = "progress";
+        this.cursor = 'progress';
         let type = this.documentDetails;
         let title = selected.Item[this._dataset.IdField];
         let parameter = selected.Item;

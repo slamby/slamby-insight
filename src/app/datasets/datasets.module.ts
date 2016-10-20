@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
+import { CustomFormsModule } from 'ng2-validation';
 import { DatasetsComponent } from './datasets.component';
 
 import { DatasetEditorDialogComponent } from './dataset-editor.dialog.component';
@@ -31,7 +32,8 @@ import { CommonComponentsModule } from '../common/components/common-components.m
         NgbModule.forRoot(),
         BrowserModule,
         HttpModule,
-        FormsModule
+        FormsModule,
+        CustomFormsModule
     ],
     bootstrap: [DatasetsComponent],
 })

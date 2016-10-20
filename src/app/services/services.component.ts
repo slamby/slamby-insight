@@ -26,7 +26,6 @@ import { ConfirmModel } from '../models/confirm.model';
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { Observable, Observer } from 'rxjs';
-import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
 
 @Component({
     template: require('./services.component.html'),

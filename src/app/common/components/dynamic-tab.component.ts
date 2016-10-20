@@ -46,28 +46,28 @@ export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy 
         }
         let module = AppModule;
         switch (this.tab.type.name) {
-            case "WelcomeComponent":
+            case 'WelcomeComponent':
                 module = WelcomeModule;
                 break;
-            case "DatasetsComponent":
+            case 'DatasetsComponent':
                 module = DatasetsModule;
                 break;
-            case "DocumentsComponent":
+            case 'DocumentsComponent':
                 module = DocumentsModule;
                 break;
-            case "ServicesComponent":
+            case 'ServicesComponent':
                 module = ServicesModule;
                 break;
-            case "ImportComponent":
+            case 'ImportComponent':
                 module = ImportModule;
                 break;
-            case "ProcessesComponent":
+            case 'ProcessesComponent':
                 module = ProcessesModule;
                 break;
-            case "ResourcesComponent":
+            case 'ResourcesComponent':
                 module = ResourcesModule;
                 break;
-            case "NotificationComponent":
+            case 'NotificationComponent':
                 module = NotificationsModule;
                 break;
             default:
@@ -89,8 +89,8 @@ export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy 
                     this.cmpRef.instance.document = this.tab.parameter;
                 }
                 this.messenger.sendMessage({
-                    message: "setCursor",
-                    arg: "pointer"
+                    message: 'setCursor',
+                    arg: 'pointer'
                 });
             }
         );

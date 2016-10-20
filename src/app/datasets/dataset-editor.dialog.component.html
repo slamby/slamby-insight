@@ -33,10 +33,15 @@
 				</div>
 			</div>
 			<div *ngIf="model.IsNew">
-				<div class="form-group">
+				<div class="form-group" [class.has-error]="nGramCount.errors && nGramCount.touched">
 					<label for="nGramCount" class="col-sm-2 control-label">NGram Count</label>
 					<div class="col-sm-10">
-						<input type="number" class="form-control" [(ngModel)]="model.dataSet.NGramCount" name="nGramCount" required min="1" max="6">
+						<input type="number" class="form-control" [(ngModel)]="model.dataSet.NGramCount" name="nGramCount" #nGramCount="ngModel" required min="1" [min]="1" max="6" [max]="6">
+						<div *ngIf="nGramCount.errors && nGramCount.touched">
+							<p class="text-danger">	
+								NGram Count must be between 1 and 6
+							</p>
+						</div>
 					</div>
 				</div>
 				<div class="form-group">
@@ -65,23 +70,23 @@
 						</md-slide-toggle>
 					</div>
 				</div>
-				<div class="form-group" [ngbCollapse]="!model.sampleDocumentChecked" [class.has-error]="sample.errors && sample.touched">
+				<div class="form-group" [ngbCollapse]="!model.sampleDocumentChecked" [class.has-error]="sample.errors">
 					<label for="sample" class="col-sm-2 control-label">Sample Document</label>
 					<div class="col-sm-10">
-						<sl-json-editor [(ngModel)]="model.dataSet.SampleDocument" name="sample" #sample="ngModel" height="300px"></sl-json-editor>
+						<sl-json-editor [(ngModel)]="model.dataSet.SampleDocument" name="sample" #sample="ngModel" height="300px" json></sl-json-editor>
 						<div *ngIf="sample.dirty && !sample.valid">
-							<p *ngIf="!sample.errors.validateJson.valid" class="text-danger">
+							<p *ngIf="sample.errors?.json" class="text-danger">
 								Invalid Sample JSON!
 							</p>
 						</div>
 					</div>
 				</div>
-				<div class="form-group" [ngbCollapse]="model.sampleDocumentChecked" [hidden]="!model.IsNew" [class.has-error]="schema.errors && schema.touched">
+				<div class="form-group" [ngbCollapse]="model.sampleDocumentChecked" [class.has-error]="schema.errors">
 					<label for="schema" class="col-sm-2 control-label">Schema</label>
 					<div class="col-sm-10">
-						<sl-json-editor [(ngModel)]="model.dataSet.Schema" name="schema" #schema="ngModel" height="300px"></sl-json-editor>
+						<sl-json-editor [(ngModel)]="model.dataSet.Schema" name="schema" #schema="ngModel" height="300px" json></sl-json-editor>
 						<div *ngIf="schema.dirty && !schema.valid">
-							<p *ngIf="!schema.errors.validateJson.valid" class="text-danger">
+							<p *ngIf="schema.errors?.json" class="text-danger">
 								Invalid Schema JSON!
 							</p>
 						</div>

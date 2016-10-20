@@ -34,10 +34,10 @@ const { ipcRenderer } = require('electron');
 export class AppComponent implements OnInit {
     version: string = 'v0.0.0';
     pageTitle: string = 'Slamby Insight';
-    cursor = "pointer";
+    cursor = 'pointer';
 
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
-    @ViewChild("tabs") tabs: TabsComponent;
+    @ViewChild('tabs') tabs: TabsComponent;
     @ViewChild(SettingsDialogComponent) settingsDialog: SettingsDialogComponent;
     menuItems = [WelcomeComponent, DatasetsComponent, ImportComponent, ServicesComponent,
         ProcessesComponent, ResourcesComponent, NotificationComponent];
@@ -77,7 +77,7 @@ export class AppComponent implements OnInit {
     }
 
     addTab(menuItem: any) {
-        this.cursor = "progress";
+        this.cursor = 'progress';
         setTimeout(() => this.tabs.addTab(menuItem));
     }
 
@@ -184,9 +184,9 @@ export class AppComponent implements OnInit {
     }
 
     settingsDialogOpen() {
-        this.cursor = "progress";
+        this.cursor = 'progress';
         setTimeout(() => this.settingsDialog.open().result.then((result) => {
-            this.cursor = "pointer";
+            this.cursor = 'pointer';
         }, (reason) => { }));
     }
 }

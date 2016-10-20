@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { IpcHelper } from '../common/helpers/ipc.helper';
-const {shell} = require('electron')
+const {shell} = require('electron');
 
 @Component({
     template: require('./welcome.component.html')
@@ -15,6 +15,6 @@ export class WelcomeComponent implements OnInit {
     }
 
     openDevSite() {
-        shell.openExternal("http://developers.slamby.com");
+        shell.openExternal('http://developers.slamby.com');
     }
 }

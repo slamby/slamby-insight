@@ -62,7 +62,6 @@ import { CommonComponentsModule } from './common/components/common-components.mo
         CommonComponentsModule,
         LogonModule,
 
-        
         BrowserModule,
         FormsModule,
         HttpModule,

@@ -1,4 +1,6 @@
-import { Component, AfterContentInit, Input, ViewChild } from '@angular/core';
+import { Component, AfterContentInit, Input, ViewChild, ModuleWithComponentFactories } from '@angular/core';
+import { RuntimeCompiler, COMPILER_PROVIDERS } from '@angular/compiler';
+import { AppModule } from '../../app.module';
 
 import { ITab } from '../../models/itab';
 import { Messenger } from './../services/messenger.service';
@@ -7,7 +9,8 @@ import { HorizontalScrollDirective } from '../directives/horizontal.scroll.direc
 @Component({
     selector: 'sl-tabs',
     template: require('./tabs.component.html'),
-    styles: [require('./tabs.component.scss')]
+    styles: [require('./tabs.component.scss')],
+    providers: [RuntimeCompiler, COMPILER_PROVIDERS]
 })
 export class TabsComponent implements AfterContentInit {
     @Input() tabs = new Array<ITab>();
@@ -16,12 +19,13 @@ export class TabsComponent implements AfterContentInit {
     @Input() listenMessages = false;
     @Input() clipContent = false;
     @ViewChild(HorizontalScrollDirective) horizontalScroll: HorizontalScrollDirective;
+    factoryCache: ModuleWithComponentFactories<any>;
 
     get contentOverflow(): string {
         return this.clipContent ? 'auto' : 'visible';
     }
 
-    constructor(private messenger: Messenger) {
+    constructor(private compiler: RuntimeCompiler, private messenger: Messenger) {
     }
 
     addTab(type: any, title: string = null, parameter: any = null): void {
@@ -48,15 +52,23 @@ export class TabsComponent implements AfterContentInit {
                 }
             });
         }
-        if (this.tabs.length === 0 && this.defaultType) {
-            this.addTab(this.defaultType);
-        }
-        // get all active tabs
-        let activeTabs = this.tabs.filter((tab) => tab.active);
 
-        // if there is no active tab set, activate the first
-        if (activeTabs.length === 0) {
-            this.selectTab(this.tabs[0]);
+        if (!this.factoryCache) {
+            this.compiler.compileModuleAndAllComponentsAsync(AppModule).then(
+                (moduleWithFactories: ModuleWithComponentFactories<any>) => {
+                    this.factoryCache = moduleWithFactories;
+                    if (this.tabs.length === 0 && this.defaultType) {
+                        this.addTab(this.defaultType);
+                    }
+                    // get all active tabs
+                    let activeTabs = this.tabs.filter((tab) => tab.active);
+
+                    // if there is no active tab set, activate the first
+                    if (activeTabs.length === 0) {
+                        this.selectTab(this.tabs[0]);
+                    }
+                }
+            );
         }
     }
 

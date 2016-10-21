@@ -12,7 +12,7 @@
 		</ul>
 	</div>
 	<div class="tab-content" [style.overflow]="contentOverflow" *ngIf="factoryCache">
-		<div *ngFor="let tab of tabs" (click)="selectTab(tab)" class="tab-pane active">
+		<div *ngFor="let tab of tabs" (click)="selectTab(tab)" class="tab-pane" [class.active]="tab.active">
 			<sl-dynamic-tab [tab]="tab" [factoryCache]="factoryCache"></sl-dynamic-tab>
 		</div>
 	</div>

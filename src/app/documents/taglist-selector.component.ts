@@ -1,4 +1,4 @@
-import { Component, Input, Output, AfterContentInit, EventEmitter } from '@angular/core';
+import { Component, Input, Output, AfterContentInit, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { ITag } from 'slamby-sdk-angular2';
 
 import * as _ from 'lodash';
@@ -12,6 +12,7 @@ export class TagListSelectorComponent implements AfterContentInit  {
     @Input() tags: ITag[] = [];
     @Input() selectedTagIds: string[] = [];
     @Output() selectionChanged: EventEmitter<string[]> = new EventEmitter<string[]>();
+    @ViewChild('tableBodyDiv') tableBodyDiv: ElementRef;
 
     idFilter: string = '';
     nameFilter: string = '';
@@ -80,14 +81,12 @@ export class TagListSelectorComponent implements AfterContentInit  {
         this.selectionChanged.emit(this.selectedTagIds);
     }
 
-    // filterInputKeyUp(event) {
-    //     this.filteredTags = this.filter();
-    // }
-
     filter(): ITag[] {
         if (!this.idFilter && !this.nameFilter) {
             return this.tags;
         }
+
+        this.tableBodyDiv.nativeElement.scrollTop = 0;
 
         return this.tags.filter(item => _.isMatchWith(item, { Id: this.idFilter }, this.matchCustomizer))
             .filter(item => _.isMatchWith(item, { Name: this.nameFilter }, this.matchCustomizer));

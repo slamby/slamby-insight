@@ -34,7 +34,7 @@
 			</thead>
 		</table>
 	</div>
-	<div class="vs-table-body">
+	<div class="vs-table-body" #tableBodyDiv>
 		<table class='table table-striped'>
 			<tbody *vsFor="filteredTags; tagName:'tr'; scrollParent:'div'; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
 				<tr *ngFor='let tag of _items; let i = index'>

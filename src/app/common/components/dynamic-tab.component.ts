@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ViewContainerRef, ComponentRef, ModuleWithComponentFactories } from '@angular/core';
+import { Component, Input, ViewChild, ViewContainerRef, ComponentRef, ModuleWithComponentFactories, ChangeDetectorRef } from '@angular/core';
 import { OnChanges, AfterViewInit, OnDestroy } from '@angular/core';
 import { ITab } from '../../models/itab';
 import { Messenger } from './../services/messenger.service';
@@ -25,7 +25,7 @@ export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy 
 
     @Input() factoryCache: ModuleWithComponentFactories<any>;
 
-    constructor(private messenger: Messenger) { }
+    constructor(private messenger: Messenger, private cd: ChangeDetectorRef) { }
 
     updateComponent() {
         if (!this.isViewInitialized) {
@@ -52,8 +52,8 @@ export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy 
             this.cmpRef.instance.document = this.tab.parameter;
         }
         this.messenger.sendMessage({
-            message: "setCursor",
-            arg: "pointer"
+            message: 'setCursor',
+            arg: 'pointer'
         });
     }
 
@@ -64,6 +64,7 @@ export class DynamicTabComponent implements OnChanges, AfterViewInit, OnDestroy 
     ngAfterViewInit() {
         this.isViewInitialized = true;
         this.updateComponent();
+        this.cd.detectChanges();
     }
 
     ngOnDestroy() {

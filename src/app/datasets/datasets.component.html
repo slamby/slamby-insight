@@ -1,8 +1,9 @@
-<div>
+<div class="panel-body">
+	<md-progress-circle *ngIf="!dataSets" mode="indeterminate"></md-progress-circle>
 	<sl-confirm-dialog></sl-confirm-dialog>
 	<sl-dataset-editor-dialog></sl-dataset-editor-dialog>
-	<button type="button" class="btn btn-primary" (click)="addOrEdit()">Add New DataSet</button>
 	<div *ngIf="dataSets && dataSets.length">
+		<button type="button" class="btn btn-primary" (click)="addOrEdit()">Add New DataSet</button>
 		<table class="table table-striped table-hover table-interactive" contextmenu="contextmenu">
 			<thead>
 				<tr>

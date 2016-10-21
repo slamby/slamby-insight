@@ -47,8 +47,8 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         this._datasetService
             .getDatasets()
             .subscribe(
-            (dataSets: Array<IDataSet>) => this.dataSets = dataSets,
-            error => this.handleError(error));
+                (dataSets: Array<IDataSet>) => this.dataSets = dataSets,
+                error => this.handleError(error));
     }
     ngOnInit(): void {
     }

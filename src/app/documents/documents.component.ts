@@ -124,13 +124,24 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     setFields() {
-        Object.keys(this.dataset.SampleDocument).forEach(field => {
-            let selectedItem = {
-                Name: field,
-                IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field
-            };
-            this.fields.push(selectedItem);
-        });
+        if (this.dataset.SampleDocument) {
+            Object.keys(this.dataset.SampleDocument).forEach(field => {
+                let selectedItem = {
+                    Name: field,
+                    IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field
+                };
+                this.fields.push(selectedItem);
+            });
+        }
+        else{
+            Object.keys(this.dataset.Schema["properties"]).forEach(field => {
+                let selectedItem = {
+                    Name: field,
+                    IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field
+                };
+                this.fields.push(selectedItem);
+            });
+        }
         this.filterSettings.FieldList = this.fields.filter(f => f.IsSelected).map(s => s.Name);
         this.sampleSettings.Settings.FieldList = this.fields.filter(f => f.IsSelected).map(s => s.Name);
     }
@@ -238,6 +249,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
     deleteConfirm(selectedItems?: Array<SelectedItem<any>>) {
         let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
+        if (this.checkArrayIsEmpty(selectedDocs)) return;
         let model: ConfirmModel = {
             Header: 'Delete documents',
             Message: 'Are you sure to remove ' + selectedDocs.length + ' document(s)',
@@ -316,8 +328,21 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         return isChecked;
     }
 
+    checkArrayIsEmpty(items: Array<any>): boolean {
+        if (items.length <= 0) {
+            this.confirmDialog.model = {
+                Header: 'Warning!',
+                Message: `Please select items!`,
+                Buttons: ['ok']
+            };
+            this.confirmDialog.open();
+        }
+        return items.length <= 0;
+    }
+
     clearTagsConfirm(selectedItems?: Array<SelectedItem<any>>) {
-        if (!this.checkTagFieldIsSelected()) {
+        let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
+        if (!this.checkTagFieldIsSelected() || this.checkArrayIsEmpty(selectedDocs)) {
             return;
         }
         let model: ConfirmModel = {
@@ -501,10 +526,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     addTags(selectedItems?: Array<SelectedItem<any>>) {
-        if (!this.checkTagFieldIsSelected()) {
+        let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
+        if (!this.checkTagFieldIsSelected() || this.checkArrayIsEmpty(selectedDocs)) {
             return;
         }
-        let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
         let tagFieldIsSimple = !_.isArray(selectedDocs[0].Item[this._dataset.TagField]);
         let tagsForDocs = selectedDocs.map(d => tagFieldIsSimple ? [d.Item[this._dataset.TagField]] : d.Item[this._dataset.TagField]);
         let commonTags = tagsForDocs[0];
@@ -587,10 +612,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     removeTags(selectedItems?: Array<SelectedItem<any>>) {
-        if (!this.checkTagFieldIsSelected()) {
+        let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
+        if (!this.checkTagFieldIsSelected() || this.checkArrayIsEmpty(selectedDocs)) {
             return;
         }
-        let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
         let tagFieldIsSimple = !_.isArray(selectedDocs[0].Item[this._dataset.TagField]);
         let tagsForDocs = selectedDocs.map(d => tagFieldIsSimple ? [d.Item[this._dataset.TagField]] : d.Item[this._dataset.TagField]);
         let commonTags = tagsForDocs[0];
@@ -763,6 +788,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
     deleteTagConfirm(selectedItems?: Array<SelectedItem<ITag>>) {
         let selectedTags = selectedItems ? selectedItems : this.tags.filter(d => d.IsSelected);
+        if (this.checkArrayIsEmpty(selectedTags)) return;
         let model: ConfirmModel = {
             Header: 'Delete tags',
             Message: 'Are you sure to remove ' + selectedTags.length + ' tag(s)',

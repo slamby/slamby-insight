@@ -65,7 +65,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
 
     addOrEdit(selected?: IDataSet) {
         let pendingDataset: DataSetWrapper;
-        if (selected) {
+        if (selected && selected.Name) {
             pendingDataset = {
                 Header: 'Rename Dataset',
                 dataSet: _.cloneDeep(selected),

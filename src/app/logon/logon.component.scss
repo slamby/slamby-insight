@@ -23,7 +23,17 @@
             .list-group-item {
                 font-weight: bold;
                 text-align: center;
-            }
+                i {
+                    opacity: 0;    
+                }
+                &:hover{
+                    color: black;
+                    
+                    i {
+                        opacity: 1;        
+                    }
+                }
+            }            
         }
     }
 }

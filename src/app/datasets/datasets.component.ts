@@ -13,6 +13,7 @@ import { ConfirmDialogComponent } from '../common/components/confirm.dialog.comp
 import { ConfirmModel } from '../models/confirm.model';
 import { DialogResult } from '../models/dialog-result';
 import { DatasetEditorDialogComponent } from './dataset-editor.dialog.component';
+import { JsonEditorDialogComponent } from './../common/components/json-editor-dialog.component';
 
 import * as _ from 'lodash';
 
@@ -26,9 +27,9 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
     cursor = 'pointer';
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
     @ViewChild(DatasetEditorDialogComponent) editorDialog: DatasetEditorDialogComponent;
+    @ViewChild(JsonEditorDialogComponent) jsonEditorDialog: JsonEditorDialogComponent;
 
     dataSets: IDataSet[];
-    selectedDataSet: IDataSet;
     docComponent = DocumentsComponent;
 
     constructor(private _datasetService: DatasetService,
@@ -50,11 +51,9 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                 (dataSets: Array<IDataSet>) => this.dataSets = dataSets,
                 error => this.handleError(error));
     }
+
     ngOnInit(): void {
     }
-
-    sampleOrSchema = (dataSet: IDataSet): any => !dataSet ? {} : dataSet.SampleDocument ? dataSet.SampleDocument : dataSet.Schema;
-    selectedDataSetJson = (): string => JSON.stringify(this.sampleOrSchema(this.selectedDataSet), null, 4);
 
     gotoDocuments(selected: IDataSet) {
         this.cursor = 'progress';
@@ -139,10 +138,6 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         this.editorDialog.open();
     }
 
-    select(selected: IDataSet) {
-        this.selectedDataSet = selected;
-    }
-
     deleteConfirm(selected: IDataSet) {
         let model: ConfirmModel = {
             Header: 'Delete dataset',
@@ -167,7 +162,6 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
             .subscribe(
             () => {
                 this.dataSets = _.without(this.dataSets, selected);
-                this.selectedDataSet = null;
                 this.confirmDialog.unsubscribeAndClose();
             },
             error => {
@@ -221,6 +215,29 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
             IsNew: true,
             Name: ''
         };
+    }
+
+    showSampleSchemaJson(dataSet: IDataSet) {
+        if (!dataSet.SampleDocument &&
+            !dataSet.Schema) {
+            return;
+        }
+
+        if (dataSet.SampleDocument) {
+            this.jsonEditorDialog.json = this.getJsonString(dataSet.SampleDocument);
+            this.jsonEditorDialog.header = 'Sample Document';
+        } else if (dataSet.Schema) {
+            this.jsonEditorDialog.json = this.getJsonString(dataSet.Schema);
+            this.jsonEditorDialog.header = 'Schema';
+        }
+
+        this.jsonEditorDialog.open();
+    }
+
+    getJsonString(document: any): string {
+        return typeof document === 'object'
+            ? JSON.stringify(document, null, 4)
+            : document;
     }
 
     handleError(response: Response): string {

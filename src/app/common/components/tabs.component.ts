@@ -19,6 +19,7 @@ export class TabsComponent implements AfterContentInit {
     @Input() listenMessages = false;
     @Input() clipContent = false;
     @ViewChild(HorizontalScrollDirective) horizontalScroll: HorizontalScrollDirective;
+    private static factoryCache: ModuleWithComponentFactories<any>;
     factoryCache: ModuleWithComponentFactories<any>;
 
     get contentOverflow(): string {
@@ -53,9 +54,10 @@ export class TabsComponent implements AfterContentInit {
             });
         }
 
-        if (!this.factoryCache) {
+        if (!TabsComponent.factoryCache) {
             this.compiler.compileModuleAndAllComponentsAsync(AppModule).then(
                 (moduleWithFactories: ModuleWithComponentFactories<any>) => {
+                    TabsComponent.factoryCache = moduleWithFactories;
                     this.factoryCache = moduleWithFactories;
                     if (this.tabs.length === 0 && this.defaultType) {
                         this.addTab(this.defaultType);
@@ -69,6 +71,19 @@ export class TabsComponent implements AfterContentInit {
                     }
                 }
             );
+        }
+        else {
+            this.factoryCache = TabsComponent.factoryCache;
+            if (this.tabs.length === 0 && this.defaultType) {
+                this.addTab(this.defaultType);
+            }
+            // get all active tabs
+            let activeTabs = this.tabs.filter((tab) => tab.active);
+
+            // if there is no active tab set, activate the first
+            if (activeTabs.length === 0) {
+                this.selectTab(this.tabs[0]);
+            }
         }
     }
 

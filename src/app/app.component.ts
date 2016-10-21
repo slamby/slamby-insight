@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild, ChangeDetectorRef } from '@angular/core';
 
 import { Endpoint } from './models/endpoint';
 import { Globals } from './models/globals';
@@ -49,7 +49,7 @@ export class AppComponent implements OnInit {
         private slimLoadingBarService: SlimLoadingBarService,
         private toastyService: ToastyService,
         private messenger: Messenger,
-        private zone: NgZone) {
+        private zone: NgZone, private cd: ChangeDetectorRef) {
         ipcRenderer.on('download-start', (event) => {
             this.zone.run(() => this.downloadStart());
         });
@@ -110,6 +110,7 @@ export class AppComponent implements OnInit {
         } else {
             this.checkUpdates(false);
         }
+        this.cd.detectChanges();
     }
 
     endpointSelected(endpoint: Endpoint) {

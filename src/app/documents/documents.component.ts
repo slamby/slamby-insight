@@ -124,13 +124,24 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     setFields() {
-        Object.keys(this.dataset.SampleDocument).forEach(field => {
-            let selectedItem = {
-                Name: field,
-                IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field
-            };
-            this.fields.push(selectedItem);
-        });
+        if (this.dataset.SampleDocument) {
+            Object.keys(this.dataset.SampleDocument).forEach(field => {
+                let selectedItem = {
+                    Name: field,
+                    IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field
+                };
+                this.fields.push(selectedItem);
+            });
+        }
+        else{
+            Object.keys(this.dataset.Schema["properties"]).forEach(field => {
+                let selectedItem = {
+                    Name: field,
+                    IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field
+                };
+                this.fields.push(selectedItem);
+            });
+        }
         this.filterSettings.FieldList = this.fields.filter(f => f.IsSelected).map(s => s.Name);
         this.sampleSettings.Settings.FieldList = this.fields.filter(f => f.IsSelected).map(s => s.Name);
     }

@@ -59,7 +59,7 @@
                             <md-menu #menu="mdMenu" x-position="before" *ngSwitchCase="serviceStatus.Prepared">
                                 <button md-menu-item (click)="details(service)">Details</button>
                                 <button md-menu-item (click)="activate(service)">Activate</button>
-                                <button md-menu-item (click)="export(service)">Export</button>
+                                <button md-menu-item (click)="export(service)">Export Dictionaries</button>
                                 <button md-menu-item (click)="deleteConfirm(service)">Delete</button>
                             </md-menu>
                             <md-menu #menu="mdMenu" x-position="before" *ngSwitchCase="serviceStatus.Active">
@@ -69,7 +69,7 @@
                                 <button md-menu-item *ngIf="service.Type==serviceType.Prc" (click)="index(service)">Index</button>
                                 <button md-menu-item *ngIf="service.Type==serviceType.Prc && service.IndexSettings" (click)="partialIndex(service)">PartialIndex</button>
                                 <button md-menu-item *ngIf="service.Type==serviceType.Prc && service.IndexSettings" (click)="recommendById(service)">RecommendById</button>
-                                <button md-menu-item (click)="export(service)">Export</button>
+                                <button md-menu-item (click)="export(service)">Export Dictionaries</button>
                                 <button md-menu-item (click)="deleteConfirm(service)">Delete</button>
                             </md-menu>
                             <md-menu #menu="mdMenu" *ngSwitchDefault>
@@ -95,7 +95,7 @@
                                 <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Prepared">
                                     <li><a (click)="details(service)">Details</a></li>
                                     <li><a (click)="activate(service)">Activate</a></li>
-                                    <li><a (click)="export(service)">Export</a></li>
+                                    <li><a (click)="export(service)">Export Dictionaries</a></li>
                                     <li><a (click)="deleteConfirm(service)">Delete</a></li>
                                 </ul>
                                 <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Active">
@@ -105,7 +105,7 @@
                                     <li *ngIf="service.Type==serviceType.Prc"><a (click)="index(service)">Index</a></li>
                                     <li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="partialIndex(service)">PartialIndex</a></li>
                                     <li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="recommendById(service)">RecommendById</a></li>
-                                    <li><a (click)="export(service)">Export</a></li>
+                                    <li><a (click)="export(service)">Export Dictionaries</a></li>
                                     <li><a (click)="deleteConfirm(service)">Delete</a></li>
                                 </ul>
                             </div>

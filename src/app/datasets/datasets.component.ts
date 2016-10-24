@@ -48,8 +48,8 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         this._datasetService
             .getDatasets()
             .subscribe(
-                (dataSets: Array<IDataSet>) => this.dataSets = dataSets,
-                error => this.handleError(error));
+            (dataSets: Array<IDataSet>) => this.dataSets = dataSets,
+            error => this.handleError(error));
     }
 
     ngOnInit(): void {
@@ -65,14 +65,32 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
 
     addOrEdit(selected?: IDataSet) {
         let pendingDataset: DataSetWrapper;
-        if (selected && selected.Name) {
-            pendingDataset = {
-                Header: 'Rename Dataset',
-                dataSet: _.cloneDeep(selected),
-                sampleDocumentChecked: selected.SampleDocument ? true : false,
-                IsNew: false,
-                Name: selected.Name
-            };
+        if (selected) {
+            if (selected.Name) {
+                pendingDataset = {
+                    Header: 'Rename Dataset',
+                    dataSet: _.cloneDeep(selected),
+                    sampleDocumentChecked: selected.SampleDocument ? true : false,
+                    IsNew: false,
+                    Name: selected.Name
+                };
+            }
+            else {
+                pendingDataset = {
+                    Header: 'Add New Dataset',
+                    dataSet: _.cloneDeep(selected),
+                    sampleDocumentChecked: selected.Schema == null,
+                    IsNew: true,
+                    Name: ''
+                };
+                if (selected.SampleDocument) {
+                    pendingDataset.dataSet.SampleDocument = JSON.stringify(selected.SampleDocument, null, 4);
+                    pendingDataset.dataSet.Schema = this.getDefaultDataSet().dataSet.Schema;
+                } else {
+                    pendingDataset.dataSet.Schema = JSON.stringify(selected.Schema);
+                    pendingDataset.dataSet.SampleDocument = this.getDefaultDataSet().dataSet.SampleDocument;
+                }
+            }
         } else {
             pendingDataset = this.getDefaultDataSet();
         }
@@ -172,13 +190,6 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
 
     cloneDataSet(selected: IDataSet) {
         let datasetToClone = _.cloneDeep(selected);
-        if (selected.SampleDocument) {
-            datasetToClone.SampleDocument = JSON.stringify(selected.SampleDocument, null, 4);
-            datasetToClone.Schema = this.getDefaultDataSet().dataSet.Schema;
-        } else {
-            datasetToClone.Schema = JSON.stringify(selected.Schema);
-            datasetToClone.SampleDocument = this.getDefaultDataSet().dataSet.SampleDocument;
-        }
         datasetToClone.Name = '';
         this.addOrEdit(datasetToClone);
     }

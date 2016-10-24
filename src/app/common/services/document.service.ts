@@ -71,6 +71,7 @@ export class DocumentService extends BaseService<DocumentApi> {
             TargetDataSetName: targetDataset,
             DocumentIdList: documentIds
         };
+        this.setContentTypeHeader();
         this.setDataSetHeader(sourceDataset);
         return this.apiService.copyDocuments(documentCopySettings);
     }
@@ -80,6 +81,7 @@ export class DocumentService extends BaseService<DocumentApi> {
             TargetDataSetName: targetDataset,
             DocumentIdList: documentIds
         };
+        this.setContentTypeHeader();
         this.setDataSetHeader(sourceDataset);
         return this.apiService.moveDocuments(documentMoveSettings);
     }

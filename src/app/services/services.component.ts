@@ -92,8 +92,8 @@ export class ServicesComponent implements OnInit {
         this._servicesService
             .deleteService(selected.Id)
             .subscribe(
-            error => this.handleError(error),
-            () => this.services = _.without(this.services, selected));
+            () => this.services = _.without(this.services, selected),
+            error => this.handleError(error));
     }
 
     add(type: IService.ITypeEnum) {

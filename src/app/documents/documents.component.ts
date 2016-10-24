@@ -133,7 +133,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 this.fields.push(selectedItem);
             });
         }
-        else{
+        else {
             Object.keys(this.dataset.Schema["properties"]).forEach(field => {
                 let selectedItem = {
                     Name: field,
@@ -283,12 +283,12 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             return Observable.create((observer: Observer<SelectedItem<any>>) => {
                 let id = currentItem.Item[this._dataset.IdField];
                 this._documentService.deleteDocument(this._dataset.Name, id).subscribe(
-                    error => {
-                        observer.error(error);
-                        observer.complete();
-                    },
                     () => {
                         observer.next(currentItem);
+                        observer.complete();
+                    },
+                    error => {
+                        observer.error(error);
                         observer.complete();
                     }
                 );
@@ -446,10 +446,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                     model.Selected.Name,
                     selectedDocs.map<string>(d => d.Item[this.dataset.IdField]))
                     .subscribe(
-                    error => {
+                    () => {
                         this.dialogService.close();
                     },
-                    () => {
+                    error => {
                         this.dialogService.close();
                     }
                     );
@@ -500,12 +500,12 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 this.dialogService.openDialog('indeterminateprogress');
                 let docIdsToMove = selectedDocs.map<string>(d => d.Item[this.dataset.IdField]);
                 this._documentService.moveTo(this._dataset.Name, model.Selected.Name, docIdsToMove).subscribe(
-                    error => {
-                        this.dialogService.close();
-                    },
                     () => {
                         let docsToRemove = this.documents.filter(d => docIdsToMove.indexOf(d.Item[this.dataset.IdField]) > -1);
                         this.documents = _.without(this.documents, ...docsToRemove);
+                        this.dialogService.close();
+                    },
+                    error => {
                         this.dialogService.close();
                     }
                 );
@@ -821,12 +821,12 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         let sources = selectedTags.map<Observable<SelectedItem<ITag>>>(currentItem => {
             return Observable.create((observer: Observer<SelectedItem<ITag>>) => {
                 this._tagService.deleteTag(this._dataset.Name, currentItem.Item.Id).subscribe(
-                    error => {
-                        observer.error(error);
-                        observer.complete();
-                    },
                     () => {
                         observer.next(currentItem);
+                        observer.complete();
+                    },
+                    error => {
+                        observer.error(error);
                         observer.complete();
                     }
                 );

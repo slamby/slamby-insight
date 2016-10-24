@@ -12,6 +12,7 @@ import { DocumentDetailsComponent } from '../../documents/document-details.compo
 import { OverlayComponent } from './overlay.component';
 
 import { PIPES_DECLARATIONS } from '../pipes/pipes.module';
+import { DIRECTIVES_DECLARATIONS } from '../directives/directives.module';
 
 import { VsFor } from 'ng2-vs-for/src/ng2-vs-for';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -27,6 +28,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         DocumentDetailsComponent,
         VsFor,
         PIPES_DECLARATIONS,
+        DIRECTIVES_DECLARATIONS,
         OverlayComponent
     ],
     imports: [
@@ -44,6 +46,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         DocumentDetailsComponent,
         VsFor,
         PIPES_DECLARATIONS,
+        DIRECTIVES_DECLARATIONS,
         OverlayComponent
     ]
 })

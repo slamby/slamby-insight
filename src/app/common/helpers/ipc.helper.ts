@@ -1,5 +1,5 @@
+import { Globals } from './../../models/globals';
 import { Endpoint } from '../../models/endpoint';
-import { Globals } from '../../models/globals';
 
 const { ipcRenderer } = require('electron');
 
@@ -36,17 +36,21 @@ export module IpcHelper {
         return <Globals>ipcRenderer.sendSync('get-globals');
     }
 
+    export function setGlobals(globals: Globals) {
+        ipcRenderer.sendSync('set-globals', globals);
+    }
+
     export function setGlobalsVar(key: string, value: any) {
         let globals = ipcRenderer.sendSync('get-globals');
         globals[key] = value;
-        ipcRenderer.sendSync('set-globals');
+        setGlobals(globals);
     }
 
     export function getVersions(): any {
         return ipcRenderer.sendSync('get-versions');
     }
 
-     export function checkForUpdates(): any {
+    export function checkForUpdates(): any {
         return ipcRenderer.sendSync('check-for-updates');
     }
 

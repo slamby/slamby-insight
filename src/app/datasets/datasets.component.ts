@@ -74,8 +74,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                     IsNew: false,
                     Name: selected.Name
                 };
-            }
-            else {
+            } else {
                 pendingDataset = {
                     Header: 'Add New Dataset',
                     dataSet: _.cloneDeep(selected),

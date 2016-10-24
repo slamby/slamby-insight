@@ -132,9 +132,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 };
                 this.fields.push(selectedItem);
             });
-        }
-        else {
-            Object.keys(this.dataset.Schema["properties"]).forEach(field => {
+        } else {
+            Object.keys(this.dataset.Schema['properties']).forEach(field => {
                 let selectedItem = {
                     Name: field,
                     IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field
@@ -249,7 +248,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
     deleteConfirm(selectedItems?: Array<SelectedItem<any>>) {
         let selectedDocs = selectedItems ? selectedItems : this.documents.filter(d => d.IsSelected);
-        if (this.checkArrayIsEmpty(selectedDocs)) return;
+        if (this.checkArrayIsEmpty(selectedDocs)) {
+            return;
+        }
+
         let model: ConfirmModel = {
             Header: 'Delete documents',
             Message: 'Are you sure to remove ' + selectedDocs.length + ' document(s)',
@@ -788,7 +790,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
     deleteTagConfirm(selectedItems?: Array<SelectedItem<ITag>>) {
         let selectedTags = selectedItems ? selectedItems : this.tags.filter(d => d.IsSelected);
-        if (this.checkArrayIsEmpty(selectedTags)) return;
+        if (this.checkArrayIsEmpty(selectedTags)) {
+            return;
+        }
+
         let model: ConfirmModel = {
             Header: 'Delete tags',
             Message: 'Are you sure to remove ' + selectedTags.length + ' tag(s)',

@@ -109,7 +109,6 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                                 () => {
                                     dataSetToSave.Statistics = { DocumentsCount: 0 };
                                     this.dataSets = _.concat(this.dataSets, [_.cloneDeep(dataSetToSave)]);
-                                    model = this.getDefaultDataSet();
                                     this.editorDialog.unsubscribeAndClose();
                                 },
                                 error => {
@@ -122,8 +121,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                             dataSetToSave.SampleDocument = null;
                             this._datasetService.createDatasetWithSchema(dataSetToSave).subscribe(
                                 () => {
-                                    this.dataSets = _.concat(this.dataSets, [_.cloneDeep(model.dataSet)]);
-                                    model = this.getDefaultDataSet();
+                                    this.dataSets = _.concat(this.dataSets, [_.cloneDeep(dataSetToSave)]);
                                     this.editorDialog.unsubscribeAndClose();
                                 },
                                 error => {

@@ -11,3 +11,9 @@ json-editor {
                 from { left: -25%; width: 25%; }
                 to { left: 100%; width: 25%;}
             }
+
+.modal-body {
+    .form-group {
+        margin-bottom: 0;
+    }
+}

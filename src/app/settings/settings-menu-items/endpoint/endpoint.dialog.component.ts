@@ -15,10 +15,16 @@ export class EndpointDialogComponent {
         size: 'lg'
     };
 
+    editing: boolean = false;
+
     constructor(private modal: NgbModal) {
     }
 
     open(): NgbModalRef {
         return this.modal.open(this.template, this.modalOptions);
+    }
+
+    onEditing(editing: boolean) {
+        this.editing = editing;
     }
 }

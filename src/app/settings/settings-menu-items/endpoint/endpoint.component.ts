@@ -1,11 +1,11 @@
-import { Component, AfterContentInit, Input } from '@angular/core';
+import { Component, AfterContentInit, Input, Output, EventEmitter, Renderer, ViewChild, ElementRef } from '@angular/core';
 
 import { Endpoint } from '../../../models/endpoint';
 import { IpcHelper } from '../../../common/helpers/ipc.helper';
 import { CommonHelper } from '../../../common/helpers/common.helper';
 
 import { OptionService } from '../../../common/services/option.service';
-import { StatusService  } from '../../../common/services/status.service';
+import { StatusService } from '../../../common/services/status.service';
 import { ErrorsModelHelper } from '../../../common/helpers/errorsmodel.helper';
 
 import * as _ from 'lodash';
@@ -20,6 +20,8 @@ export class EndpointComponent implements AfterContentInit {
     static pageIcon: string = 'fa-plug';
 
     @Input() showSelectAction: boolean = true;
+    @Output() onEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @ViewChild('endpointElement') endpointElement: ElementRef;
 
     endpointMaintenanceIsInProgress = false;
     endpoints: Array<Endpoint> = [];
@@ -33,7 +35,8 @@ export class EndpointComponent implements AfterContentInit {
     canEdit = (endpoint: Endpoint): boolean => !(this.endpointMaintenanceIsInProgress);
     canDelete = (endpoint: Endpoint): boolean => !(this.endpointMaintenanceIsInProgress || this.equals(endpoint, this.selectedEndpoint));
 
-    constructor(private optionService: OptionService, private _statusService: StatusService) {
+    constructor(private optionService: OptionService, private _statusService: StatusService,
+        private renderer: Renderer) {
     }
 
     ngAfterContentInit() {
@@ -41,6 +44,7 @@ export class EndpointComponent implements AfterContentInit {
 
         this.endpoints = IpcHelper.getEndpoints(settings);
         this.selectedEndpoint = this.optionService.currentEndpoint;
+        this.onEditing.emit(false);
     }
 
     save() {
@@ -57,23 +61,23 @@ export class EndpointComponent implements AfterContentInit {
         IpcHelper.setEndpoints(this.endpoints);
         if (reload) {
             this.select(this.selectedEndpoint);
-        } else {
-            this.collapse();
         }
+
+        this.cancelEdit();
     }
 
     select(endpoint: Endpoint) {
         this._statusService.setDefaultHeaders(endpoint);
         this._statusService.getStatus()
             .subscribe(
-                (status) => {
-                    IpcHelper.reload(endpoint);
-                },
-                (response) => {
-                    let model = ErrorsModelHelper.getFromResponse(response);
-                    let errors = ErrorsModelHelper.concatErrors(model);
-                    alert (errors);
-                });
+            (status) => {
+                IpcHelper.reload(endpoint);
+            },
+            (response) => {
+                let model = ErrorsModelHelper.getFromResponse(response);
+                let errors = ErrorsModelHelper.concatErrors(model);
+                alert(errors);
+            });
     }
 
     delete(endpoint: Endpoint) {
@@ -84,15 +88,24 @@ export class EndpointComponent implements AfterContentInit {
     }
 
     edit(endpoint: Endpoint) {
-        this.endpointMaintenanceIsInProgress = true;
         this.pendingEndpoint = _.cloneDeep(endpoint);
+        this.openEditor();
     }
 
-    collapse() {
-        this.endpointMaintenanceIsInProgress = !this.endpointMaintenanceIsInProgress;
-        if (!this.endpointMaintenanceIsInProgress) {
-            this.pendingEndpoint = this.getDefaultEndpoint();
-        }
+    add() {
+        this.pendingEndpoint = this.getDefaultEndpoint();
+        this.openEditor();
+    }
+
+    openEditor() {
+        this.endpointMaintenanceIsInProgress = true;
+        this.onEditing.emit(true);
+        setTimeout(() => this.renderer.invokeElementMethod(this.endpointElement.nativeElement, 'focus', []), 50);
+    }
+
+    cancelEdit() {
+        this.endpointMaintenanceIsInProgress = false;
+        this.onEditing.emit(false);
     }
 
     reveal(endpoint: Endpoint) {

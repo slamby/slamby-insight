@@ -50,6 +50,6 @@ export class LogonComponent implements OnInit {
 
     manage() {
         this.endpointDialog.open().result
-            .then((data) => this.endpoints = IpcHelper.getEndpoints());
+            .then((result) => this.endpoints = IpcHelper.getEndpoints(), (reason) => {});
     }
 }

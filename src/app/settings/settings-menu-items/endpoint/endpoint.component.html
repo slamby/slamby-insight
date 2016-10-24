@@ -1,109 +1,127 @@
-<div class="panel-body">
-    <div>
-        <button type="button" class="btn  btn-outline-primary" (click)="collapse()">Add New Endpoint</button>
-        <br/>
-        <div class="well" [ngbCollapse]="!endpointMaintenanceIsInProgress">
-            <form #f="ngForm" (ngSubmit)="save()" class="form-horizontal" novalidate>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Endpoint</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" [(ngModel)]="pendingEndpoint.ApiBaseEndpoint" name="ApiBaseEndpoint">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Secret</label>
-                    <div class="col-sm-10">
-                        <input type="text" class="form-control" [(ngModel)]="pendingEndpoint.ApiSecret" name="ApiSecret">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Parallel Limit</label>
-                    <div class="col-sm-10">
-                        <input type="number" class="form-control" min="0" [(ngModel)]="pendingEndpoint.ParallelLimit" name="ParallelLimit">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Bulk Size</label>
-                    <div class="col-sm-10">
-                        <input type="name" class="form-control" min="1" [(ngModel)]="pendingEndpoint.BulkSize" name="BulkSize">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 control-label">Timeout</label>
-                    <div class="col-sm-10">
-                        <input type="name" class="form-control" [(ngModel)]="pendingEndpoint.Timeout" name="Timeout">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">Save</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Endpoint</th>
-                    <th>Secret</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor='let currentEndpoint of endpoints' [class.selected-row]="equals(currentEndpoint,selectedEndpoint)">
-                    <td>
-                        <div>
-                            {{currentEndpoint.ApiBaseEndpoint}}
-                        </div>
-                        <div>
-                            <div class="small">
-                                <small class="text-muted">
+<div>
+	<div *ngIf="!endpointMaintenanceIsInProgress">
+		<button type="button" class="btn  btn-outline-primary" (click)="add()" *ngIf="!endpointMaintenanceIsInProgress">Add New Endpoint</button>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Endpoint</th>
+					<th>Secret</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor='let currentEndpoint of endpoints' [class.selected-row]="equals(currentEndpoint,selectedEndpoint)">
+					<td>
+						<div>
+							{{currentEndpoint.ApiBaseEndpoint}}
+						</div>
+						<div>
+							<div class="small">
+								<small class="text-muted">
                                     <strong>Parallel Limit:</strong> {{currentEndpoint.ParallelLimit == 0 ? 'None' : currentEndpoint.ParallelLimit + ' thread(s)'}},
                                 </small>
-                                <small class="text-muted">
+								<small class="text-muted">
                                     <strong>Bulk Size:</strong> {{currentEndpoint.BulkSize}},
                                 </small>
-                                <small class="text-muted">
+								<small class="text-muted">
                                     <strong>Timeout:</strong> {{currentEndpoint.Timeout}}
                                 </small>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-default btn-sm" (click)="reveal(currentEndpoint)">
+							</div>
+						</div>
+					</td>
+					<td>
+						<button type="button" class="btn btn-default btn-sm" (click)="reveal(currentEndpoint)">
                             <i class="fa" 
                                 [class.fa-toggle-off]="currentEndpoint!=secretRevealed" 
                                 [class.fa-toggle-on]="currentEndpoint==secretRevealed">
                             </i>
                         </button>
-                        <label *ngIf="currentEndpoint==secretRevealed">{{currentEndpoint.ApiSecret}}</label>
-                    </td>
-                    <td>
-                        <div class="btn-group">
-                            <div ngbDropdown class="dropdown">
-                                <button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
-                                    aria-haspopup="true" aria-expanded="true">
+						<label *ngIf="currentEndpoint==secretRevealed">{{currentEndpoint.ApiSecret}}</label>
+					</td>
+					<td>
+						<div class="btn-group">
+							<div ngbDropdown class="dropdown">
+								<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+									aria-haspopup="true" aria-expanded="true">
                                     Actions
                                     <span class="caret"></span>
                                 </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li *ngIf="canSelect(currentEndpoint)">
-                                        <a (click)="select(currentEndpoint)">Select</a>
-                                    </li>
-                                    <li *ngIf="canEdit(currentEndpoint)">
-                                        <a (click)="edit(currentEndpoint)">Edit</a>
-                                    </li>
-                                    <li *ngIf="canDelete(currentEndpoint)">
-                                        <a (click)="delete(currentEndpoint)">Delete</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+								<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+									<li *ngIf="canSelect(currentEndpoint)">
+										<a (click)="select(currentEndpoint)">Select</a>
+									</li>
+									<li *ngIf="canEdit(currentEndpoint)">
+										<a (click)="edit(currentEndpoint)">Edit</a>
+									</li>
+									<li *ngIf="canDelete(currentEndpoint)">
+										<a (click)="delete(currentEndpoint)">Delete</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div>
+		<div class="well" [ngbCollapse]="!endpointMaintenanceIsInProgress">
+			<form #f="ngForm" (ngSubmit)="save()" class="form-horizontal" novalidate>
+				<div class="form-group" [class.has-error]="endpoint.errors && endpoint.touched">
+					<label class="col-sm-2 control-label">Endpoint</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" [(ngModel)]="pendingEndpoint.ApiBaseEndpoint" name="ApiBaseEndpoint" required placeholder="API address" #endpointElement #endpoint="ngModel">
+						<div *ngIf="endpoint.errors && endpoint.touched">
+							<p class="text-danger">	
+								Endpoint is required
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group" [class.has-error]="secret.errors && secret.touched">
+					<label class="col-sm-2 control-label">Show Secret</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" [(ngModel)]="pendingEndpoint.ApiSecret" name="ApiSecret" required placeholder="API secret key" #secret="ngModel">
+						<div *ngIf="secret.errors && secret.touched">
+							<p class="text-danger">	
+								Secret is required
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group" [class.has-error]="parallelLimit.errors && parallelLimit.touched">
+					<label class="col-sm-2 control-label">Parallel Limit</label>
+					<div class="col-sm-10">
+						<input type="number" class="form-control" min="0" [min]="0" [(ngModel)]="pendingEndpoint.ParallelLimit" name="ParallelLimit" required placeholder="Thread limit" #parallelLimit="ngModel">
+					</div>
+				</div>
+				<div class="form-group" [class.has-error]="bulkSize.errors && bulkSize.touched">
+					<label class="col-sm-2 control-label">Bulk Size</label>
+					<div class="col-sm-10">
+						<input type="number" class="form-control" min="1" [min]="1" [(ngModel)]="pendingEndpoint.BulkSize" name="BulkSize" placeholder="Item size for bulk operation" #bulkSize="ngModel">
+					</div>
+				</div>
+				<div class="form-group" [class.has-error]="timeout.errors && timeout.touched">
+					<label class="col-sm-2 control-label">Timeout</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" [(ngModel)]="pendingEndpoint.Timeout" name="Timeout" pattern="(0[0-9]|1[0-9]|2[0-3])(:[0-5][0-9]){2}" required #timeout="ngModel" placeholder="Connection timeout (hh:mm:ss)">
+						<div *ngIf="timeout.errors && timeout.touched">
+							<p class="text-danger" *ngIf="timeout.errors.pattern">	
+								Invalid timeout format
+							</p>
+							<p class="text-danger" *ngIf="timeout.errors.required">	
+								Timeout is reuqired
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" class="btn btn-success" [disabled]="!f.valid">{{pendingEndpoint.Id ? "Save" : "Add"}}</button>
+						<button type="button" class="btn btn-warning" (click)="cancelEdit()">Cancel</button>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>

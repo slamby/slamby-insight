@@ -3,12 +3,12 @@
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
                 <span aria-hidden="true">&times;</span>
             </button>
-        <h4 class="modal-title">Endpoints</h4>
+        <h4 class="modal-title">Manage Endpoints</h4>
     </div>
     <div class="modal-body">
-        <sl-endpoint-editor [showSelectAction]=false></sl-endpoint-editor>
+        <sl-endpoint-editor [showSelectAction]=false (onEditing)="onEditing($event)"></sl-endpoint-editor>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="c('Close click')">Close</button>
+        <button type="button" class="btn btn-primary" (click)="c('Close click')" [disabled]="editing">Close</button>
     </div>
 </template>

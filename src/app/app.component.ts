@@ -50,6 +50,7 @@ export class AppComponent implements OnInit {
         private toastyService: ToastyService,
         private messenger: Messenger,
         private zone: NgZone, private cd: ChangeDetectorRef) {
+
         ipcRenderer.on('download-start', (event) => {
             this.zone.run(() => this.downloadStart());
         });
@@ -117,7 +118,7 @@ export class AppComponent implements OnInit {
         this.optionService.currentEndpoint = endpoint;
     }
 
-    selectedBaseUrl(): string {
+    get selectedBaseUrl(): string {
         return this.optionService.currentEndpoint.ApiBaseEndpoint;
     }
 

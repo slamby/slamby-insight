@@ -11,6 +11,7 @@ import { CommonComponentsModule } from '../common/components/common-components.m
 import { EndpointDialogComponent } from '../settings/settings-menu-items/endpoint/endpoint.dialog.component';
 import { EndpointComponent } from '../settings/settings-menu-items/endpoint/endpoint.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { CustomFormsModule } from 'ng2-validation';
 
 
 @NgModule({
@@ -31,8 +32,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         NgbModule.forRoot(),
         BrowserModule,
         HttpModule,
-        FormsModule
+        FormsModule,
+        CustomFormsModule
     ],
-    bootstrap: [LogonComponent],
 })
 export class LogonModule { }

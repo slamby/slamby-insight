@@ -20,7 +20,6 @@ import { WelcomeModule } from './home/welcome.module';
 import { NotificationsModule } from './notifications/notifications.module';
 
 import { COMPONENTS_DECLARATIONS } from './common/components/components.module';
-import { DIRECTIVES_DECLARATIONS } from './common/directives/directives.module';
 import { SERVICE_PROVIDERS } from './common/services/services.module';
 import { APPERROR_HANDLER_PROVIDERS } from './common/services/apperror.handler';
 
@@ -44,7 +43,6 @@ import { CommonComponentsModule } from './common/components/common-components.mo
         SettingsComponent,
         SettingsDialogComponent,
         COMPONENTS_DECLARATIONS,
-        DIRECTIVES_DECLARATIONS,
 
         SafeJsonPipe,
         PrettyJsonPipe,

@@ -1,4 +1,5 @@
-import { Component, Input, ViewChild, ViewContainerRef, ComponentRef, ModuleWithComponentFactories, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ModuleWithComponentFactories, ChangeDetectorRef } from '@angular/core';
+import { ViewChild, ViewContainerRef, ComponentRef } from '@angular/core';
 import { OnChanges, AfterViewInit, OnDestroy } from '@angular/core';
 import { ITab } from '../../models/itab';
 import { Messenger } from './../services/messenger.service';

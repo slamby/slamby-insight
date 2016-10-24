@@ -13,13 +13,15 @@ import { HorizontalScrollDirective } from '../directives/horizontal.scroll.direc
     providers: [RuntimeCompiler, COMPILER_PROVIDERS]
 })
 export class TabsComponent implements AfterContentInit {
+    private static factoryCache: ModuleWithComponentFactories<any>;
+
     @Input() tabs = new Array<ITab>();
     @Input() defaultType: any;
     @Input() canCloseTabs = true;
     @Input() listenMessages = false;
     @Input() clipContent = false;
     @ViewChild(HorizontalScrollDirective) horizontalScroll: HorizontalScrollDirective;
-    private static factoryCache: ModuleWithComponentFactories<any>;
+
     factoryCache: ModuleWithComponentFactories<any>;
 
     get contentOverflow(): string {
@@ -69,10 +71,8 @@ export class TabsComponent implements AfterContentInit {
                     if (activeTabs.length === 0) {
                         this.selectTab(this.tabs[0]);
                     }
-                }
-            );
-        }
-        else {
+                });
+        } else {
             this.factoryCache = TabsComponent.factoryCache;
             if (this.tabs.length === 0 && this.defaultType) {
                 this.addTab(this.defaultType);

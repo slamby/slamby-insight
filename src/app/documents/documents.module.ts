@@ -21,6 +21,7 @@ import { NotificationService } from '../common/services/notification.service';
 import { MaterialModule } from '@angular/material';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonComponentsModule } from '../common/components/common-components.module';
+import { CustomFormsModule } from 'ng2-validation';
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import { CommonComponentsModule } from '../common/components/common-components.m
         NgbModule.forRoot(),
         BrowserModule,
         HttpModule,
-        FormsModule
+        FormsModule,
+        CustomFormsModule
     ],
     bootstrap: [DocumentsComponent],
 })

@@ -197,7 +197,7 @@
 								<button type="button" class="btn btn-default" (click)="deleteTagConfirm()">Delete</button>
 							</div>
 						</div>
-						
+
 						<br role="separator" class="divider">
 						<p>{{getSelectedItemsCount(tags)}} item(s) selected</p>
 						<div>
@@ -226,10 +226,16 @@
 											<th></th>
 											<th><input type="text" class="form-control input-sm" #idFilter (keyup)="0" placeholder="Id Filter" /></th>
 											<th><input type="text" class="form-control input-sm" #nameFilter (keyup)="0" placeholder="Name Filter" /></th>
-											<th></th>
-											<th></th>
-											<th></th>
-											<th></th>
+											<th><input type="text" class="form-control input-sm" #parentIdFilter (keyup)="0" placeholder="Parent Id Filter" /></th>
+											<th><input type="text" class="form-control input-sm" #pathFilter (keyup)="0" placeholder="Path" /></th>
+											<th>
+												<select (change)="0" class="form-control input-sm" #isLeafSelector placeholder="IsLeaf" style="width: auto;">
+													<option value="null" class="form-control">select</option>
+													<option value="true" class="form-control">true</option>
+													<option value="false" class="form-control">false</option>
+												</select>
+											</th>
+											<th><input type="text" class="form-control input-sm" #levelFilter (keyup)="0" placeholder="Level" /></th>
 											<th></th>
 											<th></th>
 											<th></th>
@@ -239,7 +245,7 @@
 							</div>
 							<div class="vs-table-body">
 								<table class='table table-striped tags-table' *ngIf='tags && tags.length'>
-									<tbody *vsFor="tags | filter:{Item: {Id:idFilter.value}} | filter:{Item: {Name:nameFilter.value}}; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+									<tbody *vsFor="tags | filter:{Item: {Id:idFilter.value}} | filter:{Item: {Name:nameFilter.value}} | filter:{Item: {ParentId:parentIdFilter.value}} | filter:{Item: {Properties: {Paths:pathFilter.value}}} | filter:{Item: {Properties: {Level:levelFilter.value}}} | filter:{Item: {Properties: {IsLeaf:isLeafSelector.value}}}; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
 										<tr *ngFor='let tag of _items; let i = index'>
 											<td class="vs-col-short">{{ i + _startIndex + 1}}</td>
 											<td class="vs-col-short text-center"><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>

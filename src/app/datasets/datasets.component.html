@@ -3,44 +3,46 @@
 	<sl-confirm-dialog></sl-confirm-dialog>
 	<sl-dataset-editor-dialog></sl-dataset-editor-dialog>
 	<sl-json-editor-dialog></sl-json-editor-dialog>
-	<div *ngIf="dataSets && dataSets.length">
+	<div *ngIf="!isLoading">
 		<button type="button" class="btn btn-primary" (click)="addOrEdit()" style="margin-bottom: 70px;">Add New DataSet</button>
-		<table class="table table-striped table-hover table-interactive" contextmenu="contextmenu">
-			<thead>
-				<tr>
-					<th></th>
-					<th>Name</th>
-					<th>Id Field</th>
-					<th>Tag Field</th>
-					<th>Interpreted Fields</th>
-					<th>Document Count</th>
-					<th>NGram Count</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody *vsFor="dataSets; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
-				<tr *ngFor="let dataSet of _items; let i= index" [style.cursor]="cursor" (dblclick)="gotoDocuments(dataSet)">
-					<td>{{ i + _startIndex + 1}}</td>
-					<td>{{ dataSet.Name }}</td>
-					<td>{{ dataSet.IdField }}</td>
-					<td>{{ dataSet.TagField }}</td>
-					<td>{{ dataSet.InterpretedFields.join(", ") }}</td>
-					<td>{{ dataSet.Statistics?.DocumentsCount }}</td>
-					<td>{{ dataSet.NGramCount }}</td>
-					<td>
-						<button md-icon-button [md-menu-trigger-for]="menu">
+		<div class='table-responsive' style="overflow-y: auto; overflow-x: auto; max-height: 500px">
+			<table class="table table-striped table-hover table-interactive" contextmenu="contextmenu">
+				<thead>
+					<tr>
+						<th></th>
+						<th>Name</th>
+						<th>Id Field</th>
+						<th>Tag Field</th>
+						<th>Interpreted Fields</th>
+						<th>Document Count</th>
+						<th>NGram Count</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody *vsFor="dataSets; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+					<tr *ngFor="let dataSet of _items; let i= index" [style.cursor]="cursor" (dblclick)="gotoDocuments(dataSet)">
+						<td>{{ i + _startIndex + 1}}</td>
+						<td>{{ dataSet.Name }}</td>
+						<td>{{ dataSet.IdField }}</td>
+						<td>{{ dataSet.TagField }}</td>
+						<td>{{ dataSet.InterpretedFields.join(", ") }}</td>
+						<td>{{ dataSet.Statistics?.DocumentsCount }}</td>
+						<td>{{ dataSet.NGramCount }}</td>
+						<td>
+							<button md-icon-button [md-menu-trigger-for]="menu">
                             <md-icon>more_vert</md-icon>
                         </button>
-						<md-menu #menu="mdMenu" x-position="before" y-position="above">
-							<button md-menu-item (click)="gotoDocuments(dataSet)">Open</button>
-							<button md-menu-item (click)="cloneDataSet(dataSet)">Clone</button>
-							<button md-menu-item (click)="addOrEdit(dataSet)">Rename</button>
-							<button md-menu-item (click)="deleteConfirm(dataSet)">Delete</button>
-							<button md-menu-item (click)="showSampleSchemaJson(dataSet)">Show {{ dataSet.SampleDocument ? 'Sample' : 'Schema' }}</button>
-						</md-menu>
-					</td>
-				</tr>
-			</tbody>
-		</table>
+							<md-menu #menu="mdMenu" x-position="before" y-position="above">
+								<button md-menu-item (click)="gotoDocuments(dataSet)">Open</button>
+								<button md-menu-item (click)="cloneDataSet(dataSet)">Clone</button>
+								<button md-menu-item (click)="addOrEdit(dataSet)">Rename</button>
+								<button md-menu-item (click)="deleteConfirm(dataSet)">Delete</button>
+								<button md-menu-item (click)="showSampleSchemaJson(dataSet)">Show {{ dataSet.SampleDocument ? 'Sample' : 'Schema' }}</button>
+							</md-menu>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 </div>

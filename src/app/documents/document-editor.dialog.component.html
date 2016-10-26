@@ -23,10 +23,10 @@
 					</div>
 				</div>
 			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-success" [disabled]="!f.valid">OK</button>
+				<button type="button" class="btn btn-warning" (click)="cancel();">Close</button>
+			</div>
 		</form>
-	</div>
-	<div class="modal-footer">
-		<button type="submit" class="btn btn-success" [disabled]="!f.valid">OK</button>
-		<button type="button" class="btn btn-warning" (click)="cancel();">Close</button>
 	</div>
 </template>

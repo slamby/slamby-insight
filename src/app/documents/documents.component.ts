@@ -128,7 +128,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             Object.keys(this.dataset.SampleDocument).forEach(field => {
                 let selectedItem = {
                     Name: field,
-                    IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field
+                    IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field || this._dataset.TagField === field
                 };
                 this.fields.push(selectedItem);
             });
@@ -136,7 +136,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             Object.keys(this.dataset.Schema['properties']).forEach(field => {
                 let selectedItem = {
                     Name: field,
-                    IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field
+                    IsSelected: this._dataset.InterpretedFields.indexOf(field) >= 0 || this._dataset.IdField === field || this._dataset.TagField === field
                 };
                 this.fields.push(selectedItem);
             });
@@ -322,7 +322,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         if (!isChecked) {
             this.confirmDialog.model = {
                 Header: 'Warning!',
-                Message: `To modify tag field please check the ${this._dataset.IdField} field!`,
+                Message: `To modify tag field please load the ${this._dataset.TagField} field!`,
                 Buttons: ['ok']
             };
             this.confirmDialog.open();

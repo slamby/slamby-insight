@@ -4,7 +4,7 @@
 	<sl-dataset-editor-dialog></sl-dataset-editor-dialog>
 	<sl-json-editor-dialog></sl-json-editor-dialog>
 	<div *ngIf="dataSets && dataSets.length">
-		<button type="button" class="btn btn-primary" (click)="addOrEdit()">Add New DataSet</button>
+		<button type="button" class="btn btn-primary" (click)="addOrEdit()" style="margin-bottom: 70px;">Add New DataSet</button>
 		<table class="table table-striped table-hover table-interactive" contextmenu="contextmenu">
 			<thead>
 				<tr>
@@ -31,7 +31,7 @@
 						<button md-icon-button [md-menu-trigger-for]="menu">
                             <md-icon>more_vert</md-icon>
                         </button>
-						<md-menu #menu="mdMenu" x-position="before">
+						<md-menu #menu="mdMenu" x-position="before" y-position="above">
 							<button md-menu-item (click)="gotoDocuments(dataSet)">Open</button>
 							<button md-menu-item (click)="cloneDataSet(dataSet)">Clone</button>
 							<button md-menu-item (click)="addOrEdit(dataSet)">Rename</button>

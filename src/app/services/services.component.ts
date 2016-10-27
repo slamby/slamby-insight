@@ -290,6 +290,24 @@ export class ServicesComponent implements OnInit {
         }
     }
 
+    cancelConfirm(selected: IService | IPrcService | IClassifierService) {
+        let model: ConfirmModel = {
+            Header: 'Cancel',
+            Message: 'Are you sure to cancel the current process of ' + selected.Name + ' service',
+            Buttons: ['yes', 'no']
+        };
+        this.confirmDialog.model = model;
+        this.confirmDialog.dialogClosed.subscribe(
+            (result: ConfirmModel) => {
+                if (result.Result === DialogResult.Yes) {
+                    this.cancel(selected);
+                }
+            },
+            error => this.handleError(error)
+        );
+        this.confirmDialog.open();
+    }
+
     cancel(selected: IService | IPrcService | IClassifierService) {
         if (!selected || !selected.ActualProcessId) {
             return;
@@ -414,6 +432,24 @@ export class ServicesComponent implements OnInit {
             }
         );
         this.inputDialog.open();
+    }
+
+    deactivateConfirm(selected: IService | IPrcService | IClassifierService) {
+        let model: ConfirmModel = {
+            Header: 'Deactivate service',
+            Message: 'Are you sure to deactivate the following service: ' + selected.Name,
+            Buttons: ['yes', 'no']
+        };
+        this.confirmDialog.model = model;
+        this.confirmDialog.dialogClosed.subscribe(
+            (result: ConfirmModel) => {
+                if (result.Result === DialogResult.Yes) {
+                    this.deactivate(selected);
+                }
+            },
+            error => this.handleError(error)
+        );
+        this.confirmDialog.open();
     }
 
     deactivate(selected: IService | IPrcService | IClassifierService) {

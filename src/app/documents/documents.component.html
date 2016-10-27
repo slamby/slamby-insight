@@ -266,7 +266,7 @@
 													<button md-icon-button [md-menu-trigger-for]="menu">
                                                     <md-icon>more_vert</md-icon>
                                                 </button>
-													<md-menu #menu="mdMenu" x-position="before">
+													<md-menu #menu="mdMenu" x-position="before" y-position="above">
 														<button md-menu-item (click)="exportWords([tag])">Export Words</button>
 														<button md-menu-item (click)="saveOrEditTag(tag)">Edit</button>
 														<button md-menu-item (click)="deleteTagConfirm([tag])">Delete</button>

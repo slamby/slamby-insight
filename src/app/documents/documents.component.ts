@@ -15,9 +15,7 @@ import { SelectedItem } from '../models/selected-item';
 import { ProgressDialogModel } from '../models/progress-dialog-model';
 import { DialogComponent } from '../common/components/dialog.component';
 import { DatasetSelectorDialogComponent } from '../datasets/dataset-selector.dialog.component';
-import { TagSelectorDialogComponent } from './tag-selector.dialog.component';
 import { DocumentDetailsDialogComponent } from './document-details.dialog.component';
-import { TagSelectorModel } from './tag-selector.model';
 import { DocumentDetailsComponent } from './document-details.component';
 import { ProcessesComponent } from '../processes/processes.component';
 import { Messenger } from '../common/services/messenger.service';
@@ -59,7 +57,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     get dataset() { return this._dataset; }
     @ViewChild(DialogComponent) dialogService: DialogComponent;
     @ViewChild(DatasetSelectorDialogComponent) datasetSelector: DatasetSelectorDialogComponent;
-    @ViewChild(TagSelectorDialogComponent) tagSelector: TagSelectorDialogComponent;
     @ViewChild(DocumentDetailsDialogComponent) documentDetailsDialog: DocumentDetailsDialogComponent;
     @ViewChild(CommonInputDialogComponent) inputDialog: CommonInputDialogComponent;
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
@@ -538,17 +535,13 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         for (let i = 1; i < tagsForDocs.length; i++) {
             commonTags = _.intersection(commonTags, tagsForDocs[i]);
         }
-        let tagSelectorModel: TagSelectorModel = {
-            Tags: this.tags.map(t => {
-                let sm = _.cloneDeep(t);
-                sm.IsSelected = commonTags.indexOf(t.Item.Id) > -1;
-                return sm;
-            }),
-            IsMultiselectAllowed: !tagFieldIsSimple
-        };
-        this.tagSelector.dialogClosed.subscribe(
-            (model: TagSelectorModel) => {
-                let selectedTagIds = model.Tags.filter(t => t.IsSelected).map(t => t.Item.Id);
+
+        this.tagListSelectorDialog.tags = this.tags.map<ITag>(t => t.Item);
+        this.tagListSelectorDialog.isMultiselectAllowed = !tagFieldIsSimple;
+        this.tagListSelectorDialog.selectedTagIds = this.tags.filter(t => commonTags.findIndex(ct => ct == t.Item.Id) > -1).map(t => t.Item.Id);
+        this.tagListSelectorDialog.open().result.then((result) => {
+            if (result === 'OK') {
+                let selectedTagIds = this.tagListSelectorDialog.selectedTagIds.slice();
                 if (selectedTagIds.length === 0) {
                     return;
                 }
@@ -569,7 +562,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         let updatedDoc = {};
                         updatedDoc[this._dataset.TagField] = tagFieldIsSimple
                             ? selectedTagIds[0]
-                            : _.union(currentItem.Item[this._dataset.TagField], selectedTagIds);
+                            : _.union(currentItem.Item[this._dataset.TagField].map(tid => tid.toString()), selectedTagIds);
                         this._documentService.updateDocument(this._dataset.Name, id, updatedDoc).subscribe(
                             updated => {
                                 observer.next(updated);
@@ -604,13 +597,9 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         dialogModel.IsDone = true;
                     }
                 );
-            },
-            error => {
-                this.errorMessage = <any>error;
             }
-        );
-        this.tagSelector.model = tagSelectorModel;
-        this.tagSelector.open();
+        }, (reason) => {
+        });
     }
 
     removeTags(selectedItems?: Array<SelectedItem<any>>) {
@@ -624,18 +613,11 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         for (let i = 1; i < tagsForDocs.length; i++) {
             commonTags = _.intersection(commonTags, tagsForDocs[i]);
         }
-        let tagSelectorModel: TagSelectorModel = {
-            Tags: commonTags.length > 0 ? this.tags.filter(t => commonTags.findIndex(c => c.toString() === t.Item.Id) > -1).map(t => {
-                let sm = _.cloneDeep(t);
-                sm.IsSelected = false;
-                return sm;
-            }) : [],
-            IsMultiselectAllowed: true
-        };
+        var selectableTags = commonTags.length > 0 ? this.tags.filter(t => commonTags.findIndex(c => c.toString() === t.Item.Id) > -1) : [];
         // if the tag missing from database
-        if (commonTags.length > tagSelectorModel.Tags.length) {
-            let difference = _.difference(commonTags, tagSelectorModel.Tags.map(t => t.Item.Id));
-            tagSelectorModel.Tags.push(...difference.map(tid => {
+        if (commonTags.length > selectableTags.length) {
+            let difference = _.difference(commonTags, selectableTags.map(t => t.Item.Id));
+            selectableTags.push(...difference.map(tid => {
                 let sm = {
                     IsSelected: false,
                     Item: <ITag>{
@@ -646,9 +628,13 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 return sm;
             }));
         }
-        this.tagSelector.dialogClosed.subscribe(
-            (model: TagSelectorModel) => {
-                let selectedTagIds = model.Tags.filter(t => t.IsSelected).map(t => t.Item.Id);
+
+        this.tagListSelectorDialog.tags = selectableTags.map<ITag>(t => t.Item);
+        this.tagListSelectorDialog.isMultiselectAllowed = true;
+        this.tagListSelectorDialog.selectedTagIds = [];
+        this.tagListSelectorDialog.open().result.then((result) => {
+            if (result === 'OK') {
+                let selectedTagIds = this.tagListSelectorDialog.selectedTagIds.slice();
                 if (selectedTagIds.length === 0) {
                     return;
                 }
@@ -669,7 +655,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         let updatedDoc = {};
                         updatedDoc[this._dataset.TagField] = tagFieldIsSimple
                             ? ''
-                            : _.without(currentItem.Item[this._dataset.TagField], selectedTagIds);
+                            : _.without(currentItem.Item[this._dataset.TagField], ...selectedTagIds);
                         this._documentService.updateDocument(this._dataset.Name, id, updatedDoc).subscribe(
                             updated => {
                                 observer.next(updated);
@@ -704,13 +690,9 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                         dialogModel.IsDone = true;
                     }
                 );
-            },
-            error => {
-                this.errorMessage = <any>error;
             }
-        );
-        this.tagSelector.model = tagSelectorModel;
-        this.tagSelector.open();
+        }, (reason) => {
+        });
     }
 
     preview(selected: SelectedItem<any>) {

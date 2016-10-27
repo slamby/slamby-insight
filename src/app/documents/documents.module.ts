@@ -8,7 +8,6 @@ import { DocumentEditorDialogComponent } from './document-editor.dialog.componen
 import { TagEditorDialogComponent } from './tag-editor.dialog.component';
 import { DocumentDetailsDialogComponent } from './document-details.dialog.component';
 import { DatasetSelectorDialogComponent } from '../datasets/dataset-selector.dialog.component';
-import { TagSelectorDialogComponent } from './tag-selector.dialog.component';
 import { TagListSelectorComponent } from './taglist-selector.component';
 import { TagListSelectorDialogComponent } from './taglist-selector-dialog.component';
 
@@ -33,7 +32,6 @@ import { CustomFormsModule } from 'ng2-validation';
         DatasetSelectorDialogComponent,
         TagEditorDialogComponent,
         TagListSelectorComponent,
-        TagSelectorDialogComponent,
         TagListSelectorDialogComponent
     ],
     providers: [

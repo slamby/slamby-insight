@@ -10,6 +10,9 @@ import { ITag } from 'slamby-sdk-angular2';
 export class TagListSelectorDialogComponent {
     @Input() tags: ITag[] = [];
     @Input() selectedTagIds: string[] = [];
+    @Input() isMultiselectAllowed: boolean = true;
+
+    private selectedItem;
 
     @ViewChild('template') template;
     modalOptions: NgbModalOptions = {
@@ -23,10 +26,16 @@ export class TagListSelectorDialogComponent {
     }
 
     open(): NgbModalRef {
+        if (!this.isMultiselectAllowed && this.selectedTagIds && this.tags) {
+            this.selectedItem = this.tags.find(t => t.Id == this.selectedTagIds[0]);
+        }
         return this.modal.open(this.template, this.modalOptions);
     }
 
     selectionChanged(selectedTagIds: string[]) {
         this.selectedTagIds = selectedTagIds.slice();
+        if (this.selectedTagIds && this.tags) {
+            this.selectedItem = this.tags.find(t => t.Id == this.selectedTagIds[0]);
+        }
     }
 }

@@ -6,11 +6,16 @@
 		<h4 class="modal-title">Tag Selector ({{selectedTagIds.length}}/{{tags.length}})</h4>
 	</div>
 	<div class="modal-body">
-		<sl-taglist-selector [tags]="tags" [selectedTagIds]="selectedTagIds" (selectionChanged)="selectionChanged($event)"></sl-taglist-selector>		
+		<sl-taglist-selector *ngIf='isMultiselectAllowed' [tags]="tags" [selectedTagIds]="selectedTagIds" (selectionChanged)="selectionChanged($event)"></sl-taglist-selector>
+		<div *ngIf='!isMultiselectAllowed'>
+			<select [ngModel]='selectedItem' (ngModelChange)="selectionChanged([($event).Id])"
+				name="name">
+                <option [ngValue]="tag" *ngFor='let tag of tags'>{{tag.Id}} - {{tag.Name}}</option>
+            </select>
+		</div>
 	</div>
 	<div class="modal-footer">
-		<button type="button" class="btn btn-secondary" (click)="c('OK')">OK</button>
-        <button type="button" class="btn btn-secondary" (click)="c('Cancel')">Cancel</button>
+		<button type="button" class="btn btn-success" (click)="c('OK')">OK</button>
+		<button type="button" class="btn btn-warning" (click)="c('Cancel')">Cancel</button>
 	</div>
 </template>
-

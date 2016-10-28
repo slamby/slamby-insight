@@ -49,7 +49,9 @@ export class EndpointComponent implements AfterContentInit {
 
     save() {
         let reload = this.equals(this.pendingEndpoint, this.selectedEndpoint);
-
+        if (this.pendingEndpoint.ApiBaseEndpoint.endsWith("/")) {
+            this.pendingEndpoint.ApiBaseEndpoint = this.pendingEndpoint.ApiBaseEndpoint.slice(0, -1);
+        }
         if (this.pendingEndpoint.Id) {
             let index = this.endpoints.indexOf(this.endpoints.find(e => e.Id === this.pendingEndpoint.Id));
             this.endpoints[index] = this.pendingEndpoint;

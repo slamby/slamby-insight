@@ -6,7 +6,7 @@
         <h4 class="modal-title ">Dataset Selector</h4>
     </div>
     <div class="modal-body ">
-        <select [(ngModel)]='model.Selected' name="name ">
+        <select [(ngModel)]='model.Selected' name="name" class="form-control">
             <option [ngValue]="dataset " *ngFor='let dataset of model.Datasets'>{{dataset.Name}}</option>
         </select>
     </div>

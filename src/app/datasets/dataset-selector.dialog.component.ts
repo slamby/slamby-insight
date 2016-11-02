@@ -15,7 +15,8 @@ export class DatasetSelectorDialogComponent {
     modalOptions: NgbModalOptions = {
         backdrop: 'static',
         keyboard: true,
-        size: 'lg'
+        size: 'lg',
+        windowClass: 'md-dialog'
     };
 
     private dialogClosedEventSource = new Subject<DatasetSelectorModel>();

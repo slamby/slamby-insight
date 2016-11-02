@@ -1,128 +1,127 @@
 <div>
-	<sl-common-templates></sl-common-templates>
-	<sl-dataset-selector></sl-dataset-selector>
-	<sl-document-details-dialog></sl-document-details-dialog>
-	<sl-input-dialog></sl-input-dialog>
-	<sl-confirm-dialog></sl-confirm-dialog>
-	<sl-document-editor-dialog></sl-document-editor-dialog>
-	<sl-taglist-selector-dialog></sl-taglist-selector-dialog>
-	<sl-tag-editor-dialog></sl-tag-editor-dialog>
 	<div class='panel-body'>
 		<div class='has-error' *ngIf='errorMessage'>{{errorMessage}}</div>
 		<div>
-			<ngb-tabset>
-				<ngb-tab title="Documents">
-					<template ngbTabContent>
-						<!--add or edit document section-->
-						<div>
-							<br/>
-							<button type="button" class="btn  btn-primary" (click)="saveOrEditDocument()">Add New Document</button>
-							<br/>
-						</div>
-						<hr role="separator" class="divider">
-						<div class="container-fluid">
-							<div class="row">
-								<!--field filter section-->
-								<div class="col-md-3">
-									<div class="card" style="display: inline;">
-										<div class="card-header">
-											<span class="h3">
-                                        Fields
-                                    </span>
+
+			<!-- Nav tabs -->
+			<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" [class.active]="activeTab === 'documents'" (click)="activeTab = 'documents'">
+					<a aria-controls="home" role="tab" data-toggle="tab">Documents</a>
+				</li>
+				<li role="presentation" [class.active]="activeTab === 'tags'" (click)="activeTab = 'tags'">
+					<a aria-controls="profile" role="tab" data-toggle="tab">Tags</a>
+				</li>
+			</ul>
+
+			<!-- Tab panes -->
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane" [class.active]="activeTab === 'documents'" id="home">
+					<div class="container-fluid">
+						<br>
+						<div class="row">
+							<!--field filter section-->
+							<div class="col-md-3">
+								<div class="card" style="display: inline;">
+									<div class="card-header">
+										<span class="h3">
+												Fields
+											</span>
+									</div>
+									<br role="separator" class="divider">
+									<div class="card-block">
+										<div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
+											<table class='table table-striped'>
+												<thead>
+													<th><input type="checkbox" [checked]="getSelectedItemsCount(fields) == fields.length" name="checkAll" (change)="checkField($event)"
+															style="margin: 3px;"></th>
+													<th>Field</th>
+												</thead>
+												<tbody>
+													<tr *ngFor='let field of fields'>
+														<td><input type="checkbox" [checked]="field.IsSelected" name="check" (change)="checkField($event, field)"></td>
+														<td>{{field.Name}}</td>
+													</tr>
+												</tbody>
+											</table>
 										</div>
-										<br role="separator" class="divider">
-										<div class="card-block">
-											<div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
-												<table class='table table-striped'>
-													<thead>
-														<th><input type="checkbox" [checked]="getSelectedItemsCount(fields) == fields.length" name="checkAll" (change)="checkField($event)"
-																style="margin: 3px;"></th>
-														<th>Field</th>
-													</thead>
-													<tbody>
-														<tr *ngFor='let field of fields'>
-															<td><input type="checkbox" [checked]="field.IsSelected" name="check" (change)="checkField($event, field)"></td>
-															<td>{{field.Name}}</td>
-														</tr>
-													</tbody>
-												</table>
-											</div>
-											<button class="btn btn-default" (click)="fieldFilter()">Set Fields</button>
-										</div>
+										<button class="btn btn-default" (click)="fieldFilter()">Set Fields</button>
 									</div>
 								</div>
-								<div class="col-md-1 divider" role="separator">
-								</div>
-								<!--filter section-->
-								<div class="col-md-3">
-									<div class="card" style="display: inline;">
-										<div class="card-header">
-											<span class="h3">
+							</div>
+							<div class="col-md-1 divider" role="separator">
+							</div>
+							<!--filter section-->
+							<div class="col-md-3">
+								<div class="card" style="display: inline;">
+									<div class="card-header">
+										<span class="h3">
                                         Filter
                                     </span>
-										</div>
-										<br role="separator" class="divider">
-										<div class="card-block">
-											<form (submit)="filter()">
-												<div class="form-group">
-													<button type="button" class="btn btn-primary" (click)="selectFilterTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForFilter.length}})</button>
-												</div>
-												<div class="form-group">
-													<label>Query </label>
-													<input type="text" class="form-control" name="query" [(ngModel)]="filterSettings.Filter.Query">
-												</div>
-												<div class="form-group">
-													<label>Scroll size </label>
-													<input type="number" class="form-control" name="size" [(ngModel)]="filterSettings.Pagination.Limit">
-												</div>
-												<button type="submit" class="btn btn-default">Filter</button>
-											</form>
-										</div>
+									</div>
+									<br role="separator" class="divider">
+									<div class="card-block">
+										<form (submit)="filter()">
+											<div class="form-group">
+												<button type="button" class="btn btn-primary" (click)="selectFilterTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForFilter.length}})</button>
+											</div>
+											<div class="form-group">
+												<label>Query </label>
+												<input type="text" class="form-control" name="query" [(ngModel)]="filterSettings.Filter.Query">
+											</div>
+											<div class="form-group">
+												<label>Scroll size </label>
+												<input type="number" class="form-control" name="size" [(ngModel)]="filterSettings.Pagination.Limit">
+											</div>
+											<button type="submit" class="btn btn-default">Filter</button>
+										</form>
 									</div>
 								</div>
-								<div class="col-md-1 divider" role="separator">
-								</div>
-								<!--sampling section-->
-								<div class="col-md-3">
-									<div class="card" style="display: inline;">
-										<div class="card-header">
-											<span class="h3">
+							</div>
+							<div class="col-md-1 divider" role="separator">
+							</div>
+							<!--sampling section-->
+							<div class="col-md-3">
+								<div class="card" style="display: inline;">
+									<div class="card-header">
+										<span class="h3">
                                                 Sample
                                             </span>
-										</div>
-										<br role="separator" class="divider">
-										<div class="card-block">
-											<form (submit)="getSample()">
-												<div class="form-group">
-													<button type="button" class="btn btn-primary" (click)="selectSampleTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForSample.length}})</button>
-												</div>
-												<div class="form-group">
-													<input type="checkbox" name="isFix" [(ngModel)]="sampleSettings.IsFix">Fix Size
-													<br/>
-													<div *ngIf="sampleSettings.IsFix">
-														<div class="form-group">
-															<label>Size </label>
-															<input type="number" class="form-control" name="size" [(ngModel)]="sampleSettings.Settings.Size">
-														</div>
-													</div>
-													<div *ngIf="!sampleSettings.IsFix">
-														<div class="form-group">
-															<label>Percent </label>
-															<input type="number" class="form-control" name="percent" [(ngModel)]="sampleSettings.Settings.Percent">
-														</div>
+									</div>
+									<br role="separator" class="divider">
+									<div class="card-block">
+										<form (submit)="getSample()">
+											<div class="form-group">
+												<button type="button" class="btn btn-primary" (click)="selectSampleTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForSample.length}})</button>
+											</div>
+											<div class="form-group">
+												<input type="checkbox" name="isFix" [(ngModel)]="sampleSettings.IsFix">Fix Size
+												<br/>
+												<div *ngIf="sampleSettings.IsFix">
+													<div class="form-group">
+														<label>Size </label>
+														<input type="number" class="form-control" name="size" [(ngModel)]="sampleSettings.Settings.Size">
 													</div>
 												</div>
-												<button class="btn btn-default" type="submit">Get Sample</button>
-											</form>
-										</div>
+												<div *ngIf="!sampleSettings.IsFix">
+													<div class="form-group">
+														<label>Percent </label>
+														<input type="number" class="form-control" name="percent" [(ngModel)]="sampleSettings.Settings.Percent">
+													</div>
+												</div>
+											</div>
+											<button class="btn btn-default" type="submit">Get Sample</button>
+										</form>
 									</div>
 								</div>
 							</div>
 						</div>
-						<br/>
-						<hr role="separator" class="divider">
-						<!--bulk actions-->
+					</div>
+					<br/>
+					<hr role="separator" class="divider">
+					<!--bulk actions-->
+					<div class="well">
 						<div class="button-container">
+							<button type="button" class="btn btn-primary" (click)="saveOrEditDocument()">Add New Document</button>
 							<button type="button" class="btn btn-default" (click)="deleteConfirm()">Delete</button>
 							<button type="button" class="btn btn-default" (click)="copyTo()">Copy To</button>
 							<button type="button" class="btn btn-default" (click)="moveTo()">Move To</button>
@@ -132,155 +131,43 @@
 							<button type="button" class="btn btn-default" (click)="removeTags()">Remove Tags</button>
 							<button type="button" class="btn btn-default" (click)="clearTagsConfirm()">Clear Tag List</button>
 						</div>
-						<br role="separator" class="divider">
-						<!--Document table-->
-						<div class='table-responsive' style="overflow-y: auto; overflow-x: auto; max-height: 400px">
-							<p>{{getSelectedItemsCount(documents)}} item(s) selected</p>
-							<table class='table table-striped table-hover table-interactive' *ngIf='documents && documents.length'>
-								<thead>
-									<tr>
-										<th></th>
-										<th>
-											<div>
-												<input type="checkbox" [checked]="getSelectedItemsCount(documents) == documents.length" (change)="checkDocument($event)"
-													style="margin: 3px;">
-											</div>
-										</th>
-										<th *ngFor='let header of headers'>{{header}}</th>
-									</tr>
-								</thead>
-								<tbody *vsFor="documents; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
-									<tr *ngFor='let document of _items; let i = index' (click)='select(document)' [style.cursor]="cursor" (dblclick)='openDocument(document)'>
-										<td>{{ i + _startIndex + 1}}</td>
-										<td><input type="checkbox" [checked]="document.IsSelected" (change)="checkDocument($event, document)"></td>
-										<td *ngFor='let header of headers'>{{document.Item[header]}}</td>
-										<td>
-											<button md-icon-button [md-menu-trigger-for]="menu">
-                                                <md-icon>more_vert</md-icon>
-                                            </button>
-											<md-menu #menu="mdMenu" x-position="before" y-position="above">
-												<button md-menu-item (click)="copyTo([document])">CopyTo</button>
-												<button md-menu-item (click)="moveTo([document])">MoveTo</button>
-												<button md-menu-item (click)="addTags([document])">AddTags</button>
-												<button md-menu-item (click)="removeTags([document])">RemoveTags</button>
-												<button md-menu-item (click)="clearTagsConfirm([document])">Clear tags</button>
-												<button md-menu-item (click)="deleteConfirm([document])">Delete</button>
-												<button md-menu-item (click)="saveOrEditDocument(document)">Edit</button>
-												<button md-menu-item (click)="openDocument(document)">Open</button>
-												<button md-menu-item (click)="preview(document)">Preview</button>
-											</md-menu>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-							<button class="btn btn-default form-control" (click)='loadMore()' *ngIf='_scrollId'>Load more</button>
-						</div>
-						<div style="height: 50px;">
-						</div>
-					</template>
-				</ngb-tab>
-				<ngb-tab title="Tags">
-					<template ngbTabContent>
-						<br/>
-						<div class="row">
-							<div class="col-sm-12">
-								<button type="button" class="btn  btn-primary" (click)="saveOrEditTag()">Add New Tag</button>
-							</div>
-						</div>
-						<br/>
-						<hr role="separator" class="divider">
-						<!--bulk actions-->
-						<div class="row">
-							<div class="col-sm-12 button-container">
-								<button type="button" class="btn btn-default" (click)="exportWords()">Export Words</button>
-								<button type="button" class="btn btn-default" (click)="deleteTagConfirm()">Delete</button>
-							</div>
-						</div>
+					</div>
 
-						<br role="separator" class="divider">
-						<p>{{getSelectedItemsCount(tags)}} item(s) selected</p>
-						<div>
-							<div class="vs-table-header">
-								<table class="table">
-									<thead>
-										<tr>
-											<th class="vs-col-short"></th>
-											<th class="vs-col-short">
-												<div>
-													<input type="checkbox" [checked]="getSelectedItemsCount(tags) == tags.length" (change)="checkTag($event)" style="margin: 3px;">
-												</div>
-											</th>
-											<th class="vs-col-medium">Id</th>
-											<th>Name</th>
-											<th class="vs-col-medium">Parent Id</th>
-											<th class="vs-col-large">Path</th>
-											<th class="vs-col-short">Leaf</th>
-											<th class="vs-col-short">Level</th>
-											<th class="vs-col-medium">Document Count</th>
-											<th class="vs-col-medium">Word Count</th>
-											<th class="vs-col-short"></th>
-										</tr>
-										<tr>
-											<th></th>
-											<th></th>
-											<th><input type="text" class="form-control input-sm" #idFilter (keyup)="0" placeholder="Id Filter" /></th>
-											<th><input type="text" class="form-control input-sm" #nameFilter (keyup)="0" placeholder="Name Filter" /></th>
-											<th><input type="text" class="form-control input-sm" #parentIdFilter (keyup)="0" placeholder="Parent Id Filter" /></th>
-											<th><input type="text" class="form-control input-sm" #pathFilter (keyup)="0" placeholder="Path" /></th>
-											<th>
-												<select (change)="0" class="form-control input-sm" #isLeafSelector placeholder="IsLeaf" style="width: auto;">
-													<option value="null" class="form-control">select</option>
-													<option value="true" class="form-control">true</option>
-													<option value="false" class="form-control">false</option>
-												</select>
-											</th>
-											<th><input type="text" class="form-control input-sm" #levelFilter (keyup)="0" placeholder="Level" /></th>
-											<th></th>
-											<th></th>
-											<th></th>
-										</tr>
-									</thead>
-								</table>
+					<section>
+						<div class="row">
+							<div class="col-sm-2">
+								<input class="form-control" placeholder="Filter..." type="text" [ngModel]="gridFilter" (ngModelChange)="onFilterChanged($event)"
+								/>
 							</div>
-							<div class="vs-table-body">
-								<table class='table table-striped tags-table' *ngIf='tags && tags.length'>
-									<tbody *vsFor="tags | filter:{Item: {Id:idFilter.value}} | filter:{Item: {Name:nameFilter.value}} | filter:{Item: {ParentId:parentIdFilter.value}} | filter:{Item: {Properties: {Paths:pathFilter.value}}} | filter:{Item: {Properties: {Level:levelFilter.value}}} | filter:{Item: {Properties: {IsLeaf:isLeafSelector.value}}}; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
-										<tr *ngFor='let tag of _items; let i = index'>
-											<td class="vs-col-short">{{ i + _startIndex + 1}}</td>
-											<td class="vs-col-short text-center"><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>
-											<td class="vs-col-medium">{{tag.Item.Id}}</td>
-											<td>{{tag.Item.Name}}</td>
-											<td class="vs-col-medium">{{tag.Item.ParentId}}</td>
-											<td class="vs-col-large">
-												<span *ngFor="let path of tag.Item.Properties.Paths; let fst = first" title="{{path.Id}}">
-                                                <i class="fa fa-angle-right" *ngIf="!fst"></i>
-                                                {{path.Name}}
-                                            </span>
-											</td>
-											<td class="vs-col-short">{{tag.Item.Properties.IsLeaf}}</td>
-											<td class="vs-col-short">{{tag.Item.Properties.Level}}</td>
-											<td class="vs-col-medium">{{tag.Item.Properties.DocumentCount}}</td>
-											<td class="vs-col-medium">{{tag.Item.Properties.WordCount}}</td>
-											<td class="vs-col-short">
-												<div ngbDropdown class="dropdown">
-													<button md-icon-button [md-menu-trigger-for]="menu">
-                                                    <md-icon>more_vert</md-icon>
-                                                </button>
-													<md-menu #menu="mdMenu" x-position="before" y-position="above">
-														<button md-menu-item (click)="exportWords([tag])">Export Words</button>
-														<button md-menu-item (click)="saveOrEditTag(tag)">Edit</button>
-														<button md-menu-item (click)="deleteTagConfirm([tag])">Delete</button>
-													</md-menu>
-												</div>
-											</td>
-										</tr>
-									</tbody>
-								</table>
+							<div class="col-sm-10 float-right">
+								<div class="button-container">
+									<button class="btn btn-default" (click)="sizeToFit()">Size to Fit</button>
+									<button class="btn btn-default" (click)="autoSizeAll()">Autosize All</button>
+									<button class="btn btn-default" (click)="selectAll()">Select All</button>
+								</div>
+								<br>
 							</div>
 						</div>
-					</template>
-				</ngb-tab>
-			</ngb-tabset>
+						<ag-grid-ng2 #agGrid style="width: 100%; height: 350px;" class="ag-fresh" [gridOptions]="gridOptions">
+						</ag-grid-ng2>
+						<button class="btn btn-default col-sm-12" [disabled]="!filterIsActive || !_scrollId" (click)="loadMore()">Load more...</button>
+					</section>
+				</div>
+				<div role="tabpanel" class="tab-pane" [class.active]="activeTab === 'tags'" id="profile">
+					<sl-tab-pane [dataset]="dataset" (onDeleted)="onTagDeleted($event)"></sl-tab-pane>
+				</div>
+			</div>
+
+
 		</div>
 	</div>
+	<section>
+		<sl-common-templates></sl-common-templates>
+		<sl-dataset-selector></sl-dataset-selector>
+		<sl-document-details-dialog></sl-document-details-dialog>
+		<sl-input-dialog></sl-input-dialog>
+		<sl-confirm-dialog></sl-confirm-dialog>
+		<sl-document-editor-dialog></sl-document-editor-dialog>
+		<sl-taglist-selector-dialog></sl-taglist-selector-dialog>
+	</section>
 </div>

@@ -1,0 +1,90 @@
+<sl-common-templates></sl-common-templates>
+<sl-confirm-dialog></sl-confirm-dialog>
+<sl-input-dialog></sl-input-dialog>
+<sl-tag-editor-dialog></sl-tag-editor-dialog>
+<div class='has-error' *ngIf='errorMessage'>{{errorMessage}}</div>
+<br/>
+<!--bulk actions-->
+<div class="well">
+	<div class="button-container">
+		<button type="button" class="btn btn-primary" (click)="saveOrEditTag()">Add New Tag</button>
+		<button type="button" class="btn btn-default" (click)="exportWords()">Export Words</button>
+		<button type="button" class="btn btn-default" [disabled]="getSelectedItemsCount(tags) === 0" (click)="deleteTagConfirm()">Delete</button>
+	</div>
+</div>
+
+<br role="separator" class="divider">
+<p>{{getSelectedItemsCount(tags)}} item(s) selected</p>
+<div>
+	<div class="vs-table-header">
+		<table class="table">
+			<thead>
+				<tr>
+					<th class="vs-col-short"></th>
+					<th class="vs-col-short">
+						<div>
+							<input type="checkbox" [checked]="getSelectedItemsCount(tags) == tags.length" (change)="checkTag($event)" style="margin: 3px;">
+						</div>
+					</th>
+					<th class="vs-col-medium">Id</th>
+					<th>Name</th>
+					<th class="vs-col-medium">Parent Id</th>
+					<th class="vs-col-large">Path</th>
+					<th class="vs-col-short">Leaf</th>
+					<th class="vs-col-short">Level</th>
+					<th class="vs-col-medium">Document Count</th>
+					<th class="vs-col-medium">Word Count</th>
+					<th class="vs-col-short"></th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th><input type="text" class="form-control input-sm" #idFilter (keyup)="0" placeholder="Id Filter" /></th>
+					<th><input type="text" class="form-control input-sm" #nameFilter (keyup)="0" placeholder="Name Filter" /></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<div class="vs-table-body">
+		<table class='table table-striped tags-table' *ngIf='tags && tags.length'>
+			<tbody *vsFor="tags | filter:{Item: {Id:idFilter.value}} | filter:{Item: {Name:nameFilter.value}}; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+				<tr *ngFor='let tag of _items; let i = index'>
+					<td class="vs-col-short">{{ i + _startIndex + 1}}</td>
+					<td class="vs-col-short text-center"><input type="checkbox" [checked]="tag.IsSelected" (change)="checkTag($event, tag)"></td>
+					<td class="vs-col-medium">{{tag.Item.Id}}</td>
+					<td>{{tag.Item.Name}}</td>
+					<td class="vs-col-medium">{{tag.Item.ParentId}}</td>
+					<td class="vs-col-large">
+						<span *ngFor="let path of tag.Item.Properties.Paths; let fst = first" title="{{path.Id}}">
+                                                <i class="fa fa-angle-right" *ngIf="!fst"></i>
+                                                {{path.Name}}
+                                            </span>
+					</td>
+					<td class="vs-col-short">{{tag.Item.Properties.IsLeaf}}</td>
+					<td class="vs-col-short">{{tag.Item.Properties.Level}}</td>
+					<td class="vs-col-medium">{{tag.Item.Properties.DocumentCount}}</td>
+					<td class="vs-col-medium">{{tag.Item.Properties.WordCount}}</td>
+					<td class="vs-col-short">
+						<div ngbDropdown class="dropdown">
+							<button md-icon-button [md-menu-trigger-for]="menu">
+                                                    <md-icon>more_vert</md-icon>
+                                                </button>
+							<md-menu #menu="mdMenu" x-position="before">
+								<button md-menu-item (click)="exportWords([tag])">Export Words</button>
+								<button md-menu-item (click)="saveOrEditTag(tag)">Edit</button>
+								<button md-menu-item (click)="deleteTagConfirm([tag])">Delete</button>
+							</md-menu>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

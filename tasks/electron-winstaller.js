@@ -12,10 +12,10 @@ createInstaller('win32-x64')
     );
 
 function createInstaller(platform) {
+    var remoteReleasesUrl = 'https://insight.slamby.com/download/latest';
     var appName = module.exports.name;
     var setupExeName = `${appName}-${module.exports.version}-${platform}.exe`;
     var appDir = path.join(__dirname, '..', 'packager', `${appName}-${platform}`);
-    //var installerDir = path.join(__dirname, '..', 'installer', `${appName}-${platform}`);
     var installerDir = path.join(__dirname, '..', 'installer');
     var iconDir = path.join(__dirname, '..', 'src', 'assets', 'icons', 'icon.ico');
 
@@ -30,7 +30,8 @@ function createInstaller(platform) {
         setupIcon: iconDir,
         setupExe: setupExeName,
         iconUrl: 'https://www.slamby.com/app/icon.png',
-        noMsi: true
+        noMsi: true,
+        remoteReleases: remoteReleasesUrl
     });
 
     return resultPromise.then(() => console.log(`Creating installer for ${platform} succeded!`));

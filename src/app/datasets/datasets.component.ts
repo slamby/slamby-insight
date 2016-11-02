@@ -31,6 +31,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
 
     dataSets: IDataSet[];
     docComponent = DocumentsComponent;
+    isLoading = true;
 
     constructor(private _datasetService: DatasetService,
         private messenger: Messenger,
@@ -48,8 +49,14 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
         this._datasetService
             .getDatasets()
             .subscribe(
-            (dataSets: Array<IDataSet>) => this.dataSets = dataSets,
-            error => this.handleError(error));
+            (dataSets: Array<IDataSet>) => {
+                this.dataSets = dataSets;
+                this.isLoading = false;
+            },
+            error => {
+                this.handleError(error);
+                this.isLoading = false;
+            });
     }
 
     ngOnInit(): void {
@@ -101,7 +108,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                 if (model.Result === DialogResult.Ok) {
                     let dataSetToSave = _.cloneDeep(model.dataSet);
                     if (model.IsNew) {
-                        dataSetToSave.InterpretedFields = dataSetToSave.InterpretedFields.toString().split(',');
+                        dataSetToSave.InterpretedFields = dataSetToSave.InterpretedFields.toString().split(',').map(f=>f.trim());
                         if (model.sampleDocumentChecked) {
                             dataSetToSave.SampleDocument = JSON.parse(model.dataSet.SampleDocument);
                             dataSetToSave.Schema = null;

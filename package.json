@@ -1,7 +1,7 @@
 {
   "name": "slambyinsight",
   "description": "Slamby Insight Application",
-  "version": "0.2.0-alpha1",
+  "version": "0.9.0",
   "author": "Slamby",
   "contributors": [
     "Zsolt Illés <zsolt.illes@slamby.com>",
@@ -39,6 +39,7 @@
     "installer:redhat:x86": "electron-installer-redhat --src packager/slambyinsight-linux-ia32/ --dest installer/ --arch i386 --config linux-installer-config.json",
     "installer:redhat:x64": "electron-installer-redhat --src packager/slambyinsight-linux-x64/ --dest installer/ --arch amd64 --config linux-installer-config.json",
     "installer:redhat": "npm run installer:redhat:x86 && npm run installer:redhat:x64",
+    "installer:osx": "electron-installer-dmg packager/slambyinsight-darwin-x64 \"Slamby Insight\" --out=installer/ --icon=src/assets/icons/icon.icns",
     "installer": "npm run installer:win && npm run installer:debian"
   },
   "license": "ISC",
@@ -59,6 +60,7 @@
     "animate.css": "^3.5.2",
     "bootstrap": "^3.3.7",
     "core-js": "^2.4.1",
+    "electron-installer-dmg": "^0.1.2",
     "electron-settings": "^2.2.1",
     "electron-squirrel-startup": "^1.0.0",
     "es6-promise": "^4.0.5",

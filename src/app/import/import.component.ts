@@ -144,6 +144,22 @@ export class ImportComponent implements AfterContentInit {
                         });
                     }
                     let filteredData = results.data;
+                    if (this.selectedDataset.SampleDocument) {
+                        if (_.isArray(this.selectedDataset.SampleDocument[this.selectedDataset.TagField])) {
+                            filteredData = filteredData.map(d => {
+                                d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
+                                return d;
+                            });
+                        }
+                    }
+                    else{
+                        if(this.selectedDataset.Schema["properties"][this.selectedDataset.TagField]["type"]=="array"){
+                            filteredData = filteredData.map(d => {
+                                d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
+                                return d;
+                            });
+                        }
+                    }
                     filteredData.splice(...errorRows);
                     if (filteredData.length > 0) {
                         if (this.tagImport) {

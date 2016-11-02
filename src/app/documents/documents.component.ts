@@ -289,13 +289,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             },
             <ColDef>{
                 headerName: '',
-                width: 80,
-                minWidth: 80,
-                maxWidth: 80,
+                width: 135,
+                minWidth: 135,
+                maxWidth: 135,
                 cellRendererFramework: {
                     component: DocDropdownCellComponent,
                     moduleImports: [NgbModule.forRoot()]
                 },
+                cellStyle: { overflow: 'visible' },
                 pinned: 'left',
                 suppressSorting: true
             },
@@ -524,19 +525,19 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 this.refreshGrid();
             })
             .subscribe(
-                document => {
-                    let index = this.documents.findIndex(doc => doc[this._dataset.IdField] === document[this._dataset.IdField]);
-                    this.documents[index].Item = document;
-                    this.documents = JSON.parse(JSON.stringify(this.documents)); // ??
-                    dialogModel.Done += 1;
-                    dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
-                },
-                error => {
-                    this.errorMessage = <any>error;
-                    dialogModel.ErrorCount += 1;
-                    dialogModel.Done += 1;
-                    dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
-                });
+            document => {
+                let index = this.documents.findIndex(doc => doc[this._dataset.IdField] === document[this._dataset.IdField]);
+                this.documents[index].Item = document;
+                this.documents = JSON.parse(JSON.stringify(this.documents)); // ??
+                dialogModel.Done += 1;
+                dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
+            },
+            error => {
+                this.errorMessage = <any>error;
+                dialogModel.ErrorCount += 1;
+                dialogModel.Done += 1;
+                dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
+            });
     }
 
     copyAllTo() {

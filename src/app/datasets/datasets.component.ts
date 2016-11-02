@@ -48,14 +48,15 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
     ngAfterContentInit() {
         this._datasetService
             .getDatasets()
+            .finally(() => {
+                this.isLoading = false;
+            })
             .subscribe(
             (dataSets: Array<IDataSet>) => {
                 this.dataSets = dataSets;
-                this.isLoading = false;
             },
             error => {
                 this.handleError(error);
-                this.isLoading = false;
             });
     }
 

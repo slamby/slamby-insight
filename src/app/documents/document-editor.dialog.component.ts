@@ -1,10 +1,11 @@
 import { Component, Input, ViewChild } from '@angular/core';
+import { Response } from '@angular/http';
+import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { DialogResult } from '../models/dialog-result';
-import { Subject } from 'rxjs';
 import { DocumentWrapper } from '../models/document-wrapper';
+import { DocumentService } from '../common/services/document.service';
 
-import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { CommonHelper } from '../common/helpers/common.helper';
+import { NgbModal, NgbModalOptions, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'sl-document-editor-dialog',
@@ -12,50 +13,80 @@ import { CommonHelper } from '../common/helpers/common.helper';
     styles: [require('./document-editor.dialog.component.scss')]
 })
 export class DocumentEditorDialogComponent {
-    private _modalRef: any;
+    private _modalRef: NgbModalRef;
+    json: string;
     @Input() model: DocumentWrapper;
+    @Input() dataSetName: string;
     @ViewChild('template') template;
+
     modalOptions: NgbModalOptions = {
         backdrop: 'static',
         keyboard: true,
         size: 'lg'
     };
 
-    showProgress = false;
-    private dialogClosedEventSource = new Subject<DocumentWrapper>();
-    dialogClosed = this.dialogClosedEventSource.asObservable();
+    inProgress: boolean = false;
 
-    constructor(private modal: NgbModal) {
+    constructor(private modal: NgbModal, private _documentService: DocumentService) {
     }
 
-    open() {
+    open(): NgbModalRef {
         this._modalRef = this.modal.open(this.template, this.modalOptions);
-        this.showProgress = false;
+        this.inProgress = false;
+        this.json = JSON.stringify(this.model.Document, null, 4);
+
+        return this._modalRef;
     }
 
     cancel() {
-        this.model.Result = DialogResult.Cancel;
-        this.dialogClosedEventSource.next(this.model);
-        this.unsubscribeAndClose();
+        this._modalRef.dismiss();
     }
 
     ok() {
-        let isParseError = false;
-        try {
-            JSON.parse(CommonHelper.escapeJson(this.model.Document));
-        } catch (error) {
-            this.model.ErrorMessage = error;
-            isParseError = true;
-        }
-        if (!isParseError) {
-            this.model.Result = DialogResult.Ok;
-            this.dialogClosedEventSource.next(this.model);
+        this.inProgress = true;
+
+        if (this.model.IsNew) {
+            this.addNew();
+        } else {
+            this.update();
         }
     }
 
-    unsubscribeAndClose() {
-        this.dialogClosedEventSource = new Subject<DocumentWrapper>();
-        this.dialogClosed = this.dialogClosedEventSource.asObservable();
-        this._modalRef.close();
+    addNew() {
+        let document = JSON.parse(this.json);
+        this._documentService.createDocument(this.dataSetName, document)
+            .finally(() => {
+                this.inProgress = false;
+            })
+            .subscribe(
+            () => {
+                this.model.Document = document;
+                this._modalRef.close(DialogResult.Ok);
+            },
+            error => {
+                this.model.ErrorMessage = this.getErrors(error);
+            });
+    }
+
+    update() {
+        let document = JSON.parse(this.json);
+        this._documentService.updateDocument(this.dataSetName, this.model.Id, document)
+            .finally(() => {
+                this.inProgress = false;
+            })
+            .subscribe(
+            updatedDoc => {
+                this.model.Document = document;
+                this._modalRef.close(DialogResult.Ok);
+            },
+            error => {
+                this.model.ErrorMessage = this.getErrors(error);
+            });
+    }
+
+    getErrors(response: Response): string {
+        let model = ErrorsModelHelper.getFromResponse(response);
+        let errors = ErrorsModelHelper.concatErrors(model);
+        return errors;
     }
 }

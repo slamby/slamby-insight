@@ -27,6 +27,8 @@ import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { Observable, Observer } from 'rxjs';
 
+import * as _ from 'lodash';
+
 @Component({
     template: require('./services.component.html'),
     styles: [require('./services.component.scss')]

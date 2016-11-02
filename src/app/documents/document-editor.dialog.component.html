@@ -9,13 +9,13 @@
 		<font size="3" color="red">{{model.ErrorMessage}}</font>
 	</div>
 	<div class="modal-body">
-		<div class="progress" style="position: relative;" *ngIf="showProgress">
+		<div class="progress" style="position: relative;" *ngIf="inProgress">
 			<div class="progress-bar indeterminate"></div>
 		</div>
-		<form (submit)="ok()" #f="ngForm" class="form-horizontal">
+		<form #f="ngForm" class="form-horizontal">
 			<div class="form-group" [class.has-error]="doc.errors">
 				<div class="col-sm-12">
-					<sl-json-editor [(ngModel)]="model.Document" name="doc" #doc="ngModel" height="400px" json></sl-json-editor>
+					<sl-json-editor [(ngModel)]="json" name="doc" #doc="ngModel" height="400px" json></sl-json-editor>
 					<div *ngIf="doc.dirty && !doc.valid">
 						<p *ngIf="doc.errors?.json" class="text-danger">
 							Invalid JSON!
@@ -26,7 +26,7 @@
 		</form>
 	</div>
 	<div class="modal-footer">
-		<button type="submit" class="btn btn-success" [disabled]="!f.valid">OK</button>
+		<button type="button" class="btn btn-success" [disabled]="!f.valid || inProgress" (click)="ok()">OK</button>
 		<button type="button" class="btn btn-warning" (click)="cancel();">Close</button>
 	</div>
 </template>

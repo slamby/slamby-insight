@@ -11,6 +11,7 @@ import { IDataSet, IBulkResults, IBulkResult } from 'slamby-sdk-angular2';
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 
+import * as _ from 'lodash';
 let papa = require('papaparse');
 
 class ImportStatus {

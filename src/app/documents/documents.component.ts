@@ -351,6 +351,12 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         });
     }
 
+    getOtherDataSets(datasets: IDataSet[]): IDataSet[] {
+        return datasets
+            .filter(ds => ds !== this._dataset)
+            .sort((a, b) => a.Name.localeCompare(b.Name));
+    }
+
     refreshGrid() {
         let selectedIds = this.getSelectedIds();
         this.gridOptions.api.setRowData(this.documents);
@@ -569,19 +575,21 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         let datasetSelectorModel: DatasetSelectorModel;
         this.datasetSelector.dialogClosed.subscribe(
             (model: DatasetSelectorModel) => {
+                if (model.Result !== DialogResult.Ok) {
+                    return;
+                }
                 this.dialogService.progressModel = { Header: 'Copy documents...' };
                 this.dialogService.openDialog('indeterminateprogress');
                 this._documentService.copyTo(
                     this._dataset.Name,
                     model.Selected.Name,
-                    selectedDocs.map<string>(doc => doc[this.dataset.IdField]))
+                    selectedDocs.map<string>(doc => doc[this.dataset.IdField])
+                )
                     .finally(() => this.dialogService.close())
                     .subscribe(
                     () => {
-                        this.dialogService.close();
                     },
                     error => {
-                        this.dialogService.close();
                     });
             },
             error => this.errorMessage = <any>error
@@ -589,7 +597,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this._datasetService.getDatasets().subscribe(
             (datasets: Array<IDataSet>) => {
                 datasetSelectorModel = {
-                    Datasets: datasets,
+                    Datasets: this.getOtherDataSets(datasets),
                     Selected: datasets.length > 0 ? datasets[0] : null
                 };
                 this.datasetSelector.model = datasetSelectorModel;
@@ -628,6 +636,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         let datasetSelectorModel: DatasetSelectorModel;
         this.datasetSelector.dialogClosed.subscribe(
             (model: DatasetSelectorModel) => {
+                if (model.Result !== DialogResult.Ok) {
+                    return;
+                }
+
                 this.dialogService.progressModel = { Header: 'Move documents...' };
                 this.dialogService.openDialog('indeterminateprogress');
                 let docIdsToMove = selectedDocs.map<string>(d => d[this.dataset.IdField]);
@@ -645,7 +657,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this._datasetService.getDatasets().subscribe(
             (datasets: Array<IDataSet>) => {
                 datasetSelectorModel = {
-                    Datasets: datasets,
+                    Datasets: this.getOtherDataSets(datasets),
                     Selected: datasets.length > 0 ? datasets[0] : null
                 };
                 this.datasetSelector.model = datasetSelectorModel;
@@ -960,7 +972,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 this.clearTags([data]);
                 break;
             case 'deleteDocuments':
-                this.deleteDocuments([data]);
+                this.deleteConfirm([data]);
                 break;
         }
     }

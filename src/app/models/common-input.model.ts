@@ -5,4 +5,5 @@ export interface CommonInputModel {
     Header: string;
     ErrorMessage?: string;
     Result?: DialogResult;
+    Type?: string;
 }

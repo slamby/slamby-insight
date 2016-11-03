@@ -6,6 +6,9 @@ require('!style!css!ng2-toastr/bundles/ng2-toastr.min.css');
 require('!style!css!ng2-toasty/style.css');
 require('!style!css!ng2-slim-loading-bar/style.css');
 require('!style!css!@angular/material/core/theming/prebuilt/deeppurple-amber.css');
+require('!style!css!ag-grid/dist/styles/ag-grid.css');
+require('!style!css!ag-grid/dist/styles/theme-fresh.css');
+
 require('!style!css!sass!../assets/site.scss');
 
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';

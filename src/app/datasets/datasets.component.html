@@ -1,11 +1,13 @@
 <div class="panel-body">
-	<md-progress-circle *ngIf="!dataSets" mode="indeterminate"></md-progress-circle>
+	<md-progress-circle *ngIf="isLoading" mode="indeterminate"></md-progress-circle>
 	<sl-confirm-dialog></sl-confirm-dialog>
 	<sl-dataset-editor-dialog></sl-dataset-editor-dialog>
 	<sl-json-editor-dialog></sl-json-editor-dialog>
 	<div *ngIf="!isLoading">
-		<button type="button" class="btn btn-primary" (click)="addOrEdit()" style="margin-bottom: 70px;">Add New DataSet</button>
-		<div class='table-responsive' style="overflow-y: auto; overflow-x: auto; max-height: 500px">
+		<div class="well">
+			<button type="button" class="btn btn-primary" (click)="addOrEdit()">Add New DataSet</button>
+		</div>
+		<div>
 			<table class="table table-striped table-hover table-interactive" contextmenu="contextmenu">
 				<thead>
 					<tr>

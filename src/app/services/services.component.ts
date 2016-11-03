@@ -28,7 +28,7 @@ import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { Observable, Observer } from 'rxjs';
 
 import { ServiceMaintenanceDialogComponent } from './service-maintenance.dialog.component';
-
+import * as _ from 'lodash';
 @Component({
     template: require('./services.component.html'),
     styles: [require('./services.component.scss')]
@@ -73,9 +73,6 @@ export class ServicesComponent implements OnInit {
         this.resultDialog.open();
     }
 
-    log(dialog) {
-        console.log(dialog);
-    }
 
     deleteConfirm(selected: IService | IPrcService | IClassifierService) {
         let model: ConfirmModel = {

@@ -1,26 +1,31 @@
 <div class="panel-body  col-xs-12 col-sm-12 col-md-8 col-lg-6">
-    <ul class="list-group">
-        <li class="list-group-item">
-            API version
-            <span class="pull-right">{{statusObj.ApiVersion}}</span>
-        </li>
-        <li class="list-group-item">
-            Number of CPU core(s)
-            <span class="pull-right">{{statusObj.ProcessorCount}}</span>
-        </li>
-        <li class="list-group-item">
-            CPU usage
-            <span class="pull-right">{{statusObj.CpuUsage}} %</span>
-        </li>
-        <li class="list-group-item">
-            Available free disk space
-            <span class="pull-right">{{statusObj.AvailableFreeSpace}} MB</span>
-        </li>
-        <li class="list-group-item">
-            Free memory / Total memory
-            <span class="pull-right">{{statusObj.FreeMemory}} MB / {{statusObj.TotalMemory}} MB</span>
-        </li>
-    </ul>
+    <div class="alert alert-danger" role="alert" *ngIf="errorMessage">
+        <strong>Error!</strong> {{errorMessage}}
+    </div>
+    <div *ngIf="!errorMessage">
+        <ul class="list-group">
+            <li class="list-group-item">
+                API version
+                <span class="pull-right">{{statusObj.ApiVersion}}</span>
+            </li>
+            <li class="list-group-item">
+                Number of CPU core(s)
+                <span class="pull-right">{{statusObj.ProcessorCount}}</span>
+            </li>
+            <li class="list-group-item">
+                CPU usage
+                <span class="pull-right">{{statusObj.CpuUsage}} %</span>
+            </li>
+            <li class="list-group-item">
+                Available free disk space
+                <span class="pull-right">{{statusObj.AvailableFreeSpace}} MB</span>
+            </li>
+            <li class="list-group-item">
+                Free memory / Total memory
+                <span class="pull-right">{{statusObj.FreeMemory}} MB / {{statusObj.TotalMemory}} MB</span>
+            </li>
+        </ul>
+    </div>
     <div class="pull-right">
         <div>
             <label for="refreshInterval">Refresh interval (sec)</label>

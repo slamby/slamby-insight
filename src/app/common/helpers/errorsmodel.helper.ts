@@ -1,11 +1,15 @@
-import { Response }  from '@angular/http';
+import { Response } from '@angular/http';
 import { IErrorsModel } from 'slamby-sdk-angular2';
 
 export module ErrorsModelHelper {
     export function getFromResponse(response: Response): IErrorsModel {
         let model: any = {};
         try {
-            model = JSON.parse((<any> response)._body);
+            if (!response.ok && response.status === 0 && response.type === 3) {
+                return { Errors: ['Connection failed!'] };
+            }
+
+            model = JSON.parse((<any>response)._body);
         } catch (error) {
             return { Errors: ['Invalid JSON response!'] };
         }
@@ -22,7 +26,7 @@ export module ErrorsModelHelper {
 
         let model: any = {};
         try {
-            model = (<any> response)._body;
+            model = (<any>response)._body;
             if (!model) {
                 return emptyResult;
             }

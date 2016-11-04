@@ -31,7 +31,8 @@ function createInstaller(platform) {
         setupExe: setupExeName,
         iconUrl: 'https://www.slamby.com/app/icon.png',
         noMsi: true,
-        remoteReleases: remoteReleasesUrl
+        remoteReleases: remoteReleasesUrl,
+        skipUpdateIcon: true
     });
 
     return resultPromise.then(() => console.log(`Creating installer for ${platform} succeded!`));

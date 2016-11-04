@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
+import { CustomFormsModule } from 'ng2-validation';
 
 import { ServicesComponent } from './services.component';
 
@@ -16,10 +17,13 @@ import { MaterialModule } from '@angular/material';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonComponentsModule } from '../common/components/common-components.module';
 
+import { ServiceMaintenanceDialogComponent } from './service-maintenance.dialog.component';
+
 
 @NgModule({
     declarations: [
-        ServicesComponent
+        ServicesComponent,
+        ServiceMaintenanceDialogComponent
     ],
     providers: [
         ServicesService,
@@ -35,7 +39,8 @@ import { CommonComponentsModule } from '../common/components/common-components.m
         NgbModule.forRoot(),
         BrowserModule,
         HttpModule,
-        FormsModule
+        FormsModule,
+        CustomFormsModule
     ],
     bootstrap: [ServicesComponent],
 })

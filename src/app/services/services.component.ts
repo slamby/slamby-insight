@@ -27,8 +27,8 @@ import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { Observable, Observer } from 'rxjs';
 
+import { ServiceMaintenanceDialogComponent } from './service-maintenance.dialog.component';
 import * as _ from 'lodash';
-
 @Component({
     template: require('./services.component.html'),
     styles: [require('./services.component.scss')]
@@ -41,6 +41,7 @@ export class ServicesComponent implements OnInit {
     @ViewChild(CommonOutputDialogComponent) resultDialog: CommonOutputDialogComponent;
     @ViewChild(DialogComponent) dialogService: DialogComponent;
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
+    @ViewChild(ServiceMaintenanceDialogComponent) sm: ServiceMaintenanceDialogComponent;
 
     serviceType = IService.ITypeEnum;
     serviceStatus = IService.IStatusEnum;
@@ -71,6 +72,7 @@ export class ServicesComponent implements OnInit {
         this.resultDialog.model = model;
         this.resultDialog.open();
     }
+
 
     deleteConfirm(selected: IService | IPrcService | IClassifierService) {
         let model: ConfirmModel = {
@@ -106,10 +108,12 @@ export class ServicesComponent implements OnInit {
         };
         let inputModel: CommonInputModel = {
             Header: type === IService.ITypeEnum.Classifier ? 'Add New Classifier Service' : 'Add New Prc Service',
-            Model: defaultModel
+            Model: defaultModel,
+            Type: "new"
         };
-        this.inputDialog.model = inputModel;
-        this.inputDialog.dialogClosed.subscribe(
+        this.sm.model = inputModel;
+        this.sm.open();
+        this.sm.dialogClosed.subscribe(
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
                     model.Model.Type = type;
@@ -117,18 +121,17 @@ export class ServicesComponent implements OnInit {
                         (service: IService) => {
                             this.services = _.concat(this.services, [service]);
                             this.refresh(service);
-                            this.inputDialog.unsubscribeAndClose();
+                            this.sm.unsubscribeAndClose();
                         },
                         error => {
                             let errors = this.handleError(error);
                             model.ErrorMessage = errors;
-                            this.inputDialog.showProgress = false;
+                            this.sm.showProgress = false;
                         }
                     );
                 }
             }
         );
-        this.inputDialog.open();
     }
 
     refresh(selected?: IService | IPrcService | IClassifierService) {
@@ -235,10 +238,11 @@ export class ServicesComponent implements OnInit {
             };
             let inputModel: CommonInputModel = {
                 Header: 'Classifier Prepare Settings',
-                Model: model
+                Model: model,
+                Type: "prepare"
             };
-            this.inputDialog.model = inputModel;
-            this.inputDialog.dialogClosed.subscribe(
+            this.sm.model = inputModel;
+            this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
                         this._classifierService.prepare(selected.Id, model.Model).subscribe(
@@ -256,7 +260,7 @@ export class ServicesComponent implements OnInit {
                     }
                 }
             );
-            this.inputDialog.open();
+            this.sm.open();
 
         } else {
             let model: IPrcPrepareSettings = {

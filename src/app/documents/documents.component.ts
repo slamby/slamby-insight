@@ -71,6 +71,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     documentDetails = DocumentDetailsComponent;
 
     activeTab: string = 'documents';
+    isFilterOpen: boolean = true;
 
     errorMessage: string;
     documents: Array<any> = [];
@@ -289,13 +290,14 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             },
             <ColDef>{
                 headerName: '',
-                width: 80,
-                minWidth: 80,
-                maxWidth: 80,
+                width: 135,
+                minWidth: 135,
+                maxWidth: 135,
                 cellRendererFramework: {
                     component: DocDropdownCellComponent,
                     moduleImports: [NgbModule.forRoot()]
                 },
+                cellStyle: { overflow: 'visible' },
                 pinned: 'left',
                 suppressSorting: true
             },
@@ -350,6 +352,12 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         });
     }
 
+    getOtherDataSets(datasets: IDataSet[]): IDataSet[] {
+        return datasets
+            .filter(ds => ds !== this._dataset)
+            .sort((a, b) => a.Name.localeCompare(b.Name));
+    }
+
     refreshGrid() {
         let selectedIds = this.getSelectedIds();
         this.gridOptions.api.setRowData(this.documents);
@@ -366,7 +374,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
         let model: ConfirmModel = {
             Header: 'Delete documents',
-            Message: 'Are you sure to remove ' + selectedDocs.length + ' document(s)',
+            Message: `Are you sure to remove ${selectedDocs.length} document(s)`,
             Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
@@ -398,16 +406,12 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         let sources = selectedDocs.map<Observable<any>>(currentItem => {
             return Observable.create((observer: Observer<any>) => {
                 let id = currentItem[this._dataset.IdField];
-                this._documentService.deleteDocument(this._dataset.Name, id).subscribe(
-                    () => {
-                        observer.next(currentItem);
-                        observer.complete();
-                    },
-                    error => {
-                        observer.error(error);
-                        observer.complete();
-                    }
-                );
+                this._documentService.deleteDocument(this._dataset.Name, id)
+                    .finally(() => observer.complete())
+                    .subscribe(
+                    () => observer.next(currentItem),
+                    error => observer.error(error)
+                    );
             });
         });
         let source = Observable.concat(...sources);
@@ -524,19 +528,19 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 this.refreshGrid();
             })
             .subscribe(
-                document => {
-                    let index = this.documents.findIndex(doc => doc[this._dataset.IdField] === document[this._dataset.IdField]);
-                    this.documents[index].Item = document;
-                    this.documents = JSON.parse(JSON.stringify(this.documents)); // ??
-                    dialogModel.Done += 1;
-                    dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
-                },
-                error => {
-                    this.errorMessage = <any>error;
-                    dialogModel.ErrorCount += 1;
-                    dialogModel.Done += 1;
-                    dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
-                });
+            document => {
+                let index = this.documents.findIndex(doc => doc[this._dataset.IdField] === document[this._dataset.IdField]);
+                this.documents[index].Item = document;
+                this.documents = JSON.parse(JSON.stringify(this.documents)); // ??
+                dialogModel.Done += 1;
+                dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
+            },
+            error => {
+                this.errorMessage = <any>error;
+                dialogModel.ErrorCount += 1;
+                dialogModel.Done += 1;
+                dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
+            });
     }
 
     copyAllTo() {
@@ -568,19 +572,21 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         let datasetSelectorModel: DatasetSelectorModel;
         this.datasetSelector.dialogClosed.subscribe(
             (model: DatasetSelectorModel) => {
+                if (model.Result !== DialogResult.Ok) {
+                    return;
+                }
                 this.dialogService.progressModel = { Header: 'Copy documents...' };
                 this.dialogService.openDialog('indeterminateprogress');
                 this._documentService.copyTo(
                     this._dataset.Name,
                     model.Selected.Name,
-                    selectedDocs.map<string>(doc => doc[this.dataset.IdField]))
+                    selectedDocs.map<string>(doc => doc[this.dataset.IdField])
+                )
                     .finally(() => this.dialogService.close())
                     .subscribe(
                     () => {
-                        this.dialogService.close();
                     },
                     error => {
-                        this.dialogService.close();
                     });
             },
             error => this.errorMessage = <any>error
@@ -588,7 +594,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this._datasetService.getDatasets().subscribe(
             (datasets: Array<IDataSet>) => {
                 datasetSelectorModel = {
-                    Datasets: datasets,
+                    Datasets: this.getOtherDataSets(datasets),
                     Selected: datasets.length > 0 ? datasets[0] : null
                 };
                 this.datasetSelector.model = datasetSelectorModel;
@@ -627,6 +633,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         let datasetSelectorModel: DatasetSelectorModel;
         this.datasetSelector.dialogClosed.subscribe(
             (model: DatasetSelectorModel) => {
+                if (model.Result !== DialogResult.Ok) {
+                    return;
+                }
+
                 this.dialogService.progressModel = { Header: 'Move documents...' };
                 this.dialogService.openDialog('indeterminateprogress');
                 let docIdsToMove = selectedDocs.map<string>(d => d[this.dataset.IdField]);
@@ -644,7 +654,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this._datasetService.getDatasets().subscribe(
             (datasets: Array<IDataSet>) => {
                 datasetSelectorModel = {
-                    Datasets: datasets,
+                    Datasets: this.getOtherDataSets(datasets),
                     Selected: datasets.length > 0 ? datasets[0] : null
                 };
                 this.datasetSelector.model = datasetSelectorModel;
@@ -959,7 +969,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 this.clearTags([data]);
                 break;
             case 'deleteDocuments':
-                this.deleteDocuments([data]);
+                this.deleteConfirm([data]);
                 break;
         }
     }

@@ -1,0 +1,19 @@
+<div ngbDropdown class="dropdown btn-group">
+	<button type="button" class="btn btn-xs btn-default" (click)="invoke('editDocument')">Edit</button>
+	<button ngbDropdownToggle type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+		aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+	<ul class="dropdown-menu" aria-labelledby="documentDropdownMenu">
+		<li><a (click)="invoke('preview')">Preview</a></li>
+		<li><a (click)="invoke('openDocument')">Open</a></li>
+		<li><a (click)="invoke('editDocument')">Edit</a></li>
+		<li><a (click)="invoke('copyTo')">Copy To</a></li>
+		<li><a (click)="invoke('moveTo')">Move To</a></li>
+		<li><a (click)="invoke('addTags')">Add Tags</a></li>
+		<li><a (click)="invoke('removeTags')">Remove Tags</a></li>
+		<li><a (click)="invoke('clearTags')">Clear Tags</a></li>
+		<li><a (click)="invoke('deleteDocuments')">Delete</a></li>
+	</ul>
+</div>

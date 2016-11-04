@@ -8,6 +8,7 @@ import { Component, OnInit, Input, ViewChild } from '@angular/core';
 export class JsonEditorDialogComponent implements OnInit {
     @Input() json: any;
     @Input() header: string = 'JSON';
+    @Input() readonly: boolean = false;
     @ViewChild('template') template;
 
     modalOptions: NgbModalOptions = {

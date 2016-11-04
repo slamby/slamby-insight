@@ -6,7 +6,7 @@
 		<h4 class="modal-title">{{header}}</h4>
 	</div>
 	<div class="modal-body">
-        <sl-json-editor [(ngModel)]="json" name="json" height="400px"></sl-json-editor>
+        <sl-json-editor [(ngModel)]="json" name="json" height="400px" [readonly]="readonly"></sl-json-editor>
 	</div>
 	<div class="modal-footer">
 		<button type="button" class="btn btn-warning" (click)="c('Close click')">Close</button>

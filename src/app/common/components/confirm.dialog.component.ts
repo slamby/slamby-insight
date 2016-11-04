@@ -34,7 +34,7 @@ export class ConfirmDialogComponent {
         backdrop: true,
         keyboard: true,
         size: 'lg',
-        windowClass: ''
+        windowClass: 'md-dialog'
     };
     private dialogClosedEventSource = new Subject<ConfirmModel>();
     dialogClosed = this.dialogClosedEventSource.asObservable();

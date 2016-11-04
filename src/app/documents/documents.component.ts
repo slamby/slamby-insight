@@ -71,6 +71,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     documentDetails = DocumentDetailsComponent;
 
     activeTab: string = 'documents';
+    isFilterOpen: boolean = true;
 
     errorMessage: string;
     documents: Array<any> = [];
@@ -373,7 +374,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
         let model: ConfirmModel = {
             Header: 'Delete documents',
-            Message: 'Are you sure to remove ' + selectedDocs.length + ' document(s)',
+            Message: `Are you sure to remove ${selectedDocs.length} document(s)`,
             Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
@@ -405,16 +406,12 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         let sources = selectedDocs.map<Observable<any>>(currentItem => {
             return Observable.create((observer: Observer<any>) => {
                 let id = currentItem[this._dataset.IdField];
-                this._documentService.deleteDocument(this._dataset.Name, id).subscribe(
-                    () => {
-                        observer.next(currentItem);
-                        observer.complete();
-                    },
-                    error => {
-                        observer.error(error);
-                        observer.complete();
-                    }
-                );
+                this._documentService.deleteDocument(this._dataset.Name, id)
+                    .finally(() => observer.complete())
+                    .subscribe(
+                    () => observer.next(currentItem),
+                    error => observer.error(error)
+                    );
             });
         });
         let source = Observable.concat(...sources);

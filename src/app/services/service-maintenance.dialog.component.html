@@ -18,8 +18,12 @@
 			<ng-content *ngIf='model.Type == "new"' class="modal-body" select="[new]"></ng-content>
 			<ng-content *ngIf='model.Type == "prepare"' class="modal-body" select="[prepare]"></ng-content>
 			<ng-content *ngIf='model.Type == "activate"' class="modal-body" select="[activate]"></ng-content>
+			<ng-content *ngIf='model.Type == "export"' class="modal-body" select="[export]"></ng-content>
+			<ng-content *ngIf='model.Type == "index"' class="modal-body" select="[index]"></ng-content>
+			<ng-content *ngIf='model.Type == "recommend"' class="modal-body" select="[recommend]"></ng-content>
+			<ng-content *ngIf='model.Type == "recommendById"' class="modal-body" select="[recommendById]"></ng-content>
 			<div class="modal-footer">
-				<button type="submit" class="btn btn-success" [disabled]="!f.valid">OK</button>
+				<button type="submit" class="btn btn-success" [disabled]="!f.valid || showProgress">Ok</button>
 				<button type="button" class="btn btn-warning" (click)="cancel();">Close</button>
 			</div>
 		</form>

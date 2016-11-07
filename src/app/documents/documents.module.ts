@@ -9,8 +9,6 @@ import { DocumentEditorDialogComponent } from './document-editor.dialog.componen
 import { TagEditorDialogComponent } from './tag-editor.dialog.component';
 import { DocumentDetailsDialogComponent } from './document-details.dialog.component';
 import { DatasetSelectorDialogComponent } from '../datasets/dataset-selector.dialog.component';
-import { TagListSelectorComponent } from './taglist-selector.component';
-import { TagListSelectorDialogComponent } from './taglist-selector-dialog.component';
 import { TabPaneComponent } from './tab-pane.component';
 
 import { DocumentService } from '../common/services/document.service';
@@ -35,8 +33,6 @@ import { AgGridModule } from 'ag-grid-ng2/main';
         DocumentDetailsDialogComponent,
         DatasetSelectorDialogComponent,
         TagEditorDialogComponent,
-        TagListSelectorComponent,
-        TagListSelectorDialogComponent,
         TabPaneComponent
     ],
     providers: [

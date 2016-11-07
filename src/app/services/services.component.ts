@@ -1,3 +1,8 @@
+import { SelectedItem } from './../models/selected-item';
+import { TagService } from './../common/services/tag.service';
+import { TagListSelectorDialogComponent } from './../documents/taglist-selector-dialog.component';
+import { CommonInputModel } from './../models/common-input.model';
+import { DatasetService } from './../common/services/dataset.service';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Response } from '@angular/http';
 
@@ -5,7 +10,7 @@ import {
     IService, IPrcService, IClassifierService, IClassifierPrepareSettings, IProcess, IPrcPrepareSettings,
     IClassifierActivateSettings, IPrcActivateSettings, IExportDictionariesSettings,
     IClassifierRecommendationRequest, IClassifierRecommendationResult, IPrcRecommendationRequest,
-    IPrcRecommendationByIdRequest, IPrcRecommendationResult, IPrcIndexSettings
+    IPrcRecommendationByIdRequest, IPrcRecommendationResult, IPrcIndexSettings, IDataSet, ITag
 } from 'slamby-sdk-angular2';
 import { ServicesService } from '../common/services/services.service';
 import { ClassifierServicesService } from '../common/services/classifier.services.service';
@@ -14,7 +19,6 @@ import { Messenger } from '../common/services/messenger.service';
 import { ProcessesService } from '../common/services/processes.service';
 import { CommonInputDialogComponent } from '../common/components/common-input.dialog.component';
 import { CommonOutputDialogComponent } from '../common/components/common-output.dialog.component';
-import { CommonInputModel } from '../models/common-input.model';
 import { CommonOutputModel } from '../models/common-output.model';
 import { DialogResult } from '../models/dialog-result';
 import { ProgressDialogModel } from '../models/progress-dialog-model';
@@ -42,18 +46,22 @@ export class ServicesComponent implements OnInit {
     @ViewChild(DialogComponent) dialogService: DialogComponent;
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
     @ViewChild(ServiceMaintenanceDialogComponent) sm: ServiceMaintenanceDialogComponent;
+    @ViewChild(TagListSelectorDialogComponent) tagListSelectorDialog: TagListSelectorDialogComponent;
 
     serviceType = IService.ITypeEnum;
     serviceStatus = IService.IStatusEnum;
 
     services: Array<IService | IPrcService | IClassifierService> = [];
+    inputModel: CommonInputModel;
 
     constructor(private _servicesService: ServicesService,
         private _classifierService: ClassifierServicesService,
         private _prcService: PrcServicesService,
         private _processesService: ProcessesService,
         private _notificationService: NotificationService,
-        private _messenger: Messenger) {
+        private _messenger: Messenger,
+        private _datasetService: DatasetService,
+        private _tagService: TagService) {
     }
 
     ngOnInit(): void {
@@ -224,76 +232,115 @@ export class ServicesComponent implements OnInit {
         }
     }
 
+    prepareDatasetChanged(dataset: any) {
+        this.sm.showProgress = true;
+        this.inputModel.Model.Ngrams = _.range(1, dataset.NGramCount + 1);
+        this.inputModel.Model.SelectedTagList = [];
+        this._tagService.getTags(dataset.Name, true).subscribe(
+            (tags: Array<ITag>) => {
+                this.inputModel.Model.TagList = tags;
+                this.inputModel.Model.SelectedTagList = tags.map(t=>t.Id);
+                this.sm.showProgress = false;
+            },
+            (error) => {
+                this.handleError(error);
+                this.sm.showProgress = false;
+            }
+        );
+    }
+
     prepare(selected: IService | IPrcService | IClassifierService) {
         if (!selected) {
             return;
         }
+
         if (selected.Type === IService.ITypeEnum.Classifier) {
-            let model: IClassifierPrepareSettings = {
-                DataSetName: '',
-                NGramList: [],
-                TagIdList: [],
-                CompressLevel: 0,
-                CompressSettings: null
-            };
-            let inputModel: CommonInputModel = {
-                Header: 'Classifier Prepare Settings',
-                Model: model,
-                Type: "prepare"
-            };
-            this.sm.model = inputModel;
             this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
-                        this._classifierService.prepare(selected.Id, model.Model).subscribe(
+                        let prepareSettings: IClassifierPrepareSettings = {
+                            DataSetName: model.Model.SelectedDataset.Name,
+                            NGramList: _.range(1, model.Model.SelectedNgram + 1),
+                            TagIdList: model.Model.SelectedTagList.slice(),
+                            CompressLevel: model.Model.CompressLevel,
+                            CompressSettings: model.Model.CompressSettingsJson.replace(" ", "").replace("\n", "") == "{}" ? null : JSON.parse(model.Model.CompressSettingsJson)
+                        };
+                        this._classifierService.prepare(selected.Id, prepareSettings).subscribe(
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
-                                this.inputDialog.unsubscribeAndClose();
+                                this.sm.unsubscribeAndClose();
                             },
                             error => {
                                 let errors = this.handleError(error);
                                 model.ErrorMessage = errors;
-                                this.inputDialog.showProgress = false;
+                                this.sm.showProgress = false;
                             }
                         );
                     }
                 }
             );
-            this.sm.open();
 
         } else {
-            let model: IPrcPrepareSettings = {
-                DataSetName: '',
-                TagIdList: [],
-                CompressLevel: 0,
-                CompressSettings: null
-            };
-            let inputModel: CommonInputModel = {
-                Header: 'Prc Prepare Settings',
-                Model: model
-            };
-            this.inputDialog.model = inputModel;
-            this.inputDialog.dialogClosed.subscribe(
+            this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
+                    let prepareSettings: IPrcPrepareSettings = {
+                        DataSetName: model.Model.SelectedDataset.Name,
+                        TagIdList: model.Model.SelectedTagList.slice(),
+                        CompressLevel: model.Model.CompressLevel,
+                        CompressSettings: model.Model.CompressSettingsJson.replace(" ", "").replace("\n", "") == "{}" ? null : JSON.parse(model.Model.CompressSettingsJson)
+                    };
                     if (model.Result === DialogResult.Ok) {
-                        this._prcService.prepare(selected.Id, model.Model).subscribe(
+                        this._prcService.prepare(selected.Id, prepareSettings).subscribe(
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
-                                this.inputDialog.unsubscribeAndClose();
+                                this.sm.unsubscribeAndClose();
                             },
                             error => {
                                 let errors = this.handleError(error);
                                 model.ErrorMessage = errors;
-                                this.inputDialog.showProgress = false;
+                                this.sm.showProgress = false;
                             }
                         );
                     }
                 }
             );
-            this.inputDialog.open();
         }
+        this.sm.dialogOpened.subscribe(
+            () => {
+                this.sm.showProgress = true;
+                this._datasetService.getDatasets().subscribe(
+                    (datasets: Array<IDataSet>) => {
+                        this.inputModel.Model.Datasets = datasets;
+                        this.sm.model = this.inputModel;
+                        this.sm.showProgress = false;
+                    },
+                    error => {
+                        this.handleError(error);
+                        this.sm.showProgress = false;
+                    }
+                )
+            }
+        );
+        let model = {
+            SelectedDataset: null,
+            Datasets: [],
+            SelectedNgram: 1,
+            Ngrams: [],
+            SelectedTagList: [],
+            TagList: [],
+            CompressLevel: 0,
+            CompressSettingsJson: "{}",
+            Type: selected.Type
+        };
+        this.inputModel = {
+            Header: selected.Type + ' Prepare Settings',
+            Model: model,
+            Type: "prepare"
+        };
+        this.sm.model = this.inputModel;
+        this.sm.open();
     }
 
     cancelConfirm(selected: IService | IPrcService | IClassifierService) {
@@ -324,120 +371,238 @@ export class ServicesComponent implements OnInit {
         );
     }
 
+    selectTags(isEmphasize: boolean = false) {
+        if (!isEmphasize) {
+            this.tagListSelectorDialog.tags = this.inputModel.Model.TagList;
+            this.tagListSelectorDialog.selectedTagIds = this.inputModel.Model.SelectedTagList.slice();
+            this.tagListSelectorDialog.open().result.then((result) => {
+                if (result === 'OK') {
+                    this.inputModel.Model.SelectedTagList = this.tagListSelectorDialog.selectedTagIds.slice();
+                }
+            }, (reason) => {
+            });
+        }
+        else {
+            this.tagListSelectorDialog.tags = this.inputModel.Model.TagList;
+            this.tagListSelectorDialog.selectedTagIds = this.inputModel.Model.SelectedEmphasizedTagList.slice();
+            this.tagListSelectorDialog.open().result.then((result) => {
+                if (result === 'OK') {
+                    this.inputModel.Model.SelectedEmphasizedTagList = this.tagListSelectorDialog.selectedTagIds.slice();
+                }
+            }, (reason) => {
+            });
+        }
+    }
+
+    checkField(e, field?: SelectedItem<any>) {
+        if (field) {
+            this.inputModel.Model.fields[this.inputModel.Model.fields.indexOf(field)].IsSelected = e.target.checked;
+        } else {
+            this.inputModel.Model.fields.forEach(t => {
+                t.IsSelected = e.target.checked;
+            });
+        }
+    }
+    getSelectedItemsCount(items: Array<SelectedItem<any>>) {
+        let selectedCount = items ? items.filter(t => t.IsSelected).length : 0;
+        return selectedCount;
+    }
+
     activate(selected: IService | IPrcService | IClassifierService) {
         if (!selected) {
             return;
         }
+        let model;
         if (selected.Type === IService.ITypeEnum.Classifier) {
-            let model: IClassifierActivateSettings = {
-                NGramList: [],
-                TagIdList: [],
-                EmphasizedTagIdList: []
+            model = {
+                SelectedNgram: 1,
+                Ngrams: (<IClassifierService>selected).PrepareSettings.NGramList,
+                SelectedTagList: [],
+                TagList: [],
+                SelectedEmphasizedTagList: [],
+                Type: selected.Type
             };
-            let inputModel: CommonInputModel = {
-                Header: 'Classifier Activate Settings',
-                Model: model
-            };
-            this.inputDialog.model = inputModel;
-            this.inputDialog.dialogClosed.subscribe(
+            this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
-                        this._classifierService.activate(selected.Id, model.Model).subscribe(
+                        let settingsModel: IClassifierActivateSettings = {
+                            NGramList: _.range(1, model.Model.SelectedNgram + 1),
+                            TagIdList: model.Model.SelectedTagList.slice(),
+                            EmphasizedTagIdList: model.Model.SelectedEmphasizedTagList.slice()
+                        };
+                        this._classifierService.activate(selected.Id, settingsModel).subscribe(
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
-                                this.inputDialog.unsubscribeAndClose();
+                                this.sm.unsubscribeAndClose();
                             },
                             error => {
                                 let errors = this.handleError(error);
                                 model.ErrorMessage = errors;
-                                this.inputDialog.showProgress = false;
+                                this.sm.showProgress = false;
                             }
                         );
                     }
                 }
             );
-            this.inputDialog.open();
+            this.sm.dialogOpened.subscribe(
+                () => {
+                    this.sm.showProgress = true;
+                    this._tagService.getTags((<IClassifierService>selected).PrepareSettings.DataSetName, true).subscribe(
+                        (tags: Array<ITag>) => {
+                            var tagsForService = (<IClassifierService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t=>t!=undefined);
+                            this.inputModel.Model.TagList = tagsForService;
+                            this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
+                            this.inputModel.Model.SelectedEmphasizedTagList = [];
+                            this.sm.showProgress = false;
+                        },
+                        error => {
+                            this.handleError(error);
+                            this.sm.showProgress = false;
+                        }
+                    )
+                }
+            );
 
-        } else {
-            let model: IPrcActivateSettings = {
-                FieldsForRecommendation: []
-            };
-            let inputModel: CommonInputModel = {
-                Header: 'Prc Activate Settings',
-                Model: model
-            };
-            this.inputDialog.model = inputModel;
-            this.inputDialog.dialogClosed.subscribe(
+        }
+        else {
+            model = {
+                fields: [],
+                Type: selected.Type
+            }
+            let dataset = (<IPrcService>selected).PrepareSettings.DataSetName;
+            this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
-                        this._prcService.activate(selected.Id, model.Model).subscribe(
+                        let settingsModel: IPrcActivateSettings = {
+                            FieldsForRecommendation: model.Model.fields.filter(f => f.IsSelected).map(f => f.Item)
+                        };
+                        this._prcService.activate(selected.Id, settingsModel).subscribe(
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
-                                this.inputDialog.unsubscribeAndClose();
+                                this.sm.unsubscribeAndClose();
                             },
                             error => {
                                 let errors = this.handleError(error);
                                 model.ErrorMessage = errors;
-                                this.inputDialog.showProgress = false;
+                                this.sm.showProgress = false;
                             }
                         );
                     }
                 }
             );
-            this.inputDialog.open();
+            this.sm.dialogOpened.subscribe(
+                () => {
+                    this.sm.showProgress = true;
+                    this._datasetService.getDataset((<IClassifierService>selected).PrepareSettings.DataSetName).subscribe(
+                        (dataset: IDataSet) => {
+                            this.inputModel.Model.fields = dataset.InterpretedFields.map(f => {
+                                return {
+                                    Id: f,
+                                    Name: f,
+                                    IsSelected: true,
+                                    Item: f
+                                };
+                            });
+                            this.sm.showProgress = false;
+                        },
+                        error => {
+                            this.handleError(error);
+                            this.sm.showProgress = false;
+                        }
+                    )
+                }
+            );
         }
+        this.inputModel = {
+            Header: selected.Type + ' Activate Settings',
+            Model: model,
+            Type: "activate"
+        };
+        this.sm.model = this.inputModel;
+        this.sm.open();
     }
 
     export(selected: IService | IPrcService | IClassifierService) {
         if (!selected) {
             return;
         }
-
-        let settings: IExportDictionariesSettings = {
-            NGramList: [],
-            TagIdList: []
-        };
-        let inputModel: CommonInputModel = {
-            Header: 'Export Dictionary Settings',
-            Model: settings
-        };
-        this.inputDialog.model = inputModel;
-        this.inputDialog.dialogClosed.subscribe(
+        this.sm.dialogClosed.subscribe(
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
                     if (selected.Type === IService.ITypeEnum.Classifier) {
-                        this._classifierService.exportDictionary(selected.Id, model.Model).subscribe(
+                        let settings: IExportDictionariesSettings = {
+                            NGramList: _.range(1, model.Model.SelectedNgram + 1),
+                            TagIdList: model.Model.SelectedTagList.slice(),
+                        };
+                        this._classifierService.exportDictionary(selected.Id, settings).subscribe(
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
-                                this.inputDialog.unsubscribeAndClose();
+                                this.sm.unsubscribeAndClose();
                             },
                             error => {
                                 let errors = this.handleError(error);
                                 model.ErrorMessage = errors;
-                                this.inputDialog.showProgress = false;
+                                this.sm.showProgress = false;
                             }
                         );
                     } else {
-                        this._prcService.exportDictionary(selected.Id, model.Model).subscribe(
+                        let settings: IExportDictionariesSettings = {
+                            TagIdList: model.Model.SelectedTagList.slice()
+                        };
+                        this._prcService.exportDictionary(selected.Id, settings).subscribe(
                             (process: IProcess) => {
                                 this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                                 this.refresh(selected);
-                                this.inputDialog.unsubscribeAndClose();
+                                this.sm.unsubscribeAndClose();
                             },
                             error => {
                                 let errors = this.handleError(error);
                                 model.ErrorMessage = errors;
-                                this.inputDialog.showProgress = false;
+                                this.sm.showProgress = false;
                             }
                         );
                     }
                 }
             }
         );
-        this.inputDialog.open();
+
+        this.sm.dialogOpened.subscribe(
+            () => {
+                this.sm.showProgress = true;
+                let dataset = selected.Type === IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.DataSetName : (<IPrcService>selected).PrepareSettings.DataSetName
+                this._tagService.getTags(dataset, true).subscribe(
+                    (tags: Array<ITag>) => {
+                        var tagsForService = IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t=>t!=undefined) :
+                            (<IPrcService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t=>t!=undefined);
+                        this.inputModel.Model.TagList = tagsForService;
+                        this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
+                        this.inputModel.Model.SelectedEmphasizedTagList = [];
+                        this.sm.showProgress = false;
+                    },
+                    error => {
+                        this.handleError(error);
+                        this.sm.showProgress = false;
+                    }
+                )
+            }
+        );
+        let model = {
+            SelectedNgram: 1,
+            Ngrams: selected.Type === IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.NGramList : [],
+            SelectedTagList: [],
+            TagList: [],
+            Type: selected.Type
+        };
+        this.inputModel = {
+            Header: 'Export Dictionary Settings',
+            Model: model,
+            Type: "export"
+        };
+        this.sm.model = this.inputModel;
+        this.sm.open();
     }
 
     deactivateConfirm(selected: IService | IPrcService | IClassifierService) {
@@ -484,22 +649,25 @@ export class ServicesComponent implements OnInit {
         this.dialogService.progressModel = {
             Header: 'Waiting for recommendation result'
         };
+        let model;
         if (selected.Type === IService.ITypeEnum.Classifier) {
-            let model: IClassifierRecommendationRequest = {
+            model = {
                 Text: '',
                 Count: 3,
                 NeedTagInResult: true,
-                UseEmphasizing: false
+                UseEmphasizing: false,
+                Type: selected.Type
             };
-            let inputModel: CommonInputModel = {
-                Header: 'Classifier Recommenation Request',
-                Model: model
-            };
-            this.inputDialog.model = inputModel;
-            this.inputDialog.dialogClosed.subscribe(
+            this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
-                        this._classifierService.recommend(selected.Id, model.Model).subscribe(
+                        let settings: IClassifierRecommendationRequest = {
+                            Text: model.Model.Text,
+                            Count: model.Model.Count,
+                            NeedTagInResult: model.Model.NeedTagInResult,
+                            UseEmphasizing: model.Model.UseEmphasizing
+                        };
+                        this._classifierService.recommend(selected.Id, settings).subscribe(
                             (results: Array<IClassifierRecommendationResult>) => {
                                 this.dialogService.close();
                                 this.resultDialog.model = {
@@ -508,38 +676,41 @@ export class ServicesComponent implements OnInit {
                                         RecommendationResult: results
                                     }
                                 };
-                                this.inputDialog.unsubscribeAndClose();
+                                this.sm.unsubscribeAndClose();
                                 this.resultDialog.open();
                             },
                             error => {
                                 let errors = this.handleError(error);
                                 model.ErrorMessage = errors;
-                                this.inputDialog.showProgress = false;
+                                this.sm.showProgress = false;
                             }
                         );
                     }
                 }
             );
-            this.inputDialog.open();
 
         } else {
-            let model: IPrcRecommendationRequest = {
+            model = {
                 Text: '',
                 Count: 3,
                 Filter: '',
                 NeedDocumentInResult: false,
                 TagId: '',
-                Weights: null
+                Weightsjson: "[]",
+                Type: selected.Type
             };
-            let inputModel: CommonInputModel = {
-                Header: 'Prc Recommenation Request',
-                Model: model
-            };
-            this.inputDialog.model = inputModel;
-            this.inputDialog.dialogClosed.subscribe(
+            this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
-                        this._prcService.recommend(selected.Id, model.Model).subscribe(
+                        let settings: IPrcRecommendationRequest = {
+                            Text: model.Model.Text,
+                            Count: model.Model.Count,
+                            Filter: model.Model.Filter,
+                            NeedDocumentInResult: model.Model.Weights,
+                            TagId: model.Model.TagId,
+                            Weights: model.Model.Weightsjson.replace(" ", "").replace("\n", "") == "[]" ? null : JSON.parse(model.Model.Weightsjson)
+                        };
+                        this._prcService.recommend(selected.Id, settings).subscribe(
                             (results: Array<IPrcRecommendationResult>) => {
                                 this.dialogService.close();
                                 this.resultDialog.model = {
@@ -548,53 +719,63 @@ export class ServicesComponent implements OnInit {
                                         RecommendationResult: results
                                     }
                                 };
-                                this.inputDialog.unsubscribeAndClose();
+                                this.sm.unsubscribeAndClose();
                                 this.resultDialog.open();
                             },
                             error => {
                                 let errors = this.handleError(error);
                                 model.ErrorMessage = errors;
-                                this.inputDialog.showProgress = false;
+                                this.sm.showProgress = false;
                             }
                         );
                     }
                 }
             );
-            this.inputDialog.open();
         }
+        this.inputModel = {
+            Header: selected.Type + ' Recommenation Request',
+            Model: model,
+            Type: "recommend"
+        };
+        this.sm.model = this.inputModel;
+        this.sm.open();
     }
 
     index(selected: IService | IPrcService | IClassifierService) {
         if (!selected || selected.Type === IService.ITypeEnum.Classifier) {
             return;
         }
-        let settings: IPrcIndexSettings = {
-            Filter: ''
-        };
-        let inputModel: CommonInputModel = {
-            Header: 'Prc Index Settings',
-            Model: settings
-        };
-        this.inputDialog.model = inputModel;
-        this.inputDialog.dialogClosed.subscribe(
+        this.sm.dialogClosed.subscribe(
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
-                    this._prcService.index(selected.Id, model.Model).subscribe(
+                    let settings: IPrcIndexSettings = {
+                        Filter: model.Model.Filter
+                    };
+                    this._prcService.index(selected.Id, settings).subscribe(
                         (process: IProcess) => {
                             this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
                             this.refresh(selected);
-                            this.inputDialog.unsubscribeAndClose();
+                            this.sm.unsubscribeAndClose();
                         },
                         error => {
                             let errors = this.handleError(error);
                             model.ErrorMessage = errors;
-                            this.inputDialog.showProgress = false;
+                            this.sm.showProgress = false;
                         }
                     );
                 }
             }
         );
-        this.inputDialog.open();
+        let model = {
+            Filter: ""
+        };
+        this.inputModel = {
+            Header: 'Prc Index Settings',
+            Model: model,
+            Type: "index"
+        };
+        this.sm.model = this.inputModel;
+        this.sm.open();
     }
 
     partialIndex(selected: IService | IPrcService | IClassifierService) {
@@ -617,23 +798,18 @@ export class ServicesComponent implements OnInit {
         this.dialogService.progressModel = {
             Header: 'Waiting for recommendation result'
         };
-        let request: IPrcRecommendationByIdRequest = {
-            DocumentId: '',
-            Query: '',
-            Count: 3,
-            NeedDocumentInResult: false,
-            TagId: '',
-            Weights: null
-        };
-        let inputModel: CommonInputModel = {
-            Header: 'Prc RecommenationById Request',
-            Model: request
-        };
-        this.inputDialog.model = inputModel;
-        this.inputDialog.dialogClosed.subscribe(
+        this.sm.dialogClosed.subscribe(
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
-                    this._prcService.recommendById(selected.Id, model.Model).subscribe(
+                    let settings: IPrcRecommendationByIdRequest = {
+                            DocumentId: model.Model.DocumentId,
+                            Count: model.Model.Count,
+                            Query: model.Model.Query,
+                            NeedDocumentInResult: model.Model.Weights,
+                            TagId: model.Model.TagId,
+                            Weights: model.Model.Weightsjson.replace(" ", "").replace("\n", "") == "[]" ? null : JSON.parse(model.Model.Weightsjson)
+                        };
+                    this._prcService.recommendById(selected.Id, settings).subscribe(
                         (results: Array<IPrcRecommendationResult>) => {
                             this.dialogService.close();
                             this.resultDialog.model = {
@@ -642,19 +818,34 @@ export class ServicesComponent implements OnInit {
                                     RecommendationResult: results
                                 }
                             };
-                            this.inputDialog.unsubscribeAndClose();
+                            this.sm.unsubscribeAndClose();
                             this.resultDialog.open();
                         },
                         error => {
                             let errors = this.handleError(error);
                             model.ErrorMessage = errors;
-                            this.inputDialog.showProgress = false;
+                            this.sm.showProgress = false;
                         }
                     );
                 }
             }
         );
-        this.inputDialog.open();
+        let model = {
+            DocumentId: '',
+            Query: '',
+            Count: 3,
+            NeedDocumentInResult: false,
+            TagId: '',
+            Weightsjson: '[]',
+            Type: selected.Type
+        };
+        this.inputModel = {
+            Header: 'Prc RecommenationById Request',
+            Model: model,
+            Type: "recommendById"
+        };
+        this.sm.model = this.inputModel;
+        this.sm.open();
     }
 
     handleError(response: Response): string {

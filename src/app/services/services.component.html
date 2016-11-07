@@ -3,8 +3,9 @@
 	<sl-output-dialog></sl-output-dialog>
 	<sl-common-templates></sl-common-templates>
 	<sl-confirm-dialog></sl-confirm-dialog>
+	<sl-taglist-selector-dialog></sl-taglist-selector-dialog>
 	<sl-service-maintenance-dialog #smd>
-		<div *ngIf="smd.model" new>
+		<div *ngIf='smd.model?.Type== "new"' new>
 			<div class="form-group" [class.has-error]="name.errors && name.touched">
 				<label for="name" class="col-sm-2 control-label">Name</label>
 				<div class="col-sm-10">
@@ -30,14 +31,39 @@
 				</div>
 			</div>
 		</div>
-        <div *ngIf="smd.model" prepare>
-            <div class="form-group" [class.has-error]="dataSetName.errors && dataSetName.touched">
-				<label for="dataSetName" class="col-sm-2 control-label">DataSetName</label>
+		<div *ngIf='smd.model?.Type == "prepare"' prepare>
+			<div class="form-group" [class.has-error]="datasetName.errors || !smd.model.Model.SelectedDataset">
+				<label for="datasetName" class="col-sm-2 control-label">DataSet</label>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" [(ngModel)]="smd.model.Model.DataSetName" dataSetName="dataSetName" #dataSetName="ngModel" required autofocus>
-					<div *ngIf="dataSetName.errors?.required && dataSetName.touched">
+					<select [(ngModel)]='smd.model.Model.SelectedDataset' (ngModelChange)="prepareDatasetChanged($event)" class="form-control">
+						<option [ngValue]="dataset" *ngFor='let dataset of smd.model.Model.Datasets'>{{dataset.Name}}</option>
+					</select>
+					<input type="text" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedDataset?.Name" datasetName="datasetName"
+						#datasetName="ngModel" required autofocus>
+					<div *ngIf="datasetName.errors?.required || !smd.model.Model.SelectedDataset">
 						<p class="text-danger">
 							Field is required!
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="form-group" *ngIf="sm.model.Model?.Type == serviceType.Classifier">
+				<label class="col-sm-2 control-label">NgramCount</label>
+				<div class="col-sm-10">
+					<select [(ngModel)]='smd.model.Model.SelectedNgram' name="name" class="form-control">
+						<option [ngValue]="n" *ngFor='let n of smd.model.Model.Ngrams'>{{n}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="tags" class="col-sm-2 control-label">TagIdList</label>
+				<div class="col-sm-10">
+					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0 || smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
+					<input type="number" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedTagList.length" name="tags" #tags="ngModel"
+						[min]="1" />
+					<div *ngIf="tags.errors?.min">
+						<p *ngIf="tags.errors?.min" class="text-danger">
+							No selected tag.
 						</p>
 					</div>
 				</div>
@@ -45,8 +71,272 @@
 			<div class="form-group" [class.has-error]="compressLevel.errors && compressLevel.touched">
 				<label for="compressLevel" class="col-sm-2 control-label">CompressLevel</label>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" [(ngModel)]="smd.model.Model.CompressLevel" compressLevel="compressLevel" #compressLevel="ngModel" autofocus>
+					<input type="number" class="form-control" [(ngModel)]="smd.model.Model.CompressLevel" compressLevel="compressLevel" #compressLevel="ngModel"
+						autofocus>
 				</div>
+			</div>
+			<div class="form-group" [class.has-error]="compressjson.errors">
+				<label for="compressjson" class="col-sm-2 control-label">Compress Settings</label>
+				<div class="col-sm-10">
+					<sl-json-editor [(ngModel)]="smd.model.Model.CompressSettingsJson" name="compressjson" #compressjson="ngModel" height="300px"
+						json></sl-json-editor>
+					<div *ngIf="compressjson.dirty && !compressjson.valid">
+						<p *ngIf="compressjson.errors?.json" class="text-danger">
+							Invalid Compress Settings JSON!
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div *ngIf='smd.model?.Type == "activate"' activate>
+			<div *ngIf="sm.model.Model.Type == serviceType.Classifier">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">NgramCount</label>
+					<div class="col-sm-10">
+						<select [(ngModel)]='smd.model.Model.SelectedNgram' name="name" class="form-control">
+						<option [ngValue]="n" *ngFor='let n of smd.model.Model.Ngrams'>{{n}}</option>
+					</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="tags" class="col-sm-2 control-label">TagIdList</label>
+					<div class="col-sm-10">
+						<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
+						<input type="number" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedTagList.length" name="tags" #tags="ngModel"
+							[min]="1" />
+						<div *ngIf="tags.errors?.min">
+							<p *ngIf="tags.errors?.min" class="text-danger">
+								No selected tag.
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="tags" class="col-sm-2 control-label">EmphasizedTagIdList</label>
+					<div class="col-sm-10">
+						<button type="button" class="btn btn-primary" (click)="selectTags(true)" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedEmphasizedTagList.length}})</button>
+					</div>
+				</div>
+			</div>
+			<div *ngIf="sm.model.Model.Type == serviceType.Prc">
+				<div class="form-group">
+					<div class="col-sm-10">
+						<div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
+							<table class='table table-striped'>
+								<thead>
+									<th><input type="checkbox" [checked]="getSelectedItemsCount(smd.model.Model.fields) == smd.model.Model.fields.length"
+											name="checkAll" (change)="checkField($event)" style="margin: 3px;"></th>
+									<th>FieldsForRecommendation</th>
+								</thead>
+								<tbody>
+									<tr *ngFor='let field of smd.model.Model.fields'>
+										<td><input type="checkbox" [checked]="field.IsSelected" name="check" (change)="checkField($event, field)"></td>
+										<td>{{field.Name}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div *ngIf='smd.model?.Type == "export"' export>
+			<div class="form-group" *ngIf="sm.model.Model.Type == serviceType.Classifier">
+				<label class="col-sm-2 control-label">NgramCount</label>
+				<div class="col-sm-10">
+					<select [(ngModel)]='smd.model.Model.SelectedNgram' name="name" class="form-control">
+						<option [ngValue]="n" *ngFor='let n of smd.model.Model.Ngrams'>{{n}}</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="tags" class="col-sm-2 control-label">TagIdList</label>
+				<div class="col-sm-10">
+					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
+					<input type="number" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedTagList.length" name="tags" #tags="ngModel"
+						[min]="1" />
+					<div *ngIf="tags.errors?.min">
+						<p *ngIf="tags.errors?.min" class="text-danger">
+							No selected tag.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div *ngIf='smd.model?.Type == "index"' index>
+			<div class="form-group" [class.has-error]="filter.errors && filter.touched">
+				<label for="filter" class="col-sm-2 control-label">Filter</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Filter" filter="filter" #filter="ngModel" autofocus
+						required>
+					<div *ngIf="filter.errors?.required && filter.touched">
+						<p class="text-danger">
+							Field is required!
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div *ngIf='smd.model?.Type == "recommend"' recommend>
+			<div *ngIf="sm.model.Model.Type == serviceType.Classifier">
+				<div class="form-group" [class.has-error]="text.errors && text.touched">
+					<label for="text" class="col-sm-3 control-label">Text</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" text="text" #text="ngModel" autofocus required>
+						<div *ngIf="text.errors?.required && text.touched">
+							<p class="text-danger">
+								Field is required!
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group" [class.has-error]="count.errors && count.touched">
+					<label for="count" class="col-sm-3 control-label">Count</label>
+					<div class="col-sm-9">
+						<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
+						<div *ngIf="count.errors?.min && count.touched">
+							<p class="text-danger">
+								Field is required!
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="count" class="col-sm-3 control-label">NeedTagInResult</label>
+					<div class="col-sm-9">
+						<md-slide-toggle [(checked)]="smd.model.Model.NeedTagInResult" color="primary">
+						</md-slide-toggle>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="count" class="col-sm-3 control-label">UseEmphasizing</label>
+					<div class="col-sm-9">
+						<md-slide-toggle [(checked)]="smd.model.Model.UseEmphasizing" color="primary">
+						</md-slide-toggle>
+					</div>
+				</div>
+			</div>
+			<div *ngIf="sm.model.Model.Type == serviceType.Prc">
+				<div class="form-group" [class.has-error]="text.errors && text.touched">
+					<label for="text" class="col-sm-3 control-label">Text</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" text="text" #text="ngModel" autofocus required>
+						<div *ngIf="text.errors?.required && text.touched">
+							<p class="text-danger">
+								Field is required!
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group" [class.has-error]="count.errors && count.touched">
+					<label for="count" class="col-sm-3 control-label">Count</label>
+					<div class="col-sm-9">
+						<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
+						<div *ngIf="count.errors?.min && count.touched">
+							<p class="text-danger">
+								Field is required!
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="filter" class="col-sm-3 control-label">Filter</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Filter" filter="filter" #filter="ngModel" autofocus>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="count" class="col-sm-3 control-label">NeedDocumentInResult</label>
+					<div class="col-sm-9">
+						<md-slide-toggle [(checked)]="smd.model.Model.NeedDocumentInResult" color="primary">
+						</md-slide-toggle>
+					</div>
+				</div>
+				<div class="form-group" [class.has-error]="tagId.errors && tagId.touched">
+					<label for="tagId" class="col-sm-3 control-label">TagId</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus required>
+						<div *ngIf="tagId.errors?.required && tagId.touched">
+							<p class="tagId-danger">
+								Field is required!
+							</p>
+						</div>
+					</div>
+				</div>
+			<div class="form-group" [class.has-error]="weightsjson.errors">
+				<label for="weightsjson" class="col-sm-3 control-label">Weights</label>
+				<div class="col-sm-9">
+					<sl-json-editor [(ngModel)]="smd.model.Model.Weightsjson" name="weightsjson" #weightsjson="ngModel" height="300px"
+						json></sl-json-editor>
+					<div *ngIf="weightsjson.dirty && !weightsjson.valid">
+						<p *ngIf="weightsjson.errors?.json" class="text-danger">
+							Invalid Compress Settings JSON!
+						</p>
+					</div>
+				</div>
+			</div>
+			</div>
+		</div>
+		<div *ngIf='smd.model?.Type == "recommendById"' recommendById>
+			<div *ngIf="sm.model.Model.Type == serviceType.Prc">
+				<div class="form-group" [class.has-error]="documentId.errors && documentId.touched">
+					<label for="documentId" class="col-sm-3 control-label">DocumentId</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.DocumentId" documentId="documentId" #documentId="ngModel" autofocus required>
+						<div *ngIf="documentId.errors?.required && documentId.touched">
+							<p class="text-danger">
+								Field is required!
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group" [class.has-error]="count.errors && count.touched">
+					<label for="count" class="col-sm-3 control-label">Count</label>
+					<div class="col-sm-9">
+						<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
+						<div *ngIf="count.errors?.min && count.touched">
+							<p class="text-danger">
+								Field is required!
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="query" class="col-sm-3 control-label">Query</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" query="query" #query="ngModel" autofocus>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="count" class="col-sm-3 control-label">NeedDocumentInResult</label>
+					<div class="col-sm-9">
+						<md-slide-toggle [(checked)]="smd.model.Model.NeedDocumentInResult" color="primary">
+						</md-slide-toggle>
+					</div>
+				</div>
+				<div class="form-group" [class.has-error]="tagId.errors && tagId.touched">
+					<label for="tagId" class="col-sm-3 control-label">TagId</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus required>
+						<div *ngIf="tagId.errors?.required && tagId.touched">
+							<p class="tagId-danger">
+								Field is required!
+							</p>
+						</div>
+					</div>
+				</div>
+			<div class="form-group" [class.has-error]="weightsjson.errors">
+				<label for="weightsjson" class="col-sm-3 control-label">Weights</label>
+				<div class="col-sm-9">
+					<sl-json-editor [(ngModel)]="smd.model.Model.Weightsjson" name="weightsjson" #weightsjson="ngModel" height="300px"
+						json></sl-json-editor>
+					<div *ngIf="weightsjson.dirty && !weightsjson.valid">
+						<p *ngIf="weightsjson.errors?.json" class="text-danger">
+							Invalid Compress Settings JSON!
+						</p>
+					</div>
+				</div>
+			</div>
 			</div>
 		</div>
 	</sl-service-maintenance-dialog>

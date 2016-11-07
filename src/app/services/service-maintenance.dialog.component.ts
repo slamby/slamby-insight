@@ -24,6 +24,9 @@ export class ServiceMaintenanceDialogComponent {
     private dialogClosedEventSource = new Subject<CommonInputModel>();
     dialogClosed = this.dialogClosedEventSource.asObservable();
 
+    private dialogOpenedEventSource = new Subject();
+    dialogOpened = this.dialogOpenedEventSource.asObservable();
+
     constructor(private modal: NgbModal) {
     }
 
@@ -33,6 +36,7 @@ export class ServiceMaintenanceDialogComponent {
         }
         this.showProgress = false;
         this._modalRef = this.modal.open(this.template, this.modalOptions);
+        this.dialogOpenedEventSource.next();
     }
 
     cancel() {
@@ -50,6 +54,8 @@ export class ServiceMaintenanceDialogComponent {
     unsubscribeAndClose() {
         this.dialogClosedEventSource = new Subject<CommonInputModel>();
         this.dialogClosed = this.dialogClosedEventSource.asObservable();
+        this.dialogOpenedEventSource = new Subject<CommonInputModel>();
+        this.dialogOpened = this.dialogOpenedEventSource.asObservable();
         this._modalRef.close();
     }
 }

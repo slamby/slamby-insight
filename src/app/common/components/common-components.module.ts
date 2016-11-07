@@ -1,3 +1,5 @@
+import { TagListSelectorComponent } from './../../documents/taglist-selector.component';
+import { TagListSelectorDialogComponent } from './../../documents/taglist-selector-dialog.component';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -29,7 +31,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         VsFor,
         PIPES_DECLARATIONS,
         DIRECTIVES_DECLARATIONS,
-        OverlayComponent
+        OverlayComponent,
+        TagListSelectorDialogComponent,
+        TagListSelectorComponent
     ],
     imports: [
         BrowserModule,
@@ -47,7 +51,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         VsFor,
         PIPES_DECLARATIONS,
         DIRECTIVES_DECLARATIONS,
-        OverlayComponent
+        OverlayComponent,
+        TagListSelectorDialogComponent,
+        TagListSelectorComponent
     ]
 })
 export class CommonComponentsModule { }

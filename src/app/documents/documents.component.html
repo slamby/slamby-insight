@@ -1,6 +1,6 @@
 <div>
-	<div class='panel-body'>
-		<div class='has-error' *ngIf='errorMessage'>{{errorMessage}}</div>
+	<div class="panel-body">
+		<div class="has-error" *ngIf="errorMessage">{{errorMessage}}</div>
 		<div>
 
 			<!-- Nav tabs -->
@@ -19,105 +19,118 @@
 					<div class="container-fluid">
 						<br>
 						<div class="row">
-							<!--field filter section-->
-							<div class="col-md-3">
-								<div class="card" style="display: inline;">
-									<div class="card-header">
-										<span class="h3">
-												Fields
-											</span>
+							<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+								<div class="panel panel-default">
+									<div class="panel-heading" role="tab">
+										<h4 class="panel-title">
+											<i class="fa fa-angle-double-right" *ngIf="!isFilterOpen" title="Click to Open"></i>
+											<i class="fa fa-angle-double-down" *ngIf="isFilterOpen" title="Click to Collapse"></i>
+											<a role="button" data-toggle="collapse" (click)="isFilterOpen = !isFilterOpen">Filter, Sample & Fields</a>
+										</h4>
 									</div>
-									<br role="separator" class="divider">
-									<div class="card-block">
-										<div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
-											<table class='table table-striped'>
-												<thead>
-													<th><input type="checkbox" [checked]="getSelectedItemsCount(fields) == fields.length" name="checkAll" (change)="checkField($event)"
-															style="margin: 3px;"></th>
-													<th>Field</th>
-												</thead>
-												<tbody>
-													<tr *ngFor='let field of fields'>
-														<td><input type="checkbox" [checked]="field.IsSelected" name="check" (change)="checkField($event, field)"></td>
-														<td>{{field.Name}}</td>
-													</tr>
-												</tbody>
-											</table>
+									<div class="panel-collapse collapse in" role="tabpanel">
+										<div class="panel-body" [hidden]="!isFilterOpen">
+											<!--field filter section-->
+											<div class="col-md-3">
+												<div class="card" style="display: inline;">
+													<div class="card-header">
+														<span class="h3">
+															Fields
+														</span>
+													</div>
+													<br role="separator" class="divider">
+													<div class="card-block">
+														<div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
+															<table class='table table-striped'>
+																<thead>
+																	<th><input type="checkbox" [checked]="getSelectedItemsCount(fields) == fields.length" name="checkAll" (change)="checkField($event)"
+																			style="margin: 3px;"></th>
+																	<th>Field</th>
+																</thead>
+																<tbody>
+																	<tr *ngFor='let field of fields'>
+																		<td><input type="checkbox" [checked]="field.IsSelected" name="check" (change)="checkField($event, field)"></td>
+																		<td>{{field.Name}}</td>
+																	</tr>
+																</tbody>
+															</table>
+														</div>
+														<button class="btn btn-default" (click)="fieldFilter()">Set Fields</button>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-1 divider" role="separator">
+											</div>
+											<!--filter section-->
+											<div class="col-md-3">
+												<div class="card" style="display: inline;">
+													<div class="card-header">
+														<span class="h3">
+															Filter
+														</span>
+													</div>
+													<br role="separator" class="divider">
+													<div class="card-block">
+														<form (submit)="filter()">
+															<div class="form-group">
+																<button type="button" class="btn btn-primary" (click)="selectFilterTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForFilter.length}})</button>
+															</div>
+															<div class="form-group">
+																<label>Query </label>
+																<input type="text" class="form-control" name="query" [(ngModel)]="filterSettings.Filter.Query">
+															</div>
+															<div class="form-group">
+																<label>Scroll size </label>
+																<input type="number" class="form-control" name="size" [(ngModel)]="filterSettings.Pagination.Limit">
+															</div>
+															<button type="submit" class="btn btn-default">Filter</button>
+														</form>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-1 divider" role="separator">
+											</div>
+											<!--sampling section-->
+											<div class="col-md-3">
+												<div class="card" style="display: inline;">
+													<div class="card-header">
+														<span class="h3">
+															Sample
+														</span>
+													</div>
+													<br role="separator" class="divider">
+													<div class="card-block">
+														<form (submit)="getSample()">
+															<div class="form-group">
+																<button type="button" class="btn btn-primary" (click)="selectSampleTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForSample.length}})</button>
+															</div>
+															<div class="form-group">
+																<input type="checkbox" name="isFix" [(ngModel)]="sampleSettings.IsFix">Fix Size
+																<br/>
+																<div *ngIf="sampleSettings.IsFix">
+																	<div class="form-group">
+																		<label>Size </label>
+																		<input type="number" class="form-control" name="size" [(ngModel)]="sampleSettings.Settings.Size">
+																	</div>
+																</div>
+																<div *ngIf="!sampleSettings.IsFix">
+																	<div class="form-group">
+																		<label>Percent </label>
+																		<input type="number" class="form-control" name="percent" [(ngModel)]="sampleSettings.Settings.Percent">
+																	</div>
+																</div>
+															</div>
+															<button class="btn btn-default" type="submit">Get Sample</button>
+														</form>
+													</div>
+												</div>
+											</div>
 										</div>
-										<button class="btn btn-default" (click)="fieldFilter()">Set Fields</button>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-1 divider" role="separator">
-							</div>
-							<!--filter section-->
-							<div class="col-md-3">
-								<div class="card" style="display: inline;">
-									<div class="card-header">
-										<span class="h3">
-                                        Filter
-                                    </span>
-									</div>
-									<br role="separator" class="divider">
-									<div class="card-block">
-										<form (submit)="filter()">
-											<div class="form-group">
-												<button type="button" class="btn btn-primary" (click)="selectFilterTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForFilter.length}})</button>
-											</div>
-											<div class="form-group">
-												<label>Query </label>
-												<input type="text" class="form-control" name="query" [(ngModel)]="filterSettings.Filter.Query">
-											</div>
-											<div class="form-group">
-												<label>Scroll size </label>
-												<input type="number" class="form-control" name="size" [(ngModel)]="filterSettings.Pagination.Limit">
-											</div>
-											<button type="submit" class="btn btn-default">Filter</button>
-										</form>
-									</div>
-								</div>
-							</div>
-							<div class="col-md-1 divider" role="separator">
-							</div>
-							<!--sampling section-->
-							<div class="col-md-3">
-								<div class="card" style="display: inline;">
-									<div class="card-header">
-										<span class="h3">
-                                                Sample
-                                            </span>
-									</div>
-									<br role="separator" class="divider">
-									<div class="card-block">
-										<form (submit)="getSample()">
-											<div class="form-group">
-												<button type="button" class="btn btn-primary" (click)="selectSampleTags()" [disabled]="tags.length === 0">Select Tags ({{tagsForSample.length}})</button>
-											</div>
-											<div class="form-group">
-												<input type="checkbox" name="isFix" [(ngModel)]="sampleSettings.IsFix">Fix Size
-												<br/>
-												<div *ngIf="sampleSettings.IsFix">
-													<div class="form-group">
-														<label>Size </label>
-														<input type="number" class="form-control" name="size" [(ngModel)]="sampleSettings.Settings.Size">
-													</div>
-												</div>
-												<div *ngIf="!sampleSettings.IsFix">
-													<div class="form-group">
-														<label>Percent </label>
-														<input type="number" class="form-control" name="percent" [(ngModel)]="sampleSettings.Settings.Percent">
-													</div>
-												</div>
-											</div>
-											<button class="btn btn-default" type="submit">Get Sample</button>
-										</form>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<br/>
-					<hr role="separator" class="divider">
 					<!--bulk actions-->
 					<div class="well">
 						<div class="button-container">
@@ -136,8 +149,8 @@
 					<section>
 						<div class="row">
 							<div class="col-sm-2 has-feedback">
-								<input class="form-control" placeholder="Filter..." type="text" [ngModel]="gridFilter" (ngModelChange)="onFilterChanged($event)"
-								 />
+								<input class="form-control" placeholder="Grid data filter..." type="text" [ngModel]="gridFilter" (ngModelChange)="onFilterChanged($event)"
+								/>
 							</div>
 							<div class="col-sm-10 float-right">
 								<div class="button-container">

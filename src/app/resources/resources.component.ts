@@ -45,10 +45,11 @@ export class ResourcesComponent implements OnInit {
 
     private getStatus() {
         this._statusService.getStatus()
+            .finally(() => this.lastUpdateTimeString = new Date().toLocaleTimeString())
             .subscribe(
             status => {
+                this.errorMessage = '';
                 this.statusObj = status;
-                this.lastUpdateTimeString = new Date().toLocaleTimeString();
             },
             error => this.handleError(error));
     }
@@ -56,7 +57,6 @@ export class ResourcesComponent implements OnInit {
     handleError(response: Response) {
         let model = ErrorsModelHelper.getFromResponse(response);
         let errors = ErrorsModelHelper.concatErrors(model);
-        // TODO: más módon kellene jelezni, mert hamar teleszemetelődik a notification 
-        this._notificationService.error(`${errors}`, `Status error (${response.status})`);
+        this.errorMessage = errors;
     }
 }

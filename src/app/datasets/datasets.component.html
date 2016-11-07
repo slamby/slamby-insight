@@ -2,7 +2,7 @@
 	<md-progress-circle *ngIf="isLoading" mode="indeterminate"></md-progress-circle>
 	<sl-confirm-dialog></sl-confirm-dialog>
 	<sl-dataset-editor-dialog></sl-dataset-editor-dialog>
-	<sl-json-editor-dialog></sl-json-editor-dialog>
+	<sl-json-editor-dialog [readonly]="true"></sl-json-editor-dialog>
 	<div *ngIf="!isLoading">
 		<div class="well">
 			<button type="button" class="btn btn-primary" (click)="addOrEdit()">Add New DataSet</button>

@@ -20,9 +20,9 @@
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
 							<div class="checkbox">
-                                <md-slide-toggle [(ngModel)]="tagImport" color="primary" [ngModelOptions]="{standalone: true}">
-                                    Tag Import
-                                </md-slide-toggle>
+								<md-slide-toggle [(ngModel)]="tagImport" color="primary" [ngModelOptions]="{standalone: true}">
+									Tag Import
+								</md-slide-toggle>
 							</div>
 						</div>
 					</div>
@@ -34,21 +34,26 @@
 									placeholder="Csv field delimiter" />
 							</div>
 						</div>
-                        <div class="form-group">
+						<div class="form-group">
 							<div class="col-sm-offset-2 col-sm-10">
 								<div class="checkbox">
-                                    <md-slide-toggle [(ngModel)]="csvSettings.hasHeader" color="primary" [ngModelOptions]="{standalone: true}">
-                                        Has header row
-                                    </md-slide-toggle>
+									<md-slide-toggle [(ngModel)]="csvSettings.hasHeader" color="primary" [ngModelOptions]="{standalone: true}">
+										Has header row
+									</md-slide-toggle>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-offset-2 col-sm-10">
-							<button type="button" class="btn btn-default" (click)="this.import()" [disabled]="!selectedFile || !selectedDataset || (status.inProgress && !status.finished)">
+							<div class="button-container">
+								<button type="button" class="btn btn-default" (click)="this.import()" [disabled]="!selectedFile || !selectedDataset || status.inProgress">
                                 Import {{ tagImport ? 'Tags' : 'Documents'}}
                             </button>
+							<button type="button" class="btn btn-default" (click)="cancel()" *ngIf="status.inProgress">
+                                Cancel
+                            </button>
+							</div>
 						</div>
 					</div>
 				</form>

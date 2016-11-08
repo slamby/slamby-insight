@@ -1,6 +1,6 @@
 import { Component, AfterContentInit, Input, Injectable } from '@angular/core';
 import { Response } from '@angular/http';
-import { Observable, Observer } from 'rxjs';
+import { Observable, Observer, Subscription } from 'rxjs';
 
 import { DocumentService } from '../common/services/document.service';
 import { DatasetService } from '../common/services/dataset.service';
@@ -17,9 +17,7 @@ let papa = require('papaparse');
 class ImportStatus {
     inProgress: boolean = false;
     percent: number = 0;
-    get finished(): boolean {
-        return this.percent === 100;
-    }
+    finished: boolean = false;
     errorMessages: Array<string> = [];
 }
 
@@ -41,6 +39,9 @@ export class ImportComponent implements AfterContentInit {
         delimiter: ',',
         hasHeader: true
     };
+    private _actionSubscription: Subscription;
+    private _reader;
+    private _isCancelled;
     status: ImportStatus = new ImportStatus();
 
     constructor(private _documentService: DocumentService,
@@ -71,23 +72,37 @@ export class ImportComponent implements AfterContentInit {
         return filename && filename.endsWith('.csv');
     }
 
+    cancel() {
+        if (this._actionSubscription) {
+            this._actionSubscription.unsubscribe();
+        }
+        if (this._reader) {
+            this._reader.abort();
+        }
+        this._isCancelled = true;
+        this.status.finished = true;
+        this.status.inProgress = false;
+    }
+
     import(): void {
+        this._isCancelled = false;
         this.status = new ImportStatus();
         this.status.inProgress = true;
+        this.status.finished = false;
         if (this.isCsvFile(this.selectedFile.name)) {
-            this.importCsv().subscribe(x => console.log(x));
+            this._actionSubscription = this.importCsv().subscribe();
         } else {
-            this.importJson().subscribe(x => console.log(x));
+            this._actionSubscription = this.importJson().subscribe();
         }
     }
 
     importJson(): Observable<number> {
         let observableResult = Observable.create((observer: Observer<number>) => {
-            let reader = new FileReader();
-            reader.onloadend = () => {
+            this._reader = new FileReader();
+            this._reader.onloadend = () => {
                 this.status.percent = 50;
                 observer.next(this.status.percent);
-                let parsedData = JSON.parse(reader.result);
+                let parsedData = JSON.parse(this._reader.result);
                 if (this.tagImport) {
                     this._tagService.bulkImport(this.selectedDataset.Name, parsedData)
                         .subscribe(bulkResults => {
@@ -112,8 +127,9 @@ export class ImportComponent implements AfterContentInit {
                         });
                 }
             };
-            reader.readAsText(this.selectedFile, 'utf-8');
+            this._reader.readAsText(this.selectedFile, 'utf-8');
         });
+        this._reader = null;
         return observableResult;
     }
 
@@ -133,80 +149,91 @@ export class ImportComponent implements AfterContentInit {
                 encoding: 'utf-8',
                 fastMode: false,
                 chunk: (results, parser) => {
-                    parser.pause();
-                    let errorRows = [];
-                    if (results.errors.length > 0) {
-                        results.errors.forEach(e => {
-                            this.status.errorMessages.push(e.message);
-                            if (e.row) {
-                                errorRows.push(e.row);
-                            }
-                        });
+                    if (this._isCancelled) {
+                        parser.abort();
                     }
-                    let filteredData = results.data;
-                    if (this.selectedDataset.SampleDocument) {
-                        if (_.isArray(this.selectedDataset.SampleDocument[this.selectedDataset.TagField])) {
-                            filteredData = filteredData.map(d => {
-                                d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
-                                return d;
-                            });
-                        }
-                    }
-                    else{
-                        if(this.selectedDataset.Schema["properties"][this.selectedDataset.TagField]["type"]=="array"){
-                            filteredData = filteredData.map(d => {
-                                d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
-                                return d;
-                            });
-                        }
-                    }
-                    filteredData.splice(...errorRows);
-                    if (filteredData.length > 0) {
-                        if (this.tagImport) {
-                            filteredData.forEach(data => {
-                                try {
-                                    if (data['ParentId'] && data['ParentId'].toString().toLowerCase() === 'null') {
-                                        data['ParentId'] = null;
-                                    }
-                                } catch (error) {
-                                    console.log(data['Id']);
+                    else {
+                        parser.pause();
+                        let errorRows = [];
+                        if (results.errors.length > 0) {
+                            results.errors.forEach(e => {
+                                this.status.errorMessages.push(e.message);
+                                if (e.row) {
+                                    errorRows.push(e.row);
                                 }
                             });
-                            this._tagService.bulkImport(this.selectedDataset.Name, filteredData)
-                                .subscribe((bulkResults: IBulkResults) => {
-                                    this.addBulkErrors(bulkResults.Results);
-                                    done += chunkSize;
-                                    done = done > total ? total : done;
-                                    this.status.percent = Math.ceil((done / total) * 100);
-                                    observer.next(this.status.percent);
-                                    parser.resume();
-                                },
-                                error => {
-                                    let errorsModel = ErrorsModelHelper.getFromResponse(error);
-                                    this.status.errorMessages = this.status.errorMessages.concat(errorsModel.Errors);
-                                    observer.next(this.status.percent);
-                                    parser.resume();
+                        }
+                        let filteredData = results.data;
+                        if (this.selectedDataset.SampleDocument) {
+                            if (_.isArray(this.selectedDataset.SampleDocument[this.selectedDataset.TagField])) {
+                                filteredData = filteredData.map(d => {
+                                    d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
+                                    return d;
                                 });
-                        } else {
-                            this._documentService.bulkImport(this.selectedDataset.Name, filteredData)
-                                .subscribe((bulkResults: IBulkResults) => {
-                                    this.addBulkErrors(bulkResults.Results);
-                                    done += chunkSize;
-                                    done = done > total ? total : done;
-                                    this.status.percent = Math.ceil((done / total) * 100);
-                                    observer.next(this.status.percent);
-                                    parser.resume();
-                                },
-                                error => {
-                                    this.status.errorMessages = <any>error;
-                                    observer.next(this.status.percent);
-                                    parser.resume();
+                            }
+                        }
+                        else {
+                            if (this.selectedDataset.Schema["properties"][this.selectedDataset.TagField]["type"] == "array") {
+                                filteredData = filteredData.map(d => {
+                                    d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
+                                    return d;
                                 });
+                            }
+                        }
+                        filteredData.splice(...errorRows);
+                        if (filteredData.length > 0) {
+                            if (this.tagImport) {
+                                filteredData.forEach(data => {
+                                    try {
+                                        if (data['ParentId'] && data['ParentId'].toString().toLowerCase() === 'null') {
+                                            data['ParentId'] = null;
+                                        }
+                                    } catch (error) {
+                                        console.log(data['Id']);
+                                    }
+                                });
+                                this._tagService.bulkImport(this.selectedDataset.Name, filteredData)
+                                    .subscribe((bulkResults: IBulkResults) => {
+                                        this.addBulkErrors(bulkResults.Results);
+                                        done += chunkSize;
+                                        done = done > total ? total : done;
+                                        this.status.percent = Math.ceil((done / total) * 100);
+                                        observer.next(this.status.percent);
+                                        parser.resume();
+                                    },
+                                    error => {
+                                        let errorsModel = ErrorsModelHelper.getFromResponse(error);
+                                        this.status.errorMessages = this.status.errorMessages.concat(errorsModel.Errors);
+                                        observer.next(this.status.percent);
+                                        parser.resume();
+                                    });
+                            } else {
+                                this._documentService.bulkImport(this.selectedDataset.Name, filteredData)
+                                    .subscribe((bulkResults: IBulkResults) => {
+                                        this.addBulkErrors(bulkResults.Results);
+                                        done += chunkSize;
+                                        done = done > total ? total : done;
+                                        this.status.percent = Math.ceil((done / total) * 100);
+                                        observer.next(this.status.percent);
+                                        parser.resume();
+                                    },
+                                    error => {
+                                        this.status.errorMessages = <any>error;
+                                        observer.next(this.status.percent);
+                                        parser.resume();
+                                    });
+                            }
                         }
                     }
                 },
                 complete: (result) => {
+                    if(this._isCancelled){
+                        this.status.finished=true;
+                    }
+                    else{
                     this.status.percent = 100;
+                    }
+                    this.status.inProgress=false;
                 },
                 error: (error) => {
                     this.status.errorMessages = error;

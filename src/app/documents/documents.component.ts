@@ -915,6 +915,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     selectFilterTags() {
         this.tagListSelectorDialog.tags = this.tags;
         this.tagListSelectorDialog.selectedTagIds = this.tagsForFilter.slice();
+        this.tagListSelectorDialog.isMultiselectAllowed = true;
         this.tagListSelectorDialog.open().result.then((result) => {
             if (result === 'OK') {
                 this.tagsForFilter = this.tagListSelectorDialog.selectedTagIds.slice();
@@ -926,6 +927,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     selectSampleTags() {
         this.tagListSelectorDialog.tags = this.tags;
         this.tagListSelectorDialog.selectedTagIds = this.tagsForSample.slice();
+        this.tagListSelectorDialog.isMultiselectAllowed = true;
         this.tagListSelectorDialog.open().result.then((result) => {
             if (result === 'OK') {
                 this.tagsForSample = this.tagListSelectorDialog.selectedTagIds.slice();

@@ -239,7 +239,7 @@ export class ServicesComponent implements OnInit {
         this._tagService.getTags(dataset.Name, true).subscribe(
             (tags: Array<ITag>) => {
                 this.inputModel.Model.TagList = tags;
-                this.inputModel.Model.SelectedTagList = tags.map(t=>t.Id);
+                this.inputModel.Model.SelectedTagList = tags.map(t => t.Id);
                 this.sm.showProgress = false;
             },
             (error) => {
@@ -450,7 +450,7 @@ export class ServicesComponent implements OnInit {
                     this.sm.showProgress = true;
                     this._tagService.getTags((<IClassifierService>selected).PrepareSettings.DataSetName, true).subscribe(
                         (tags: Array<ITag>) => {
-                            var tagsForService = (<IClassifierService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t=>t!=undefined);
+                            var tagsForService = (<IClassifierService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t => t != undefined);
                             this.inputModel.Model.TagList = tagsForService;
                             this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
                             this.inputModel.Model.SelectedEmphasizedTagList = [];
@@ -575,8 +575,8 @@ export class ServicesComponent implements OnInit {
                 let dataset = selected.Type === IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.DataSetName : (<IPrcService>selected).PrepareSettings.DataSetName
                 this._tagService.getTags(dataset, true).subscribe(
                     (tags: Array<ITag>) => {
-                        var tagsForService = IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t=>t!=undefined) :
-                            (<IPrcService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t=>t!=undefined);
+                        var tagsForService = IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t => t != undefined) :
+                            (<IPrcService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t => t != undefined);
                         this.inputModel.Model.TagList = tagsForService;
                         this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
                         this.inputModel.Model.SelectedEmphasizedTagList = [];
@@ -640,6 +640,10 @@ export class ServicesComponent implements OnInit {
                 },
                 error => this.handleError(error));
         }
+    }
+
+    changeToggle(property) {
+        this.inputModel.Model[property] = !this.inputModel.Model[property];
     }
 
     recommend(selected: IService | IPrcService | IClassifierService) {
@@ -706,7 +710,7 @@ export class ServicesComponent implements OnInit {
                             Text: model.Model.Text,
                             Count: model.Model.Count,
                             Filter: model.Model.Filter,
-                            NeedDocumentInResult: model.Model.Weights,
+                            NeedDocumentInResult: model.Model.NeedDocumentInResult,
                             TagId: model.Model.TagId,
                             Weights: model.Model.Weightsjson.replace(" ", "").replace("\n", "") == "[]" ? null : JSON.parse(model.Model.Weightsjson)
                         };
@@ -802,13 +806,13 @@ export class ServicesComponent implements OnInit {
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
                     let settings: IPrcRecommendationByIdRequest = {
-                            DocumentId: model.Model.DocumentId,
-                            Count: model.Model.Count,
-                            Query: model.Model.Query,
-                            NeedDocumentInResult: model.Model.Weights,
-                            TagId: model.Model.TagId,
-                            Weights: model.Model.Weightsjson.replace(" ", "").replace("\n", "") == "[]" ? null : JSON.parse(model.Model.Weightsjson)
-                        };
+                        DocumentId: model.Model.DocumentId,
+                        Count: model.Model.Count,
+                        Query: model.Model.Query,
+                        NeedDocumentInResult: model.Model.NeedDocumentInResult,
+                        TagId: model.Model.TagId,
+                        Weights: model.Model.Weightsjson.replace(" ", "").replace("\n", "") == "[]" ? null : JSON.parse(model.Model.Weightsjson)
+                    };
                     this._prcService.recommendById(selected.Id, settings).subscribe(
                         (results: Array<IPrcRecommendationResult>) => {
                             this.dialogService.close();

@@ -6,7 +6,7 @@
 	<sl-taglist-selector-dialog></sl-taglist-selector-dialog>
 	<sl-service-maintenance-dialog #smd>
 		<div *ngIf='smd.model?.Type== "new"' new>
-			<div class="form-group" [class.has-error]="name.errors && name.touched">
+			<div class="form-group" [class.has-error]="name.errors && name.dirty">
 				<label for="name" class="col-sm-2 control-label">Name</label>
 				<div class="col-sm-10">
 					<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Name" name="name" #name="ngModel" required autofocus>
@@ -17,7 +17,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="form-group" [class.has-error]="alias.errors && alias.touched">
+			<div class="form-group" [class.has-error]="alias.errors && alias.dirty">
 				<label for="alias" class="col-sm-2 control-label">Alias</label>
 				<div class="col-sm-10">
 					<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Alias" alias="alias" #alias="ngModel" autofocus>
@@ -55,7 +55,7 @@
 					</select>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group" [class.has-error]="tags.errors && tags.dirty">
 				<label for="tags" class="col-sm-2 control-label">TagIdList</label>
 				<div class="col-sm-10">
 					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0 || smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
@@ -68,7 +68,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="form-group" [class.has-error]="compressLevel.errors && compressLevel.touched">
+			<div class="form-group" [class.has-error]="compressLevel.errors && compressLevel.dirty">
 				<label for="compressLevel" class="col-sm-2 control-label">CompressLevel</label>
 				<div class="col-sm-10">
 					<input type="number" class="form-control" [(ngModel)]="smd.model.Model.CompressLevel" compressLevel="compressLevel" #compressLevel="ngModel"
@@ -98,7 +98,7 @@
 					</select>
 					</div>
 				</div>
-				<div class="form-group">
+				<div class="form-group" [class.has-error]="tags.errors && tags.dirty">
 					<label for="tags" class="col-sm-2 control-label">TagIdList</label>
 					<div class="col-sm-10">
 						<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
@@ -149,7 +149,7 @@
 					</select>
 				</div>
 			</div>
-			<div class="form-group">
+			<div class="form-group" [class.has-error]="tags.errors && tags.dirty">
 				<label for="tags" class="col-sm-2 control-label">TagIdList</label>
 				<div class="col-sm-10">
 					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
@@ -164,22 +164,16 @@
 			</div>
 		</div>
 		<div *ngIf='smd.model?.Type == "index"' index>
-			<div class="form-group" [class.has-error]="filter.errors && filter.touched">
+			<div class="form-group">
 				<label for="filter" class="col-sm-2 control-label">Filter</label>
 				<div class="col-sm-10">
-					<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Filter" filter="filter" #filter="ngModel" autofocus
-						required>
-					<div *ngIf="filter.errors?.required && filter.touched">
-						<p class="text-danger">
-							Field is required!
-						</p>
-					</div>
+					<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Filter" filter="filter" #filter="ngModel" autofocus>
 				</div>
 			</div>
 		</div>
 		<div *ngIf='smd.model?.Type == "recommend"' recommend>
 			<div *ngIf="sm.model.Model.Type == serviceType.Classifier">
-				<div class="form-group" [class.has-error]="text.errors && text.touched">
+				<div class="form-group" [class.has-error]="text.errors && text.dirty">
 					<label for="text" class="col-sm-3 control-label">Text</label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" text="text" #text="ngModel" autofocus required>
@@ -190,7 +184,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="form-group" [class.has-error]="count.errors && count.touched">
+				<div class="form-group" [class.has-error]="count.errors && count.dirty">
 					<label for="count" class="col-sm-3 control-label">Count</label>
 					<div class="col-sm-9">
 						<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
@@ -204,20 +198,20 @@
 				<div class="form-group">
 					<label for="count" class="col-sm-3 control-label">NeedTagInResult</label>
 					<div class="col-sm-9">
-						<md-slide-toggle [(checked)]="smd.model.Model.NeedTagInResult" color="primary">
+						<md-slide-toggle [checked]="smd.model.Model.NeedTagInResult" (change)='changeToggle("NeedTagInResult")' color="primary">
 						</md-slide-toggle>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="count" class="col-sm-3 control-label">UseEmphasizing</label>
 					<div class="col-sm-9">
-						<md-slide-toggle [(checked)]="smd.model.Model.UseEmphasizing" color="primary">
+						<md-slide-toggle [checked]="smd.model.Model.UseEmphasizing" (change)='changeToggle("UseEmphasizing")' color="primary">
 						</md-slide-toggle>
 					</div>
 				</div>
 			</div>
 			<div *ngIf="sm.model.Model.Type == serviceType.Prc">
-				<div class="form-group" [class.has-error]="text.errors && text.touched">
+				<div class="form-group" [class.has-error]="text.errors && text.dirty">
 					<label for="text" class="col-sm-3 control-label">Text</label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" text="text" #text="ngModel" autofocus required>
@@ -228,7 +222,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="form-group" [class.has-error]="count.errors && count.touched">
+				<div class="form-group" [class.has-error]="count.errors && count.dirty">
 					<label for="count" class="col-sm-3 control-label">Count</label>
 					<div class="col-sm-9">
 						<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
@@ -248,11 +242,11 @@
 				<div class="form-group">
 					<label for="count" class="col-sm-3 control-label">NeedDocumentInResult</label>
 					<div class="col-sm-9">
-						<md-slide-toggle [(checked)]="smd.model.Model.NeedDocumentInResult" color="primary">
+						<md-slide-toggle [checked]="smd.model.Model.NeedDocumentInResult" (change)='changeToggle("NeedDocumentInResult")' color="primary">
 						</md-slide-toggle>
 					</div>
 				</div>
-				<div class="form-group" [class.has-error]="tagId.errors && tagId.touched">
+				<div class="form-group" [class.has-error]="tagId.errors && tagId.dirty">
 					<label for="tagId" class="col-sm-3 control-label">TagId</label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus required>
@@ -279,7 +273,7 @@
 		</div>
 		<div *ngIf='smd.model?.Type == "recommendById"' recommendById>
 			<div *ngIf="sm.model.Model.Type == serviceType.Prc">
-				<div class="form-group" [class.has-error]="documentId.errors && documentId.touched">
+				<div class="form-group" [class.has-error]="documentId.errors && documentId.dirty">
 					<label for="documentId" class="col-sm-3 control-label">DocumentId</label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.DocumentId" documentId="documentId" #documentId="ngModel" autofocus required>
@@ -290,7 +284,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="form-group" [class.has-error]="count.errors && count.touched">
+				<div class="form-group" [class.has-error]="count.errors && count.dirty">
 					<label for="count" class="col-sm-3 control-label">Count</label>
 					<div class="col-sm-9">
 						<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
@@ -310,11 +304,11 @@
 				<div class="form-group">
 					<label for="count" class="col-sm-3 control-label">NeedDocumentInResult</label>
 					<div class="col-sm-9">
-						<md-slide-toggle [(checked)]="smd.model.Model.NeedDocumentInResult" color="primary">
+						<md-slide-toggle [checked]="smd.model.Model.NeedDocumentInResult" (change)='changeToggle("NeedDocumentInResult")' color="primary">
 						</md-slide-toggle>
 					</div>
 				</div>
-				<div class="form-group" [class.has-error]="tagId.errors && tagId.touched">
+				<div class="form-group" [class.has-error]="tagId.errors && tagId.dirty">
 					<label for="tagId" class="col-sm-3 control-label">TagId</label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus required>

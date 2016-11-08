@@ -167,7 +167,7 @@
 					</section>
 				</div>
 				<div role="tabpanel" class="tab-pane" [class.active]="activeTab === 'tags'" id="profile">
-					<sl-tab-pane [dataset]="dataset" (onDeleted)="onTagDeleted($event)"></sl-tab-pane>
+					<sl-tab-pane [dataset]="dataset" (onChanged)="tagsChanged($event)" (onDeleted)="onTagDeleted($event)"></sl-tab-pane>
 				</div>
 			</div>
 

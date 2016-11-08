@@ -1,6 +1,6 @@
 import { SelectedItem } from './../models/selected-item';
 import { TagService } from './../common/services/tag.service';
-import { TagListSelectorDialogComponent } from './../documents/taglist-selector-dialog.component';
+import { TagListSelectorDialogComponent } from '../common/components/taglist-selector-dialog.component';
 import { CommonInputModel } from './../models/common-input.model';
 import { DatasetService } from './../common/services/dataset.service';
 import { Component, OnInit, ViewChild } from '@angular/core';

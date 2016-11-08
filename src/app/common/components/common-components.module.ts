@@ -1,5 +1,5 @@
-import { TagListSelectorComponent } from './../../documents/taglist-selector.component';
-import { TagListSelectorDialogComponent } from './../../documents/taglist-selector-dialog.component';
+import { TagListSelectorComponent } from './taglist-selector.component';
+import { TagListSelectorDialogComponent } from './taglist-selector-dialog.component';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';

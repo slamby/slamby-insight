@@ -7,7 +7,6 @@ import { ConfirmModel } from '../models/confirm.model';
 
 import { DocumentService } from '../common/services/document.service';
 import { DatasetService } from '../common/services/dataset.service';
-import { TagService } from '../common/services/tag.service';
 import { DatasetSelectorModel } from '../datasets/dataset-selector.model';
 import { DocumentWrapper } from '../models/document-wrapper';
 
@@ -19,7 +18,7 @@ import { DocumentDetailsDialogComponent } from './document-details.dialog.compon
 import { DocumentDetailsComponent } from './document-details.component';
 
 import { Messenger } from '../common/services/messenger.service';
-import { TagListSelectorDialogComponent } from './taglist-selector-dialog.component';
+import { TagListSelectorDialogComponent } from '../common/components/taglist-selector-dialog.component';
 import { IDocumentFilterSettings, IDataSet, ITag, IDocumentSampleSettings } from 'slamby-sdk-angular2';
 import { Observable, Observer } from 'rxjs';
 
@@ -56,7 +55,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this._dataset = dataset;
         this.setFields();
         this.LoadDocuments(true);
-        this.LoadTags();
     }
     get dataset() { return this._dataset; }
     @ViewChild(DialogComponent) dialogService: DialogComponent;
@@ -111,7 +109,6 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     gridFilter: string;
 
     constructor(private _documentService: DocumentService,
-        private _tagService: TagService,
         private _datasetService: DatasetService,
         private _messenger: Messenger,
         private _notificationService: NotificationService,
@@ -207,15 +204,8 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this.sampleSettings.Settings.FieldList = this.fields.filter(f => f.IsSelected).map(s => s.Name);
     }
 
-    private LoadTags() {
-        this._tagService.getTags(this._dataset.Name).subscribe(
-            (tags: Array<ITag>) => {
-                let comparator = naturalSort({ caseSensitive: false });
-                tags = tags.sort((a: ITag, b: ITag) => comparator(a.Id, b.Id));
-                this.tags = tags;
-            },
-            error => this.errorMessage = <any>error
-        );
+    tagsChanged(tags: Array<SelectedItem<ITag>>) {
+        this.tags = tags.map(tsi => tsi.Item);
     }
 
     private LoadDocuments(setHeaders: boolean) {
@@ -770,9 +760,11 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             selectableTags.push(...difference.map(tid => {
                 let sm = {
                     IsSelected: false,
+                    Id: tid,
+                    Name: tid,
                     Item: <ITag>{
                         Id: tid,
-                        Name: ''
+                        Name: '',
                     }
                 };
                 return sm;

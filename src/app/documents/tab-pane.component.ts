@@ -29,7 +29,14 @@ const naturalSort = require('node-natural-sort');
     templateUrl: 'tab-pane.component.html'
 })
 export class TabPaneComponent implements OnInit {
-    tags: Array<SelectedItem<ITag>> = [];
+    private _tags: Array<SelectedItem<ITag>> = []
+    get tags() {
+        return this._tags;
+    }
+    set tags(tags: Array<SelectedItem<ITag>>) {
+        this._tags = tags;
+        this.onChanged.emit(tags);
+    }
     errorMessage: string;
 
     _dataset: IDataSet;
@@ -43,6 +50,7 @@ export class TabPaneComponent implements OnInit {
         return this._dataset;
     }
     @Output() onDeleted: EventEmitter<string> = new EventEmitter<string>();
+    @Output() onChanged: EventEmitter<Array<SelectedItem<ITag>>> = new EventEmitter<Array<SelectedItem<ITag>>>();
 
     @ViewChild(DialogComponent) dialogService: DialogComponent;
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;

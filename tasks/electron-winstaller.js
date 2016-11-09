@@ -2,7 +2,7 @@ const electronInstaller = require('electron-winstaller');
 const path = require('path');
 const pkginfo = require('pkginfo')(module);
 
-createInstaller('win32-x64')
+createInstaller('win32')
     //.then(() => createInstaller('win32-ia32'))
     .then(() => console.log("Install created!"))
     .catch((e) => {

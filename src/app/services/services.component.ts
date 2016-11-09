@@ -235,6 +235,7 @@ export class ServicesComponent implements OnInit {
     prepareDatasetChanged(dataset: any) {
         this.sm.showProgress = true;
         this.inputModel.Model.Ngrams = _.range(1, dataset.NGramCount + 1);
+        this.inputModel.Model.SelectedNgram = dataset.NGramCount;
         this.inputModel.Model.SelectedTagList = [];
         this._tagService.getTags(dataset.Name, true).subscribe(
             (tags: Array<ITag>) => {
@@ -415,7 +416,7 @@ export class ServicesComponent implements OnInit {
         let model;
         if (selected.Type === IService.ITypeEnum.Classifier) {
             model = {
-                SelectedNgram: 1,
+                SelectedNgram: _.max((<IClassifierService>selected).PrepareSettings.NGramList),
                 Ngrams: (<IClassifierService>selected).PrepareSettings.NGramList,
                 SelectedTagList: [],
                 TagList: [],
@@ -590,7 +591,7 @@ export class ServicesComponent implements OnInit {
             }
         );
         let model = {
-            SelectedNgram: 1,
+            SelectedNgram: selected.Type === IService.ITypeEnum.Classifier ? _.max((<IClassifierService>selected).PrepareSettings.NGramList) : 0,
             Ngrams: selected.Type === IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.NGramList : [],
             SelectedTagList: [],
             TagList: [],

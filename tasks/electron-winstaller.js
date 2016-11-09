@@ -15,7 +15,7 @@ function createInstaller(platform) {
     var remoteReleasesUrl = 'https://insight.slamby.com/download/latest';
     var appName = module.exports.name;
     var setupExeName = `${appName}-${module.exports.version}-${platform}.exe`;
-    var appDir = path.join(__dirname, '..', 'packager', `${appName}-${platform}`);
+    var appDir = path.join(__dirname, '..', 'packager', `${appName}-${platform}-x64`);
     var installerDir = path.join(__dirname, '..', 'installer');
     var iconDir = path.join(__dirname, '..', 'src', 'assets', 'icons', 'icon.ico');
 

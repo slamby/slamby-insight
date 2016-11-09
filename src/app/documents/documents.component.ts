@@ -559,6 +559,9 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         if (!selectedDocs || selectedDocs.length === 0) {
             selectedDocs = this.getSelectedDocs();
         }
+        if (this.checkArrayIsEmpty(selectedDocs)) {
+            return;
+        }
         let datasetSelectorModel: DatasetSelectorModel;
         this.datasetSelector.dialogClosed.subscribe(
             (model: DatasetSelectorModel) => {
@@ -581,17 +584,21 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             },
             error => this.errorMessage = <any>error
         );
-        this._datasetService.getDatasets().subscribe(
-            (datasets: Array<IDataSet>) => {
-                datasetSelectorModel = {
-                    Datasets: this.getOtherDataSets(datasets),
-                    Selected: datasets.length > 0 ? datasets[0] : null
-                };
-                this.datasetSelector.model = datasetSelectorModel;
-                this.datasetSelector.open();
-            },
-            error => this.errorMessage = <any>error
-        );
+        this.datasetSelector.dialogOpened.subscribe(() => {
+            this._datasetService.getDatasets().finally(() => this.datasetSelector.showProgress = false).subscribe(
+                (datasets: Array<IDataSet>) => {
+                    datasetSelectorModel = {
+                        Datasets: this.getOtherDataSets(datasets),
+                        Selected: datasets.length > 0 ? datasets[0] : null
+                    };
+                    this.datasetSelector.model = datasetSelectorModel;
+                },
+                error => this.errorMessage = <any>error
+            );
+        });
+        this.datasetSelector.model=null;
+        this.datasetSelector.showProgress = true;
+        this.datasetSelector.open();
     }
 
     moveAllTo() {
@@ -620,6 +627,9 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         if (!selectedDocs || selectedDocs.length === 0) {
             selectedDocs = this.getSelectedDocs();
         }
+        if (this.checkArrayIsEmpty(selectedDocs)) {
+            return;
+        }
         let datasetSelectorModel: DatasetSelectorModel;
         this.datasetSelector.dialogClosed.subscribe(
             (model: DatasetSelectorModel) => {
@@ -641,17 +651,21 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             },
             error => this.errorMessage = <any>error
         );
-        this._datasetService.getDatasets().subscribe(
-            (datasets: Array<IDataSet>) => {
-                datasetSelectorModel = {
-                    Datasets: this.getOtherDataSets(datasets),
-                    Selected: datasets.length > 0 ? datasets[0] : null
-                };
-                this.datasetSelector.model = datasetSelectorModel;
-                this.datasetSelector.open();
-            },
-            error => this.errorMessage = <any>error
-        );
+        this.datasetSelector.dialogOpened.subscribe(() => {
+            this._datasetService.getDatasets().finally(() => this.datasetSelector.showProgress = false).subscribe(
+                (datasets: Array<IDataSet>) => {
+                    datasetSelectorModel = {
+                        Datasets: this.getOtherDataSets(datasets),
+                        Selected: datasets.length > 0 ? datasets[0] : null
+                    };
+                    this.datasetSelector.model = datasetSelectorModel;
+                },
+                error => this.errorMessage = <any>error
+            );
+        });
+        this.datasetSelector.model=null;
+        this.datasetSelector.showProgress = true;
+        this.datasetSelector.open();
     }
 
     addTags(selectedDocs: Array<any>) {

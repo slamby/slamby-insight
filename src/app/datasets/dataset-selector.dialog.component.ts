@@ -12,12 +12,16 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 export class DatasetSelectorDialogComponent {
     @Input() model: DatasetSelectorModel;
     @ViewChild('template') template;
+    showProgress = false;
     modalOptions: NgbModalOptions = {
         backdrop: 'static',
         keyboard: true,
         size: 'lg',
         windowClass: 'md-dialog'
     };
+    
+    private dialogOpenedEventSource = new Subject();
+    dialogOpened = this.dialogOpenedEventSource.asObservable();
 
     private dialogClosedEventSource = new Subject<DatasetSelectorModel>();
     dialogClosed = this.dialogClosedEventSource.asObservable();
@@ -27,6 +31,7 @@ export class DatasetSelectorDialogComponent {
 
     open() {
         this.modal.open(this.template, this.modalOptions);
+        this.dialogOpenedEventSource.next();
     }
 
     cancel() {
@@ -40,6 +45,8 @@ export class DatasetSelectorDialogComponent {
         this.model.Result = DialogResult.Ok;
         this.dialogClosedEventSource.next(this.model);
         this.dialogClosedEventSource = new Subject<DatasetSelectorModel>();
+        this.dialogOpenedEventSource = new Subject();
+        this.dialogOpened = this.dialogOpenedEventSource.asObservable();
         this.dialogClosed = this.dialogClosedEventSource.asObservable();
     }
 }

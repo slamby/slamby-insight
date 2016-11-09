@@ -54,7 +54,7 @@ export class ServiceMaintenanceDialogComponent {
     unsubscribeAndClose() {
         this.dialogClosedEventSource = new Subject<CommonInputModel>();
         this.dialogClosed = this.dialogClosedEventSource.asObservable();
-        this.dialogOpenedEventSource = new Subject<CommonInputModel>();
+        this.dialogOpenedEventSource = new Subject();
         this.dialogOpened = this.dialogOpenedEventSource.asObservable();
         this._modalRef.close();
     }

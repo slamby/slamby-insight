@@ -5,10 +5,15 @@
             </button>
         <h4 class="modal-title ">Dataset Selector</h4>
     </div>
-    <div class="modal-body ">
+    <div class="modal-body" *ngIf="model">
         <select [(ngModel)]='model.Selected' name="name" class="form-control">
             <option [ngValue]="dataset " *ngFor='let dataset of model.Datasets'>{{dataset.Name}}</option>
         </select>
+    </div>
+    <div class="modal-body">
+        <div class="progress" style="position: relative;" *ngIf="showProgress">
+            <div class="progress-bar indeterminate"></div>
+        </div>
     </div>
     <div class="modal-footer ">
         <button type="button " class="btn btn-primary " (click)="select(); c() ">Select</button>

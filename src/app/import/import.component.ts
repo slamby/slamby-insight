@@ -102,29 +102,40 @@ export class ImportComponent implements AfterContentInit {
             this._reader.onloadend = () => {
                 this.status.percent = 50;
                 observer.next(this.status.percent);
-                let parsedData = JSON.parse(this._reader.result);
-                if (this.tagImport) {
-                    this._tagService.bulkImport(this.selectedDataset.Name, parsedData)
-                        .subscribe(bulkResults => {
-                            this.addBulkErrors(bulkResults.Results);
-                            this.status.percent = 100;
-                            observer.next(this.status.percent);
-                        },
-                        error => {
-                            this.status.errorMessages = <any>error;
-                            observer.next(this.status.percent);
-                        });
-                } else {
-                    this._documentService.bulkImport(this.selectedDataset.Name, parsedData)
-                        .subscribe(bulkResults => {
-                            this.addBulkErrors(bulkResults.Results);
-                            this.status.percent = 100;
-                            observer.next(this.status.percent);
-                        },
-                        error => {
-                            this.status.errorMessages = <any>error;
-                            observer.next(this.status.percent);
-                        });
+                try {
+                    let parsedData = JSON.parse(this._reader.result);
+                    if (this.tagImport) {
+                        this._tagService.bulkImport(this.selectedDataset.Name, parsedData)._finally(() => {
+                            this.status.finished = true;
+                            this.status.inProgress = false;
+                        }).subscribe(bulkResults => {
+                                this.addBulkErrors(bulkResults.Results);
+                                this.status.percent = 100;
+                                observer.next(this.status.percent);
+                            },
+                            error => {
+                                this.status.errorMessages = <any>error;
+                                observer.next(this.status.percent);
+                            });
+                    } else {
+                        this._documentService.bulkImport(this.selectedDataset.Name, parsedData)._finally(() => {
+                            this.status.finished = true;
+                            this.status.inProgress = false;
+                        }).subscribe(bulkResults => {
+                                this.addBulkErrors(bulkResults.Results);
+                                this.status.percent = 100;
+                                observer.next(this.status.percent);
+                            },
+                            error => {
+                                this.status.errorMessages = <any>error;
+                                observer.next(this.status.percent);
+                            });
+                    }
+                } catch (error) {
+                    this.status.errorMessages = [error.toString()];
+                    this.status.inProgress = false;
+                    observer.next(this.status.percent);
+                    this.status.finished = true;
                 }
             };
             this._reader.readAsText(this.selectedFile, 'utf-8');
@@ -227,16 +238,16 @@ export class ImportComponent implements AfterContentInit {
                     }
                 },
                 complete: (result) => {
-                    if(this._isCancelled){
-                        this.status.finished=true;
+                    if (!this._isCancelled) {
+                        this.status.percent = 100;
                     }
-                    else{
-                    this.status.percent = 100;
-                    }
-                    this.status.inProgress=false;
+                    this.status.finished = true;
+                    this.status.inProgress = false;
                 },
                 error: (error) => {
                     this.status.errorMessages = error;
+                    this.status.finished = true;
+                    this.status.inProgress = false;
                 }
             });
         });

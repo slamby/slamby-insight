@@ -1,3 +1,4 @@
+import { OptionService } from './../common/services/option.service';
 import { Component, AfterContentInit, Input, Injectable } from '@angular/core';
 import { Response } from '@angular/http';
 import { Observable, Observer, Subscription } from 'rxjs';
@@ -34,11 +35,14 @@ export class ImportComponent implements AfterContentInit {
     selectedDataset: IDataSet;
     selectedFile: any;
     documents = new Array<any>();
+    bulkSize = 1000;
     tagImport: boolean = false;
     csvSettings: any = {
         delimiter: ',',
         hasHeader: true
     };
+    private _importSubscription: Subscription;
+    private _readIsCompleted: boolean;
     private _actionSubscription: Subscription;
     private _reader;
     private _isCancelled;
@@ -47,7 +51,9 @@ export class ImportComponent implements AfterContentInit {
     constructor(private _documentService: DocumentService,
         private _datasetService: DatasetService,
         private _tagService: TagService,
+        private _optionService: OptionService,
         private _notificationService: NotificationService) {
+        this.bulkSize = this._optionService.currentEndpoint.BulkSize;
     }
 
     ngAfterContentInit(): void {
@@ -109,10 +115,10 @@ export class ImportComponent implements AfterContentInit {
                             this.status.finished = true;
                             this.status.inProgress = false;
                         }).subscribe(bulkResults => {
-                                this.addBulkErrors(bulkResults.Results);
-                                this.status.percent = 100;
-                                observer.next(this.status.percent);
-                            },
+                            this.addBulkErrors(bulkResults.Results);
+                            this.status.percent = 100;
+                            observer.next(this.status.percent);
+                        },
                             error => {
                                 this.status.errorMessages = <any>error;
                                 observer.next(this.status.percent);
@@ -122,10 +128,10 @@ export class ImportComponent implements AfterContentInit {
                             this.status.finished = true;
                             this.status.inProgress = false;
                         }).subscribe(bulkResults => {
-                                this.addBulkErrors(bulkResults.Results);
-                                this.status.percent = 100;
-                                observer.next(this.status.percent);
-                            },
+                            this.addBulkErrors(bulkResults.Results);
+                            this.status.percent = 100;
+                            observer.next(this.status.percent);
+                        },
                             error => {
                                 this.status.errorMessages = <any>error;
                                 observer.next(this.status.percent);
@@ -147,9 +153,9 @@ export class ImportComponent implements AfterContentInit {
     importCsv(): Observable<number> {
         let done = 0;
         let total: number = this.selectedFile.size;
-        let chunkSize = 202400;
+        let pendingItems = [];
+        let chunkSize = papa.LocalChunkSize;
         let observableResult = Observable.create((observer: Observer<number>) => {
-            papa.LocalChunkSize = chunkSize;
             papa.DefaultDelimiter = '';
             papa.parse(this.selectedFile, {
                 delimiter: this.csvSettings.delimiter,	// empty string = auto-detect
@@ -160,11 +166,11 @@ export class ImportComponent implements AfterContentInit {
                 encoding: 'utf-8',
                 fastMode: false,
                 chunk: (results, parser) => {
+                    parser.pause();
                     if (this._isCancelled) {
                         parser.abort();
                     }
                     else {
-                        parser.pause();
                         let errorRows = [];
                         if (results.errors.length > 0) {
                             results.errors.forEach(e => {
@@ -174,7 +180,10 @@ export class ImportComponent implements AfterContentInit {
                                 }
                             });
                         }
-                        let filteredData = results.data;
+                        let filteredData = results.data.map(d=>{
+                            delete d.__parsed_extra;
+                            return d;
+                        });
                         if (this.selectedDataset.SampleDocument) {
                             if (_.isArray(this.selectedDataset.SampleDocument[this.selectedDataset.TagField])) {
                                 filteredData = filteredData.map(d => {
@@ -193,56 +202,49 @@ export class ImportComponent implements AfterContentInit {
                         }
                         filteredData.splice(...errorRows);
                         if (filteredData.length > 0) {
-                            if (this.tagImport) {
-                                filteredData.forEach(data => {
-                                    try {
-                                        if (data['ParentId'] && data['ParentId'].toString().toLowerCase() === 'null') {
-                                            data['ParentId'] = null;
+                            pendingItems.push(...filteredData);
+                            if (pendingItems.length >= this.bulkSize) {
+                                let length = _.chunk(pendingItems, this.bulkSize).length;
+                                this._importSubscription = this.bulkImport(pendingItems)
+                                    .finally(() => {
+                                        pendingItems = [];
+                                        this.complete();
+                                        if (!this._readIsCompleted) {
+                                            parser.resume();
                                         }
-                                    } catch (error) {
-                                        console.log(data['Id']);
-                                    }
-                                });
-                                this._tagService.bulkImport(this.selectedDataset.Name, filteredData)
-                                    .subscribe((bulkResults: IBulkResults) => {
+                                    })
+                                    .subscribe(
+                                    (bulkResults: IBulkResults) => {
                                         this.addBulkErrors(bulkResults.Results);
-                                        done += chunkSize;
+                                        done += total < chunkSize ? total / length : chunkSize / length;
                                         done = done > total ? total : done;
                                         this.status.percent = Math.ceil((done / total) * 100);
                                         observer.next(this.status.percent);
-                                        parser.resume();
                                     },
                                     error => {
                                         let errorsModel = ErrorsModelHelper.getFromResponse(error);
                                         this.status.errorMessages = this.status.errorMessages.concat(errorsModel.Errors);
-                                        observer.next(this.status.percent);
-                                        parser.resume();
-                                    });
-                            } else {
-                                this._documentService.bulkImport(this.selectedDataset.Name, filteredData)
-                                    .subscribe((bulkResults: IBulkResults) => {
-                                        this.addBulkErrors(bulkResults.Results);
-                                        done += chunkSize;
+                                        done += total < chunkSize ? total / length : chunkSize / length;
                                         done = done > total ? total : done;
                                         this.status.percent = Math.ceil((done / total) * 100);
                                         observer.next(this.status.percent);
-                                        parser.resume();
-                                    },
-                                    error => {
-                                        this.status.errorMessages = <any>error;
-                                        observer.next(this.status.percent);
-                                        parser.resume();
                                     });
+                            }
+                            else {
+                                if (!this._readIsCompleted) {
+                                    parser.resume();
+                                }
+                            }
+                        }
+                        else {
+                            if (!this._readIsCompleted) {
+                                parser.resume();
                             }
                         }
                     }
                 },
                 complete: (result) => {
-                    if (!this._isCancelled) {
-                        this.status.percent = 100;
-                    }
-                    this.status.finished = true;
-                    this.status.inProgress = false;
+                    this._readIsCompleted = true;
                 },
                 error: (error) => {
                     this.status.errorMessages = error;
@@ -252,6 +254,50 @@ export class ImportComponent implements AfterContentInit {
             });
         });
         return observableResult;
+    }
+
+    complete() {
+        if (this._isCancelled) {
+            this.status.percent = 100;
+            this.status.inProgress = false;
+            this.status.finished = true;
+        }
+        else if (this._importSubscription.closed && this._readIsCompleted) {
+            this.status.finished = true;
+            this.status.inProgress = false;
+        }
+    }
+
+    bulkImport(pendingItems: Array<any>): Observable<any> {
+        let sources = _.chunk(pendingItems, this.bulkSize).map<Observable<any>>(pendingChunk => {
+            return Observable.create((observer: Observer<any>) => {
+                if (this.tagImport) {
+                    pendingItems.forEach(data => {
+                        try {
+                            if (data['ParentId'] && data['ParentId'].toString().toLowerCase() === 'null') {
+                                data['ParentId'] = null;
+                            }
+                        } catch (error) {
+                            console.log(data['Id']);
+                        }
+                    });
+                    this._tagService.bulkImport(this.selectedDataset.Name, pendingChunk)
+                        .finally(() => observer.complete())
+                        .subscribe(
+                        (bulkResults: IBulkResults) => observer.next(bulkResults),
+                        error => observer.error(error));
+                }
+                else {
+                    this._documentService.bulkImport(this.selectedDataset.Name, pendingChunk)
+                        .finally(() => observer.complete())
+                        .subscribe(
+                        (bulkResults: IBulkResults) => observer.next(bulkResults),
+                        error => observer.error(error));
+                }
+            });
+        });
+        let source = Observable.concat(...sources);
+        return source;
     }
 
     addBulkErrors(results: IBulkResult[]) {

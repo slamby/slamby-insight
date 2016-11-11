@@ -8,6 +8,7 @@ import { DatasetService } from '../common/services/dataset.service';
 import { TagService } from '../common/services/tag.service';
 import { DocumentService } from '../common/services/document.service';
 import { NotificationService } from '../common/services/notification.service';
+import { OptionService } from '../common/services/option.service';
 
 import { MaterialModule } from '@angular/material';
 import { CommonComponentsModule } from '../common/components/common-components.module';
@@ -21,7 +22,8 @@ import { CommonComponentsModule } from '../common/components/common-components.m
         DatasetService,
         DocumentService,
         TagService,
-        NotificationService
+        NotificationService,
+        OptionService
     ],
     imports: [
         CommonComponentsModule,

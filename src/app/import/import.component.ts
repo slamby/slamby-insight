@@ -82,6 +82,9 @@ export class ImportComponent implements AfterContentInit {
         if (this._actionSubscription) {
             this._actionSubscription.unsubscribe();
         }
+        if (this._importSubscription) {
+            this._importSubscription.unsubscribe();
+        }
         if (this._reader) {
             this._reader.abort();
         }

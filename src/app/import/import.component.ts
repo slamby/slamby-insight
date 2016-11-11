@@ -188,20 +188,22 @@ export class ImportComponent implements AfterContentInit {
                             delete d.__parsed_extra;
                             return d;
                         });
-                        if (this.selectedDataset.SampleDocument) {
-                            if (_.isArray(this.selectedDataset.SampleDocument[this.selectedDataset.TagField])) {
-                                filteredData = filteredData.map(d => {
-                                    d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
-                                    return d;
-                                });
+                        if (!this.tagImport) {
+                            if (this.selectedDataset.SampleDocument) {
+                                if (_.isArray(this.selectedDataset.SampleDocument[this.selectedDataset.TagField])) {
+                                    filteredData = filteredData.map(d => {
+                                        d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
+                                        return d;
+                                    });
+                                }
                             }
-                        }
-                        else {
-                            if (this.selectedDataset.Schema["properties"][this.selectedDataset.TagField]["type"] == "array") {
-                                filteredData = filteredData.map(d => {
-                                    d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
-                                    return d;
-                                });
+                            else {
+                                if (this.selectedDataset.Schema["properties"][this.selectedDataset.TagField]["type"] == "array") {
+                                    filteredData = filteredData.map(d => {
+                                        d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
+                                        return d;
+                                    });
+                                }
                             }
                         }
                         filteredData.splice(...errorRows);

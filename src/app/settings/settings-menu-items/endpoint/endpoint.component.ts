@@ -62,7 +62,7 @@ export class EndpointComponent implements AfterContentInit {
 
         IpcHelper.setEndpoints(this.endpoints);
         if (reload) {
-            this.select(this.selectedEndpoint);
+            this.select(this.endpoints.find(e=>e.Id == this.pendingEndpoint.Id));
         }
 
         this.cancelEdit();

@@ -95,6 +95,7 @@ export class ImportComponent implements AfterContentInit {
 
     import(): void {
         this._isCancelled = false;
+        this._readIsCompleted = false;
         this.status = new ImportStatus();
         this.status.inProgress = true;
         this.status.finished = false;
@@ -183,7 +184,7 @@ export class ImportComponent implements AfterContentInit {
                                 }
                             });
                         }
-                        let filteredData = results.data.map(d=>{
+                        let filteredData = results.data.map(d => {
                             delete d.__parsed_extra;
                             return d;
                         });
@@ -210,7 +211,6 @@ export class ImportComponent implements AfterContentInit {
                                 let length = _.chunk(pendingItems, this.bulkSize).length;
                                 this._importSubscription = this.bulkImport(pendingItems)
                                     .finally(() => {
-                                        pendingItems = [];
                                         this.complete();
                                         if (!this._readIsCompleted) {
                                             parser.resume();
@@ -232,9 +232,10 @@ export class ImportComponent implements AfterContentInit {
                                         this.status.percent = Math.ceil((done / total) * 100);
                                         observer.next(this.status.percent);
                                     });
+                                pendingItems = [];
                             }
                             else {
-                                if (!this._readIsCompleted) {
+                                if (!this._readIsCompleted && (done + chunkSize) < total) {
                                     parser.resume();
                                 }
                             }
@@ -248,6 +249,30 @@ export class ImportComponent implements AfterContentInit {
                 },
                 complete: (result) => {
                     this._readIsCompleted = true;
+                    if (pendingItems.length) {
+                        let length = _.chunk(pendingItems, this.bulkSize).length;
+                        this._importSubscription = this.bulkImport(pendingItems)
+                            .finally(() => {
+                                this.complete();
+                            })
+                            .subscribe(
+                            (bulkResults: IBulkResults) => {
+                                this.addBulkErrors(bulkResults.Results);
+                                done += total < chunkSize ? total / length : chunkSize / length;
+                                done = done > total ? total : done;
+                                this.status.percent = Math.ceil((done / total) * 100);
+                                observer.next(this.status.percent);
+                            },
+                            error => {
+                                let errorsModel = ErrorsModelHelper.getFromResponse(error);
+                                this.status.errorMessages = this.status.errorMessages.concat(errorsModel.Errors);
+                                done += total < chunkSize ? total / length : chunkSize / length;
+                                done = done > total ? total : done;
+                                this.status.percent = Math.ceil((done / total) * 100);
+                                observer.next(this.status.percent);
+                            });
+                        pendingItems = [];
+                    }
                 },
                 error: (error) => {
                     this.status.errorMessages = error;

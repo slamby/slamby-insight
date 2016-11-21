@@ -18,19 +18,16 @@ export class FilterPipe implements PipeTransform {
     customizer(objValue: any, srcValue: any) {
         if (_.isString(objValue)) {
             return objValue.toLowerCase().indexOf(srcValue) > -1;
-        }
-        else if (_.isNumber(objValue)) {
+        } else if (_.isNumber(objValue)) {
             let parsedValue = objValue.toString();
             return parsedValue.toLowerCase().indexOf(srcValue) > -1;
-        }
-        else if (_.isBoolean(objValue)) {
+        } else if (_.isBoolean(objValue)) {
             let parsedValue = JSON.parse(srcValue);
             if (parsedValue == null) {
                 return true;
             }
             return objValue === parsedValue;
-        }
-        else if (_.isArray<ITag>(objValue)) {
+        } else if (_.isArray<ITag>(objValue)) {
             let joinedPath = _.join((<Array<ITag>>objValue).map(t => t.Name), ' > ');
             return joinedPath.toLowerCase().indexOf(srcValue) > -1;
         }

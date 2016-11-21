@@ -109,7 +109,7 @@ export class DatasetsComponent implements OnInit, AfterContentInit {
                 if (model.Result === DialogResult.Ok) {
                     let dataSetToSave = _.cloneDeep(model.dataSet);
                     if (model.IsNew) {
-                        dataSetToSave.InterpretedFields = dataSetToSave.InterpretedFields.toString().split(',').map(f=>f.trim());
+                        dataSetToSave.InterpretedFields = dataSetToSave.InterpretedFields.toString().split(',').map(f => f.trim());
                         if (model.sampleDocumentChecked) {
                             dataSetToSave.SampleDocument = JSON.parse(model.dataSet.SampleDocument);
                             dataSetToSave.Schema = null;

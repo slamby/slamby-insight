@@ -173,8 +173,7 @@ export class ImportComponent implements AfterContentInit {
                     parser.pause();
                     if (this._isCancelled) {
                         parser.abort();
-                    }
-                    else {
+                    } else {
                         let errorRows = [];
                         if (results.errors.length > 0) {
                             results.errors.forEach(e => {
@@ -196,9 +195,8 @@ export class ImportComponent implements AfterContentInit {
                                         return d;
                                     });
                                 }
-                            }
-                            else {
-                                if (this.selectedDataset.Schema["properties"][this.selectedDataset.TagField]["type"] == "array") {
+                            } else {
+                                if (this.selectedDataset.Schema['properties'][this.selectedDataset.TagField]['type'] === 'array') {
                                     filteredData = filteredData.map(d => {
                                         d[this.selectedDataset.TagField] = [d[this.selectedDataset.TagField]];
                                         return d;
@@ -235,14 +233,12 @@ export class ImportComponent implements AfterContentInit {
                                         observer.next(this.status.percent);
                                     });
                                 pendingItems = [];
-                            }
-                            else {
+                            } else {
                                 if (!this._readIsCompleted && (done + chunkSize) < total) {
                                     parser.resume();
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             if (!this._readIsCompleted) {
                                 parser.resume();
                             }
@@ -291,8 +287,7 @@ export class ImportComponent implements AfterContentInit {
             this.status.percent = 100;
             this.status.inProgress = false;
             this.status.finished = true;
-        }
-        else if (this._importSubscription.closed && this._readIsCompleted) {
+        } else if (this._importSubscription.closed && this._readIsCompleted) {
             this.status.finished = true;
             this.status.inProgress = false;
         }
@@ -316,8 +311,7 @@ export class ImportComponent implements AfterContentInit {
                         .subscribe(
                         (bulkResults: IBulkResults) => observer.next(bulkResults),
                         error => observer.error(error));
-                }
-                else {
+                } else {
                     this._documentService.bulkImport(this.selectedDataset.Name, pendingChunk)
                         .finally(() => observer.complete())
                         .subscribe(

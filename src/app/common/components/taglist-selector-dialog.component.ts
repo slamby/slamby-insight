@@ -27,7 +27,7 @@ export class TagListSelectorDialogComponent {
 
     open(): NgbModalRef {
         if (!this.isMultiselectAllowed && this.selectedTagIds && this.tags) {
-            this.selectedItem = this.tags.find(t => t.Id == this.selectedTagIds[0]);
+            this.selectedItem = this.tags.find(t => t.Id === this.selectedTagIds[0]);
         }
         return this.modal.open(this.template, this.modalOptions);
     }
@@ -35,7 +35,7 @@ export class TagListSelectorDialogComponent {
     selectionChanged(selectedTagIds: string[]) {
         this.selectedTagIds = selectedTagIds.slice();
         if (this.selectedTagIds && this.tags) {
-            this.selectedItem = this.tags.find(t => t.Id == this.selectedTagIds[0]);
+            this.selectedItem = this.tags.find(t => t.Id === this.selectedTagIds[0]);
         }
     }
 }

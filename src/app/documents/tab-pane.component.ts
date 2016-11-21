@@ -29,7 +29,7 @@ const naturalSort = require('node-natural-sort');
     templateUrl: 'tab-pane.component.html'
 })
 export class TabPaneComponent implements OnInit {
-    private _tags: Array<SelectedItem<ITag>> = []
+    private _tags: Array<SelectedItem<ITag>> = [];
     get tags() {
         return this._tags;
     }

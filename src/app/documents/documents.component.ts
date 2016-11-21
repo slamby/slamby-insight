@@ -23,8 +23,6 @@ import { IDocumentFilterSettings, IDataSet, ITag, IDocumentSampleSettings } from
 import { Observable, Observer } from 'rxjs';
 
 import { CommonInputDialogComponent } from '../common/components/common-input.dialog.component';
-
-
 import { DocumentEditorDialogComponent } from './document-editor.dialog.component';
 
 import { NotificationService } from '../common/services/notification.service';
@@ -32,13 +30,11 @@ import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 
 import { CommonHelper } from '../common/helpers/common.helper';
 
-
-import { GridOptions, RowNode, Grid, ColDef, IDatasource, IGetRowsParams } from 'ag-grid/main';
+import { GridOptions, ColDef } from 'ag-grid/main';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { DocDropdownCellComponent } from './doc-dropdown-cell.component';
 
 import * as _ from 'lodash';
-const naturalSort = require('node-natural-sort');
 
 @Component({
     template: require('./documents.component.html'),
@@ -596,7 +592,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 error => this.errorMessage = <any>error
             );
         });
-        this.datasetSelector.model=null;
+        this.datasetSelector.model = null;
         this.datasetSelector.showProgress = true;
         this.datasetSelector.open();
     }
@@ -663,7 +659,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
                 error => this.errorMessage = <any>error
             );
         });
-        this.datasetSelector.model=null;
+        this.datasetSelector.model = null;
         this.datasetSelector.showProgress = true;
         this.datasetSelector.open();
     }

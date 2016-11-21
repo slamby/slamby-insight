@@ -19,7 +19,7 @@ export class DatasetSelectorDialogComponent {
         size: 'lg',
         windowClass: 'md-dialog'
     };
-    
+
     private dialogOpenedEventSource = new Subject();
     dialogOpened = this.dialogOpenedEventSource.asObservable();
 

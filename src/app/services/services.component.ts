@@ -117,7 +117,7 @@ export class ServicesComponent implements OnInit {
         let inputModel: CommonInputModel = {
             Header: type === IService.ITypeEnum.Classifier ? 'Add New Classifier Service' : 'Add New Prc Service',
             Model: defaultModel,
-            Type: "new"
+            Type: 'new'
         };
         this.sm.model = inputModel;
         this.sm.open();
@@ -264,7 +264,9 @@ export class ServicesComponent implements OnInit {
                             NGramList: _.range(1, model.Model.SelectedNgram + 1),
                             TagIdList: model.Model.SelectedTagList.slice(),
                             CompressLevel: model.Model.CompressLevel,
-                            CompressSettings: model.Model.CompressSettingsJson.replace(" ", "").replace("\n", "") == "{}" ? null : JSON.parse(model.Model.CompressSettingsJson)
+                            CompressSettings: model.Model.CompressSettingsJson
+                                .replace(' ', '')
+                                .replace('\n', '') === '{}' ? null : JSON.parse(model.Model.CompressSettingsJson)
                         };
                         this._classifierService.prepare(selected.Id, prepareSettings).subscribe(
                             (process: IProcess) => {
@@ -289,7 +291,9 @@ export class ServicesComponent implements OnInit {
                         DataSetName: model.Model.SelectedDataset.Name,
                         TagIdList: model.Model.SelectedTagList.slice(),
                         CompressLevel: model.Model.CompressLevel,
-                        CompressSettings: model.Model.CompressSettingsJson.replace(" ", "").replace("\n", "") == "{}" ? null : JSON.parse(model.Model.CompressSettingsJson)
+                        CompressSettings: model.Model.CompressSettingsJson
+                            .replace(' ', '')
+                            .replace('\n', '') === '{}' ? null : JSON.parse(model.Model.CompressSettingsJson)
                     };
                     if (model.Result === DialogResult.Ok) {
                         this._prcService.prepare(selected.Id, prepareSettings).subscribe(
@@ -321,7 +325,7 @@ export class ServicesComponent implements OnInit {
                         this.handleError(error);
                         this.sm.showProgress = false;
                     }
-                )
+                );
             }
         );
         let model = {
@@ -332,13 +336,13 @@ export class ServicesComponent implements OnInit {
             SelectedTagList: [],
             TagList: [],
             CompressLevel: 0,
-            CompressSettingsJson: "{}",
+            CompressSettingsJson: '{}',
             Type: selected.Type
         };
         this.inputModel = {
             Header: selected.Type + ' Prepare Settings',
             Model: model,
-            Type: "prepare"
+            Type: 'prepare'
         };
         this.sm.model = this.inputModel;
         this.sm.open();
@@ -372,7 +376,7 @@ export class ServicesComponent implements OnInit {
         );
     }
 
-    selectTags(isEmphasize: boolean = false) {
+    selectTags(isEmphasize = false) {
         if (!isEmphasize) {
             this.tagListSelectorDialog.tags = this.inputModel.Model.TagList;
             this.tagListSelectorDialog.selectedTagIds = this.inputModel.Model.SelectedTagList.slice();
@@ -382,8 +386,7 @@ export class ServicesComponent implements OnInit {
                 }
             }, (reason) => {
             });
-        }
-        else {
+        } else {
             this.tagListSelectorDialog.tags = this.inputModel.Model.TagList;
             this.tagListSelectorDialog.selectedTagIds = this.inputModel.Model.SelectedEmphasizedTagList.slice();
             this.tagListSelectorDialog.open().result.then((result) => {
@@ -413,9 +416,9 @@ export class ServicesComponent implements OnInit {
         if (!selected) {
             return;
         }
-        let model;
+        let dialogModel;
         if (selected.Type === IService.ITypeEnum.Classifier) {
-            model = {
+            dialogModel = {
                 SelectedNgram: _.max((<IClassifierService>selected).PrepareSettings.NGramList),
                 Ngrams: (<IClassifierService>selected).PrepareSettings.NGramList,
                 SelectedTagList: [],
@@ -451,7 +454,9 @@ export class ServicesComponent implements OnInit {
                     this.sm.showProgress = true;
                     this._tagService.getTags((<IClassifierService>selected).PrepareSettings.DataSetName, true).subscribe(
                         (tags: Array<ITag>) => {
-                            var tagsForService = (<IClassifierService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t => t != undefined);
+                            let tagsForService = (<IClassifierService>selected).PrepareSettings.TagIdList
+                                .map(tid => tags.find(t => t.Id === tid))
+                                .filter(t => t !== undefined);
                             this.inputModel.Model.TagList = tagsForService;
                             this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
                             this.inputModel.Model.SelectedEmphasizedTagList = [];
@@ -461,17 +466,15 @@ export class ServicesComponent implements OnInit {
                             this.handleError(error);
                             this.sm.showProgress = false;
                         }
-                    )
+                    );
                 }
             );
 
-        }
-        else {
-            model = {
+        } else {
+            dialogModel = {
                 fields: [],
                 Type: selected.Type
-            }
-            let dataset = (<IPrcService>selected).PrepareSettings.DataSetName;
+            };
             this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
@@ -512,14 +515,14 @@ export class ServicesComponent implements OnInit {
                             this.handleError(error);
                             this.sm.showProgress = false;
                         }
-                    )
+                    );
                 }
             );
         }
         this.inputModel = {
             Header: selected.Type + ' Activate Settings',
-            Model: model,
-            Type: "activate"
+            Model: dialogModel,
+            Type: 'activate'
         };
         this.sm.model = this.inputModel;
         this.sm.open();
@@ -573,11 +576,18 @@ export class ServicesComponent implements OnInit {
         this.sm.dialogOpened.subscribe(
             () => {
                 this.sm.showProgress = true;
-                let dataset = selected.Type === IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.DataSetName : (<IPrcService>selected).PrepareSettings.DataSetName
+                let dataset = selected.Type === IService.ITypeEnum.Classifier
+                    ? (<IClassifierService>selected).PrepareSettings.DataSetName
+                    : (<IPrcService>selected).PrepareSettings.DataSetName;
                 this._tagService.getTags(dataset, true).subscribe(
                     (tags: Array<ITag>) => {
-                        var tagsForService = IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t => t != undefined) :
-                            (<IPrcService>selected).PrepareSettings.TagIdList.map(tid => tags.find(t => t.Id == tid)).filter(t => t != undefined);
+                        let tagsForService = IService.ITypeEnum.Classifier
+                            ? (<IClassifierService>selected).PrepareSettings.TagIdList
+                                .map(tid => tags.find(t => t.Id === tid))
+                                .filter(t => t !== undefined)
+                            : (<IPrcService>selected).PrepareSettings.TagIdList
+                                .map(tid => tags.find(t => t.Id === tid))
+                                .filter(t => t !== undefined);
                         this.inputModel.Model.TagList = tagsForService;
                         this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
                         this.inputModel.Model.SelectedEmphasizedTagList = [];
@@ -587,11 +597,13 @@ export class ServicesComponent implements OnInit {
                         this.handleError(error);
                         this.sm.showProgress = false;
                     }
-                )
+                );
             }
         );
         let model = {
-            SelectedNgram: selected.Type === IService.ITypeEnum.Classifier ? _.max((<IClassifierService>selected).PrepareSettings.NGramList) : 0,
+            SelectedNgram: selected.Type === IService.ITypeEnum.Classifier
+                ? _.max((<IClassifierService>selected).PrepareSettings.NGramList)
+                : 0,
             Ngrams: selected.Type === IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.NGramList : [],
             SelectedTagList: [],
             TagList: [],
@@ -600,7 +612,7 @@ export class ServicesComponent implements OnInit {
         this.inputModel = {
             Header: 'Export Dictionary Settings',
             Model: model,
-            Type: "export"
+            Type: 'export'
         };
         this.sm.model = this.inputModel;
         this.sm.open();
@@ -654,9 +666,9 @@ export class ServicesComponent implements OnInit {
         this.dialogService.progressModel = {
             Header: 'Waiting for recommendation result'
         };
-        let model;
+        let dialogModel;
         if (selected.Type === IService.ITypeEnum.Classifier) {
-            model = {
+            dialogModel = {
                 Text: '',
                 Count: 3,
                 NeedTagInResult: true,
@@ -695,13 +707,13 @@ export class ServicesComponent implements OnInit {
             );
 
         } else {
-            model = {
+            dialogModel = {
                 Text: '',
                 Count: 3,
                 Filter: '',
                 NeedDocumentInResult: false,
                 TagId: '',
-                Weightsjson: "[]",
+                Weightsjson: '[]',
                 Type: selected.Type
             };
             this.sm.dialogClosed.subscribe(
@@ -713,7 +725,9 @@ export class ServicesComponent implements OnInit {
                             Filter: model.Model.Filter,
                             NeedDocumentInResult: model.Model.NeedDocumentInResult,
                             TagId: model.Model.TagId,
-                            Weights: model.Model.Weightsjson.replace(" ", "").replace("\n", "") == "[]" ? null : JSON.parse(model.Model.Weightsjson)
+                            Weights: model.Model.Weightsjson
+                                .replace(' ', '')
+                                .replace('\n', '') === '[]' ? null : JSON.parse(model.Model.Weightsjson)
                         };
                         this._prcService.recommend(selected.Id, settings).subscribe(
                             (results: Array<IPrcRecommendationResult>) => {
@@ -739,8 +753,8 @@ export class ServicesComponent implements OnInit {
         }
         this.inputModel = {
             Header: selected.Type + ' Recommenation Request',
-            Model: model,
-            Type: "recommend"
+            Model: dialogModel,
+            Type: 'recommend'
         };
         this.sm.model = this.inputModel;
         this.sm.open();
@@ -772,12 +786,12 @@ export class ServicesComponent implements OnInit {
             }
         );
         let model = {
-            Filter: ""
+            Filter: ''
         };
         this.inputModel = {
             Header: 'Prc Index Settings',
             Model: model,
-            Type: "index"
+            Type: 'index'
         };
         this.sm.model = this.inputModel;
         this.sm.open();
@@ -812,7 +826,9 @@ export class ServicesComponent implements OnInit {
                         Query: model.Model.Query,
                         NeedDocumentInResult: model.Model.NeedDocumentInResult,
                         TagId: model.Model.TagId,
-                        Weights: model.Model.Weightsjson.replace(" ", "").replace("\n", "") == "[]" ? null : JSON.parse(model.Model.Weightsjson)
+                        Weights: model.Model.Weightsjson
+                            .replace(' ', '')
+                            .replace('\n', '') === '[]' ? null : JSON.parse(model.Model.Weightsjson)
                     };
                     this._prcService.recommendById(selected.Id, settings).subscribe(
                         (results: Array<IPrcRecommendationResult>) => {
@@ -847,7 +863,7 @@ export class ServicesComponent implements OnInit {
         this.inputModel = {
             Header: 'Prc RecommenationById Request',
             Model: model,
-            Type: "recommendById"
+            Type: 'recommendById'
         };
         this.sm.model = this.inputModel;
         this.sm.open();
@@ -856,7 +872,7 @@ export class ServicesComponent implements OnInit {
     handleError(response: Response): string {
         let model = ErrorsModelHelper.getFromResponse(response);
         let errors = ErrorsModelHelper.concatErrors(model);
-        this._notificationService.error(`${errors}`, `DataSet error (${response.status})`);
+        this._notificationService.error(`${errors}`, `Service error (${response.status})`);
         return errors;
     }
 }

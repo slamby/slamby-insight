@@ -136,8 +136,10 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
 
     autoSizeAll() {
         let allColumnIds = [];
-        this.gridOptions.columnDefs.forEach((columnDef) => {
-            allColumnIds.push(columnDef.field);
+        this.gridOptions.columnDefs.forEach((columnDef: ColDef) => {
+            if (columnDef !== null) {
+                allColumnIds.push(columnDef.field);
+            }
         });
         this.gridOptions.columnApi.autoSizeColumns(allColumnIds);
     }

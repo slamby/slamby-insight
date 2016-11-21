@@ -219,16 +219,26 @@ export class ImportComponent implements AfterContentInit {
                                     .subscribe(
                                     (bulkResults: IBulkResults) => {
                                         this.addBulkErrors(bulkResults.Results);
-                                        done += total < chunkSize ? total / length : chunkSize / length;
-                                        done = done > total ? total : done;
+                                        if (!this.tagImport) {
+                                            done += total < chunkSize ? total / length : chunkSize / length;
+                                            done = done > total ? total : done;
+                                        }
+                                        else {
+                                            done = total;
+                                        }
                                         this.status.percent = Math.ceil((done / total) * 100);
                                         observer.next(this.status.percent);
                                     },
                                     error => {
                                         let errorsModel = ErrorsModelHelper.getFromResponse(error);
                                         this.status.errorMessages = this.status.errorMessages.concat(errorsModel.Errors);
-                                        done += total < chunkSize ? total / length : chunkSize / length;
-                                        done = done > total ? total : done;
+                                        if (!this.tagImport) {
+                                            done += total < chunkSize ? total / length : chunkSize / length;
+                                            done = done > total ? total : done;
+                                        }
+                                        else {
+                                            done = total;
+                                        }
                                         this.status.percent = Math.ceil((done / total) * 100);
                                         observer.next(this.status.percent);
                                     });
@@ -294,7 +304,7 @@ export class ImportComponent implements AfterContentInit {
     }
 
     bulkImport(pendingItems: Array<any>): Observable<any> {
-        let sources = _.chunk(pendingItems, this.bulkSize).map<Observable<any>>(pendingChunk => {
+        let sources = _.chunk(pendingItems, this.tagImport ? pendingItems.length : this.bulkSize).map<Observable<any>>(pendingChunk => {
             return Observable.create((observer: Observer<any>) => {
                 if (this.tagImport) {
                     pendingItems.forEach(data => {

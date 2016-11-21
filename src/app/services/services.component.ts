@@ -768,7 +768,10 @@ export class ServicesComponent implements OnInit {
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
                     let settings: IPrcIndexSettings = {
-                        Filter: model.Model.Filter
+                        Filter: {
+                            Query: model.Model.Query,
+                            TagIdList: model.Model.SelectedTagList.slice()
+                        }
                     };
                     this._prcService.index(selected.Id, settings).subscribe(
                         (process: IProcess) => {
@@ -785,8 +788,29 @@ export class ServicesComponent implements OnInit {
                 }
             }
         );
+        this.sm.dialogOpened.subscribe(
+                () => {
+                    this.sm.showProgress = true;
+                    this._tagService.getTags((<IPrcService>selected).PrepareSettings.DataSetName, true).subscribe(
+                        (tags: Array<ITag>) => {
+                            let tagsForService = (<IClassifierService>selected).PrepareSettings.TagIdList
+                                .map(tid => tags.find(t => t.Id === tid))
+                                .filter(t => t !== undefined);
+                            this.inputModel.Model.TagList = tagsForService;
+                            this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
+                            this.sm.showProgress = false;
+                        },
+                        error => {
+                            this.handleError(error);
+                            this.sm.showProgress = false;
+                        }
+                    );
+                }
+            );
         let model = {
-            Filter: ''
+            Query: '',
+            TagList: [],
+            SelectedTagList: []
         };
         this.inputModel = {
             Header: 'Prc Index Settings',

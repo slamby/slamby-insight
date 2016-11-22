@@ -33,6 +33,9 @@ import { Observable, Observer } from 'rxjs';
 
 import { ServiceMaintenanceDialogComponent } from './service-maintenance.dialog.component';
 import * as _ from 'lodash';
+
+type ServiceType = IService | IPrcService | IClassifierService;
+
 @Component({
     template: require('./services.component.html'),
     styles: [require('./services.component.scss')]
@@ -51,7 +54,7 @@ export class ServicesComponent implements OnInit {
     serviceType = IService.ITypeEnum;
     serviceStatus = IService.IStatusEnum;
 
-    services: Array<IService | IPrcService | IClassifierService> = [];
+    services: Array<ServiceType> = [];
     inputModel: CommonInputModel;
 
     constructor(private _servicesService: ServicesService,
@@ -68,7 +71,7 @@ export class ServicesComponent implements OnInit {
         this.refresh();
     }
 
-    details(selected: IService | IPrcService | IClassifierService) {
+    details(selected: ServiceType) {
         let detailsObject = {};
         Object.keys(selected).forEach(prop => {
             detailsObject[prop] = selected[prop];
@@ -82,7 +85,7 @@ export class ServicesComponent implements OnInit {
     }
 
 
-    deleteConfirm(selected: IService | IPrcService | IClassifierService) {
+    deleteConfirm(selected: ServiceType) {
         let model: ConfirmModel = {
             Header: 'Delete service',
             Message: 'Are you sure to remove the following service: ' + selected.Name,
@@ -100,7 +103,7 @@ export class ServicesComponent implements OnInit {
         this.confirmDialog.open();
     }
 
-    delete(selected: IService | IPrcService | IClassifierService) {
+    delete(selected: ServiceType) {
         this._servicesService
             .deleteService(selected.Id)
             .subscribe(
@@ -142,7 +145,7 @@ export class ServicesComponent implements OnInit {
         );
     }
 
-    refresh(selected?: IService | IPrcService | IClassifierService) {
+    refresh(selected?: ServiceType) {
         if (selected) {
             if (selected.Type === IService.ITypeEnum.Classifier) {
                 this._classifierService.get(selected.Id).subscribe(
@@ -180,37 +183,42 @@ export class ServicesComponent implements OnInit {
                     };
                     this.dialogService.progressModel = dialogModel;
                     this.dialogService.openDialog('progress');
-                    let sources = services.map<Observable<IPrcService | IClassifierService | IService>>(s => {
-                        return Observable.create((observer: Observer<IPrcService | IClassifierService | IService>) => {
+
+                    // let sources = services.map<Observable<ServiceType>>(s => {
+                    //     return Observable.create((observer: Observer<ServiceType>) => {
+                    //         if (s.Type === IService.ITypeEnum.Classifier) {
+                    //             this._classifierService.get(s.Id).subscribe(
+                    //                 (classifierService: IClassifierService) => {
+                    //                     observer.next(classifierService);
+                    //                     observer.complete();
+                    //                 },
+                    //                 error => observer.error(error)
+                    //             );
+                    //         } else {
+                    //             this._prcService.get(s.Id).subscribe(
+                    //                 (prcService: IPrcService) => {
+                    //                     observer.next(prcService);
+                    //                     observer.complete();
+                    //                 },
+                    //                 error => observer.error(error)
+                    //             );
+                    //         }
+                    //     });
+                    // });
+                    // let source = Observable.concat(...sources);
+
+                    // convert IService to async Observable .get() calls
+                    let source = Observable.from(services)
+                        .flatMap((s: IService, i: number) => {
                             if (s.Type === IService.ITypeEnum.Classifier) {
-                                this._classifierService.get(s.Id).subscribe(
-                                    (classifierService: IClassifierService) => {
-                                        observer.next(classifierService);
-                                        observer.complete();
-                                    },
-                                    error => {
-                                        observer.error(error);
-                                        observer.complete();
-                                    }
-                                );
+                                return <Observable<ServiceType>>this._classifierService.get(s.Id);
                             } else {
-                                this._prcService.get(s.Id).subscribe(
-                                    (prcService: IPrcService) => {
-                                        observer.next(prcService);
-                                        observer.complete();
-                                    },
-                                    error => {
-                                        observer.error(error);
-                                        observer.complete();
-                                    }
-                                );
+                                return <Observable<ServiceType>>this._prcService.get(s.Id);
                             }
                         });
-                    });
-                    let source = Observable.concat(...sources);
 
                     source.subscribe(
-                        (s: IPrcService | IClassifierService | IService) => {
+                        (s: ServiceType) => {
                             this.services = this.services = _.concat(this.services, [s]);
                             dialogModel.Done += 1;
                             dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
@@ -250,7 +258,7 @@ export class ServicesComponent implements OnInit {
         );
     }
 
-    prepare(selected: IService | IPrcService | IClassifierService) {
+    prepare(selected: ServiceType) {
         if (!selected) {
             return;
         }
@@ -348,7 +356,7 @@ export class ServicesComponent implements OnInit {
         this.sm.open();
     }
 
-    cancelConfirm(selected: IService | IPrcService | IClassifierService) {
+    cancelConfirm(selected: ServiceType) {
         let model: ConfirmModel = {
             Header: 'Cancel',
             Message: 'Are you sure to cancel the current process of ' + selected.Name + ' service',
@@ -366,7 +374,7 @@ export class ServicesComponent implements OnInit {
         this.confirmDialog.open();
     }
 
-    cancel(selected: IService | IPrcService | IClassifierService) {
+    cancel(selected: ServiceType) {
         if (!selected || !selected.ActualProcessId) {
             return;
         }
@@ -412,7 +420,7 @@ export class ServicesComponent implements OnInit {
         return selectedCount;
     }
 
-    activate(selected: IService | IPrcService | IClassifierService) {
+    activate(selected: ServiceType) {
         if (!selected) {
             return;
         }
@@ -528,7 +536,7 @@ export class ServicesComponent implements OnInit {
         this.sm.open();
     }
 
-    export(selected: IService | IPrcService | IClassifierService) {
+    export(selected: ServiceType) {
         if (!selected) {
             return;
         }
@@ -618,7 +626,7 @@ export class ServicesComponent implements OnInit {
         this.sm.open();
     }
 
-    deactivateConfirm(selected: IService | IPrcService | IClassifierService) {
+    deactivateConfirm(selected: ServiceType) {
         let model: ConfirmModel = {
             Header: 'Deactivate service',
             Message: 'Are you sure to deactivate the following service: ' + selected.Name,
@@ -636,7 +644,7 @@ export class ServicesComponent implements OnInit {
         this.confirmDialog.open();
     }
 
-    deactivate(selected: IService | IPrcService | IClassifierService) {
+    deactivate(selected: ServiceType) {
         if (!selected) {
             return;
         }
@@ -659,7 +667,7 @@ export class ServicesComponent implements OnInit {
         this.inputModel.Model[property] = !this.inputModel.Model[property];
     }
 
-    recommend(selected: IService | IPrcService | IClassifierService) {
+    recommend(selected: ServiceType) {
         if (!selected) {
             return;
         }
@@ -760,7 +768,7 @@ export class ServicesComponent implements OnInit {
         this.sm.open();
     }
 
-    index(selected: IService | IPrcService | IClassifierService) {
+    index(selected: ServiceType) {
         if (!selected || selected.Type === IService.ITypeEnum.Classifier) {
             return;
         }
@@ -821,7 +829,7 @@ export class ServicesComponent implements OnInit {
         this.sm.open();
     }
 
-    partialIndex(selected: IService | IPrcService | IClassifierService) {
+    partialIndex(selected: ServiceType) {
         if (!selected || selected.Type === IService.ITypeEnum.Classifier) {
             return;
         }
@@ -834,7 +842,7 @@ export class ServicesComponent implements OnInit {
         );
     }
 
-    recommendById(selected: IService | IPrcService | IClassifierService) {
+    recommendById(selected: ServiceType) {
         if (!selected || selected.Type === IService.ITypeEnum.Classifier) {
             return;
         }

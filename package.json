@@ -55,7 +55,7 @@
     "@angular/platform-browser": "^2.2.1",
     "@angular/platform-browser-dynamic": "^2.2.1",
     "@angular/router": "^3.2.1",
-    "@ng-bootstrap/ng-bootstrap": "1.0.0-alpha.13",
+    "@ng-bootstrap/ng-bootstrap": "1.0.0-alpha.10",
     "ag-grid": "6.4.2",
     "ag-grid-ng2": "6.4.0",
     "angular2-prettyjson": "^1.0.5",

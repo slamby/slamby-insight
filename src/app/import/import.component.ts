@@ -222,8 +222,7 @@ export class ImportComponent implements AfterContentInit {
                                         if (!this.tagImport) {
                                             done += total < chunkSize ? total / length : chunkSize / length;
                                             done = done > total ? total : done;
-                                        }
-                                        else {
+                                        } else {
                                             done = total;
                                         }
                                         this.status.percent = Math.ceil((done / total) * 100);
@@ -235,8 +234,7 @@ export class ImportComponent implements AfterContentInit {
                                         if (!this.tagImport) {
                                             done += total < chunkSize ? total / length : chunkSize / length;
                                             done = done > total ? total : done;
-                                        }
-                                        else {
+                                        } else {
                                             done = total;
                                         }
                                         this.status.percent = Math.ceil((done / total) * 100);

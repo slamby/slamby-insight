@@ -1,4 +1,5 @@
 <div>
+	<sl-change-secret-dialog></sl-change-secret-dialog>
 	<div *ngIf="!endpointMaintenanceIsInProgress">
 		<button type="button" class="btn  btn-outline-primary" (click)="add()" *ngIf="!endpointMaintenanceIsInProgress">Add New Endpoint</button>
 		<table class="table table-striped">
@@ -56,6 +57,9 @@
 									<li *ngIf="canDelete(currentEndpoint)">
 										<a (click)="delete(currentEndpoint)">Delete</a>
 									</li>
+									<li *ngIf="canModifySecret(currentEndpoint)">
+										<a (click)="modifySecret(currentEndpoint)">Modify secret</a>
+									</li>
 								</ul>
 							</div>
 						</div>
@@ -79,7 +83,7 @@
 					</div>
 				</div>
 				<div class="form-group" [class.has-error]="secret.errors && secret.touched">
-					<label class="col-sm-2 control-label">Show Secret</label>
+					<label class="col-sm-2 control-label">Secret</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" [(ngModel)]="pendingEndpoint.ApiSecret" name="ApiSecret" required placeholder="API secret key" #secret="ngModel">
 						<div *ngIf="secret.errors && secret.touched">

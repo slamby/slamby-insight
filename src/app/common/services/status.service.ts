@@ -11,7 +11,7 @@ import { BaseService } from './base.service';
 export class StatusService extends BaseService<StatusApi> {
     constructor(private optionService: OptionService,  private _http: Http) {
         super(optionService.currentEndpoint ? new StatusApi(_http, optionService.currentEndpoint.ApiBaseEndpoint) : null,
-        optionService.currentEndpoint ? optionService.currentEndpoint : null);
+            optionService.currentEndpoint ? optionService.currentEndpoint : null);
     }
 
     getStatus(): Observable<IStatus> {

@@ -29,7 +29,7 @@ import { ConfirmModel } from '../models/confirm.model';
 
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
-import { Observable, Observer } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { ServiceMaintenanceDialogComponent } from './service-maintenance.dialog.component';
 import * as _ from 'lodash';

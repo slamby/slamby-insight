@@ -8,6 +8,9 @@ import { OptionService } from '../../../common/services/option.service';
 import { StatusService } from '../../../common/services/status.service';
 import { ErrorsModelHelper } from '../../../common/helpers/errorsmodel.helper';
 
+import { DialogResult } from '../../../models/dialog-result';
+import { ChangeSecretDialogComponent } from '../../../common/components/change-secret-dialog.component';
+
 import * as _ from 'lodash';
 
 @Component({
@@ -22,6 +25,8 @@ export class EndpointComponent implements AfterContentInit {
     @Input() showSelectAction: boolean = true;
     @Output() onEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
     @ViewChild('endpointElement') endpointElement: ElementRef;
+    @ViewChild(ChangeSecretDialogComponent) changeSecretDialog: ChangeSecretDialogComponent;
+
 
     endpointMaintenanceIsInProgress = false;
     endpoints: Array<Endpoint> = [];
@@ -30,10 +35,12 @@ export class EndpointComponent implements AfterContentInit {
     pendingEndpoint: Endpoint = this.getDefaultEndpoint();
     secretRevealed: Endpoint;
 
+    isCurrentEndpoint = (endpoint: Endpoint): boolean => this.equals(endpoint, this.selectedEndpoint);
     canSelect = (endpoint: Endpoint): boolean => this.showSelectAction &&
         !(this.endpointMaintenanceIsInProgress || this.equals(endpoint, this.selectedEndpoint));
     canEdit = (endpoint: Endpoint): boolean => !(this.endpointMaintenanceIsInProgress);
-    canDelete = (endpoint: Endpoint): boolean => !(this.endpointMaintenanceIsInProgress || this.equals(endpoint, this.selectedEndpoint));
+    canDelete = (endpoint: Endpoint): boolean => !(this.endpointMaintenanceIsInProgress || this.isCurrentEndpoint(endpoint));
+    canModifySecret = (endpoint: Endpoint): boolean => !this.endpointMaintenanceIsInProgress && this.isCurrentEndpoint(endpoint);
 
     constructor(private optionService: OptionService, private _statusService: StatusService,
         private renderer: Renderer) {
@@ -48,24 +55,27 @@ export class EndpointComponent implements AfterContentInit {
     }
 
     save() {
-        let reload = this.equals(this.pendingEndpoint, this.selectedEndpoint);
-        if (this.pendingEndpoint.ApiBaseEndpoint.endsWith('/')) {
-            this.pendingEndpoint.ApiBaseEndpoint = this.pendingEndpoint.ApiBaseEndpoint.slice(0, -1);
+        this.saveInternal(this.pendingEndpoint);
+        this.cancelEdit();
+    }
+
+    private saveInternal(endpoint: Endpoint) {
+        let reload = this.equals(endpoint, this.selectedEndpoint);
+        if (endpoint.ApiBaseEndpoint.endsWith('/')) {
+            endpoint.ApiBaseEndpoint = endpoint.ApiBaseEndpoint.slice(0, -1);
         }
-        if (this.pendingEndpoint.Id) {
-            let index = this.endpoints.indexOf(this.endpoints.find(e => e.Id === this.pendingEndpoint.Id));
-            this.endpoints[index] = this.pendingEndpoint;
+        if (endpoint.Id) {
+            let index = this.endpoints.indexOf(this.endpoints.find(e => e.Id === endpoint.Id));
+            this.endpoints[index] = endpoint;
         } else {
-            this.pendingEndpoint.Id = CommonHelper.guid();
-            this.endpoints.push(_.cloneDeep(this.pendingEndpoint));
+            endpoint.Id = CommonHelper.guid();
+            this.endpoints.push(_.cloneDeep(endpoint));
         }
 
         IpcHelper.setEndpoints(this.endpoints);
         if (reload) {
-            this.select(this.endpoints.find(e => e.Id === this.pendingEndpoint.Id));
+            this.select(this.endpoints.find(e => e.Id === endpoint.Id));
         }
-
-        this.cancelEdit();
     }
 
     select(endpoint: Endpoint) {
@@ -116,6 +126,17 @@ export class EndpointComponent implements AfterContentInit {
         } else {
             this.secretRevealed = endpoint;
         }
+    }
+
+    modifySecret(endpoint: Endpoint) {
+        this.changeSecretDialog.open()
+            .result.then((result) => {
+                if (result === DialogResult.Ok) {
+                    endpoint.ApiSecret = this.changeSecretDialog.newSecret;
+                    this.saveInternal(endpoint);
+                }
+            }, (reason) => {
+            });
     }
 
     equals(first: Endpoint, second: Endpoint): boolean {

@@ -8,6 +8,9 @@ export module ErrorsModelHelper {
             if (!response.ok && response.status === 0 && response.type === 3) {
                 return { Errors: ['Connection failed!'] };
             }
+            if (!response.ok && response.status === 401) {
+                return { Errors: [response.statusText] };
+            }
 
             model = JSON.parse((<any>response)._body);
         } catch (error) {

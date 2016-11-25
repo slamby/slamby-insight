@@ -1,0 +1,3 @@
+<label class="checkbox-inline" *ngFor="let option of options">
+    <input type="checkbox" value="{{option}}" [checked]="isSelected(option)" (change)="updateSelection(option, $event)" /> {{option}}
+</label>

@@ -5,6 +5,7 @@ import { OptionService } from './option.service';
 import { ToasterNotificationService } from './toaster.notification.service';
 import { NotificationService } from './notification.service';
 import { MaintenanceService } from './maintenance.service';
+import { LicenseService } from './license.service';
 
 export const SERVICE_PROVIDERS: any[] = [
     StatusService,
@@ -13,5 +14,6 @@ export const SERVICE_PROVIDERS: any[] = [
     ToasterNotificationService,
     NotificationService,
     OptionService,
-    MaintenanceService
+    MaintenanceService,
+    LicenseService
 ];

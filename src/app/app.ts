@@ -4,6 +4,7 @@ require('!style!css!animate.css/animate.min.css');
 require('!style!css!./../../bower_components/bootstrap-side-navbar/source/assets/stylesheets/navbar-fixed-side.css');
 require('!style!css!ng2-toastr/bundles/ng2-toastr.min.css');
 require('!style!css!ng2-toasty/style.css');
+require('!style!css!ng2-toasty/style-bootstrap.css');
 require('!style!css!ng2-slim-loading-bar/style.css');
 require('!style!css!@angular/material/core/theming/prebuilt/deeppurple-amber.css');
 require('!style!css!ag-grid/dist/styles/ag-grid.css');

@@ -18,12 +18,14 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonComponentsModule } from '../common/components/common-components.module';
 
 import { ServiceMaintenanceDialogComponent } from './service-maintenance.dialog.component';
+import { NGramSelectorComponent } from '../common/components/ngram-selector.component';
 
 
 @NgModule({
     declarations: [
         ServicesComponent,
-        ServiceMaintenanceDialogComponent
+        ServiceMaintenanceDialogComponent,
+        NGramSelectorComponent
     ],
     providers: [
         ServicesService,

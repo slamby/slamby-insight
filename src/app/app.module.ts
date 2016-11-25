@@ -26,7 +26,7 @@ import { APPERROR_HANDLER_PROVIDERS } from './common/services/apperror.handler';
 import { LogonModule } from './logon/logon.module';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { ToastModule } from 'ng2-toastr/ng2-toastr';
+import { ToastModule, ToastOptions } from 'ng2-toastr/ng2-toastr';
 
 import { MaterialModule } from '@angular/material';
 
@@ -64,7 +64,8 @@ import { CommonComponentsModule } from './common/components/common-components.mo
         FormsModule,
         HttpModule,
         NgbModule.forRoot(),
-        ToastModule,
+        // https://github.com/PointInside/ng2-toastr/issues/78
+        ToastModule.forRoot(<ToastOptions>{positionClass: 'toast-bottom-right', animate: 'flyRight'}),
         MaterialModule.forRoot(),
         SlimLoadingBarModule.forRoot(),
         ToastyModule.forRoot()

@@ -5,6 +5,7 @@ import { StatusService } from '../common/services/status.service';
 import { IStatus } from 'slamby-sdk-angular2';
 import { Observable } from 'rxjs/Observable';
 import { ISubscription } from 'rxjs/Subscription';
+import { OptionService } from '../common/services/option.service';
 
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
@@ -25,10 +26,13 @@ export class ResourcesComponent implements OnInit {
 
     private subscribe: ISubscription;
 
-    constructor(public _statusService: StatusService, private _notificationService: NotificationService) {
+    constructor(public statusService: StatusService,
+        private notificationService: NotificationService,
+        private optionService: OptionService) {
     }
 
     ngOnInit(): void {
+        this.statusService.setDefaultHeaders(this.optionService.currentEndpoint);
         this.subscribe = this.timer.subscribe(t => {
             this.getStatus();
         });
@@ -44,7 +48,7 @@ export class ResourcesComponent implements OnInit {
     }
 
     private getStatus() {
-        this._statusService.getStatus()
+        this.statusService.getStatus()
             .finally(() => this.lastUpdateTimeString = new Date().toLocaleTimeString())
             .subscribe(
             status => {

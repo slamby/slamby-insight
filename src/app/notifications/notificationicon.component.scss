@@ -32,19 +32,34 @@
             max-height: 350px;
             overflow-y: auto;
 
-            padding-left: 10px;
-            padding-right: 10px;
+            padding-left: 0px;
+            padding-right: 0px;
 
             li {
                 padding-top: 8px;
-                padding-left: 3px;
-                padding-right: 3px;
+                padding-left: 8px;
+                padding-right: 8px;
                 padding-bottom: 8px; 
                 color: #333;
+                border-left-style: solid;
+                border-left-width: 5px;
             }
 
-            li + li {
-                border-top: 1px #777 solid;
+            .notification-warning {
+                border-left-color: lighten(darkorange, 10%);
+            }
+            .notification-error {
+                border-left-color: lighten(red, 10%);
+            }
+            .notification-info {
+                border-left-color: lighten(deepskyblue, 10%);
+            }
+            .notification-success {
+                border-left-color: lighten(springgreen, 10%);
+            }
+
+            li:nth-of-type(2n+1){
+                background-color: #fafafa;
             }
         }
     } 

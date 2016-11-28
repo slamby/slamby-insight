@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild, ChangeDetectorRef, Injector, ViewContainerRef } from '@angular/core';
 
 import { Endpoint } from './models/endpoint';
 import { Globals } from './models/globals';
@@ -18,11 +18,16 @@ import { DialogResult } from './models/dialog-result';
 import { OptionService } from './common/services/option.service';
 import { Messenger } from './common/services/messenger.service';
 import { IpcHelper } from './common/helpers/ipc.helper';
+import { LicenseService } from './common/services/license.service';
 
 import { NotificationService } from './common/services/notification.service';
 import { SlimLoadingBarService } from 'ng2-slim-loading-bar';
 import { ToastyService } from 'ng2-toasty';
 import { TabsComponent } from './common/components/tabs.component';
+
+import { ToastsManager, ToastOptions } from 'ng2-toastr/ng2-toastr';
+
+import { ILicense } from 'slamby-sdk-angular2';
 
 const { ipcRenderer } = require('electron');
 
@@ -45,11 +50,16 @@ export class AppComponent implements OnInit {
     globals: Globals;
 
     constructor(private optionService: OptionService,
-        private _notificationService: NotificationService,
+        private notificationService: NotificationService,
         private slimLoadingBarService: SlimLoadingBarService,
         private toastyService: ToastyService,
         private messenger: Messenger,
-        private zone: NgZone, private cd: ChangeDetectorRef) {
+        private zone: NgZone,
+        private cd: ChangeDetectorRef,
+        private injector: Injector,
+        private toastr: ToastsManager, viewContainerRef: ViewContainerRef) {
+
+        this.toastr.setRootViewContainerRef(viewContainerRef);
 
         ipcRenderer.on('download-start', (event) => {
             this.zone.run(() => this.downloadStart());
@@ -65,7 +75,7 @@ export class AppComponent implements OnInit {
             if (method === 'update-downloaded') {
                 this.zone.run(() => this.updateInstallationQuestion(msg));
             } else {
-                this.zone.run(() => this._notificationService.info(msg));
+                this.zone.run(() => this.notificationService.info(msg));
             }
         });
         this.messenger.messageAvailable$.subscribe(
@@ -116,6 +126,45 @@ export class AppComponent implements OnInit {
 
     endpointSelected(endpoint: Endpoint) {
         this.optionService.currentEndpoint = endpoint;
+
+        // we have to get this service here since selected endpoint is a dependency of LicenseService
+        this.injector.get(LicenseService)
+            .getLicense()
+            .subscribe(
+            (license: ILicense) => {
+                if (license.Type === 'OpenSource') {
+                    let header = 'No commercial license';
+                    let text = `This Slamby API is activated under a free license for test purpose and opensourced projects. 
+                        For commercial license, please purchase a commercial license. 
+                        <b><a href="mailto:sales@slamby.com">sales@slamby.com</a></b>`;
+                    this.notificationService.warning(text, header);
+                    this.toastr.warning(`${text}`, header,
+                        <ToastOptions>{
+                            enableHTML: true,
+                            showCloseButton: true,
+                            dismiss: 'controlled'
+                        }
+                    );
+                } else if (license.IsValid === false) {
+                    let header = 'Your license is expired';
+                    let text = `You have no valid license.
+                        Your license has expired on this instance. Please request a valid license from our sales center. 
+                        When you have a new license, you can manage it under the settings menu.`;
+                    this.notificationService.error(text, header);
+                    this.toastr.error(text, header,
+                        <ToastOptions>{
+                            enableHTML: true,
+                            showCloseButton: true,
+                            dismiss: 'controlled'
+                        }
+                    );
+                }
+            },
+            (error) => {
+                if (error.status === 404) {
+                    // API server version prior 1.2.0
+                }
+            });
     }
 
     get selectedBaseUrl(): string {

@@ -48,15 +48,13 @@
 				</div>
 			</div>
 			<div class="form-group" *ngIf="sm.model.Model?.Type == serviceType.Classifier">
-				<label class="col-sm-2 control-label">NgramCount</label>
+				<label class="col-sm-2 control-label">NGram</label>
 				<div class="col-sm-10">
-					<select [(ngModel)]='smd.model.Model.SelectedNgram' name="name" class="form-control">
-						<option [ngValue]="n" *ngFor='let n of smd.model.Model.Ngrams'>{{n}}</option>
-					</select>
+					<sl-ngram-selector name="ngram" [options]="smd.model.Model.NGramList" [(ngModel)]="smd.model.Model.SelectedNGramList"></sl-ngram-selector>
 				</div>
 			</div>
 			<div class="form-group" [class.has-error]="tags.errors && tags.dirty">
-				<label for="tags" class="col-sm-2 control-label">TagIdList</label>
+				<label for="tags" class="col-sm-2 control-label">Tags</label>
 				<div class="col-sm-10">
 					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0 || smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
 					<input type="number" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedTagList.length" name="tags" #tags="ngModel"
@@ -69,7 +67,7 @@
 				</div>
 			</div>
 			<div class="form-group" [class.has-error]="compressLevel.errors && compressLevel.dirty">
-				<label for="compressLevel" class="col-sm-2 control-label">CompressLevel</label>
+				<label for="compressLevel" class="col-sm-2 control-label">Compress Level</label>
 				<div class="col-sm-10">
 					<input type="number" class="form-control" [(ngModel)]="smd.model.Model.CompressLevel" compressLevel="compressLevel" #compressLevel="ngModel"
 						autofocus>
@@ -91,16 +89,14 @@
 		<div *ngIf='smd.model?.Type == "activate"' activate>
 			<div *ngIf="sm.model.Model.Type == serviceType.Classifier">
 				<div class="form-group">
-					<label class="col-sm-2 control-label">NgramCount</label>
-					<div class="col-sm-10">
-						<select [(ngModel)]='smd.model.Model.SelectedNgram' name="name" class="form-control">
-						<option [ngValue]="n" *ngFor='let n of smd.model.Model.Ngrams'>{{n}}</option>
-					</select>
+					<label class="col-sm-3 control-label">NGram</label>
+					<div class="col-sm-9">
+						<sl-ngram-selector name="ngram" [options]="smd.model.Model.NGramList" [(ngModel)]="smd.model.Model.SelectedNGramList"></sl-ngram-selector>
 					</div>
 				</div>
 				<div class="form-group" [class.has-error]="tags.errors && tags.dirty">
-					<label for="tags" class="col-sm-2 control-label">TagIdList</label>
-					<div class="col-sm-10">
+					<label for="tags" class="col-sm-3 control-label">Tags</label>
+					<div class="col-sm-9">
 						<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
 						<input type="number" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedTagList.length" name="tags" #tags="ngModel"
 							[min]="1" />
@@ -112,8 +108,8 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="tags" class="col-sm-2 control-label">EmphasizedTagIdList</label>
-					<div class="col-sm-10">
+					<label for="tags" class="col-sm-3 control-label">Emphasized Tags</label>
+					<div class="col-sm-9">
 						<button type="button" class="btn btn-primary" (click)="selectTags(true)" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedEmphasizedTagList.length}})</button>
 					</div>
 				</div>
@@ -144,9 +140,7 @@
 			<div class="form-group" *ngIf="sm.model.Model.Type == serviceType.Classifier">
 				<label class="col-sm-2 control-label">NgramCount</label>
 				<div class="col-sm-10">
-					<select [(ngModel)]='smd.model.Model.SelectedNgram' name="name" class="form-control">
-						<option [ngValue]="n" *ngFor='let n of smd.model.Model.Ngrams'>{{n}}</option>
-					</select>
+					<sl-ngram-selector name="ngram" [options]="smd.model.Model.NGramList" [(ngModel)]="smd.model.Model.SelectedNGramList"></sl-ngram-selector>
 				</div>
 			</div>
 			<div class="form-group" [class.has-error]="tags.errors && tags.dirty">

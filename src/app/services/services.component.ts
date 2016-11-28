@@ -242,8 +242,8 @@ export class ServicesComponent implements OnInit {
 
     prepareDatasetChanged(dataset: any) {
         this.sm.showProgress = true;
-        this.inputModel.Model.Ngrams = _.range(1, dataset.NGramCount + 1);
-        this.inputModel.Model.SelectedNgram = dataset.NGramCount;
+        this.inputModel.Model.SelectedNGramList = _.range(1, dataset.NGramCount + 1);
+        this.inputModel.Model.NGramList = _.range(1, dataset.NGramCount + 1);
         this.inputModel.Model.SelectedTagList = [];
         this._tagService.getTags(dataset.Name, true).subscribe(
             (tags: Array<ITag>) => {
@@ -269,7 +269,7 @@ export class ServicesComponent implements OnInit {
                     if (model.Result === DialogResult.Ok) {
                         let prepareSettings: IClassifierPrepareSettings = {
                             DataSetName: model.Model.SelectedDataset.Name,
-                            NGramList: _.range(1, model.Model.SelectedNgram + 1),
+                            NGramList: model.Model.SelectedNGramList.slice(),
                             TagIdList: model.Model.SelectedTagList.slice(),
                             CompressLevel: model.Model.CompressLevel,
                             CompressSettings: model.Model.CompressSettingsJson
@@ -339,8 +339,8 @@ export class ServicesComponent implements OnInit {
         let model = {
             SelectedDataset: null,
             Datasets: [],
-            SelectedNgram: 1,
-            Ngrams: [],
+            SelectedNGramList: [],
+            NGramList: [],
             SelectedTagList: [],
             TagList: [],
             CompressLevel: 0,
@@ -427,8 +427,8 @@ export class ServicesComponent implements OnInit {
         let dialogModel;
         if (selected.Type === IService.ITypeEnum.Classifier) {
             dialogModel = {
-                SelectedNgram: _.max((<IClassifierService>selected).PrepareSettings.NGramList),
-                Ngrams: (<IClassifierService>selected).PrepareSettings.NGramList,
+                SelectedNGramList: (<IClassifierService>selected).PrepareSettings.NGramList.slice(),
+                NGramList: (<IClassifierService>selected).PrepareSettings.NGramList.slice(),
                 SelectedTagList: [],
                 TagList: [],
                 SelectedEmphasizedTagList: [],
@@ -438,7 +438,7 @@ export class ServicesComponent implements OnInit {
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
                         let settingsModel: IClassifierActivateSettings = {
-                            NGramList: _.range(1, model.Model.SelectedNgram + 1),
+                            NGramList: model.Model.SelectedNGramList,
                             TagIdList: model.Model.SelectedTagList.slice(),
                             EmphasizedTagIdList: model.Model.SelectedEmphasizedTagList.slice()
                         };
@@ -545,7 +545,7 @@ export class ServicesComponent implements OnInit {
                 if (model.Result === DialogResult.Ok) {
                     if (selected.Type === IService.ITypeEnum.Classifier) {
                         let settings: IExportDictionariesSettings = {
-                            NGramList: _.range(1, model.Model.SelectedNgram + 1),
+                            NGramList: model.Model.SelectedNGramList.slice(),
                             TagIdList: model.Model.SelectedTagList.slice(),
                         };
                         this._classifierService.exportDictionary(selected.Id, settings).subscribe(
@@ -609,10 +609,12 @@ export class ServicesComponent implements OnInit {
             }
         );
         let model = {
-            SelectedNgram: selected.Type === IService.ITypeEnum.Classifier
-                ? _.max((<IClassifierService>selected).PrepareSettings.NGramList)
+            SelectedNGramList: selected.Type === IService.ITypeEnum.Classifier
+                ? (<IClassifierService>selected).PrepareSettings.NGramList.slice()
                 : 0,
-            Ngrams: selected.Type === IService.ITypeEnum.Classifier ? (<IClassifierService>selected).PrepareSettings.NGramList : [],
+            NGramList: selected.Type === IService.ITypeEnum.Classifier
+                ? (<IClassifierService>selected).PrepareSettings.NGramList.slice()
+                : [],
             SelectedTagList: [],
             TagList: [],
             Type: selected.Type

@@ -15,7 +15,7 @@ export class NGramSelectorComponent {
         this._count = c;
         this.options = this.fillArray(c);
     }
-    get count () {
+    get count() {
         return this._count;
     }
 
@@ -33,12 +33,22 @@ export class NGramSelectorComponent {
         return this.selected.indexOf(option) > -1;
     }
 
-    updateSelection(option, event) {
+    updateSelection(option, event: Event) {
+        let target = event.target as HTMLInputElement;
+
+        // at least one NGram must be checked
+        if (this.selected.length === 1 && !target.checked) {
+            target.checked = true;
+            event.preventDefault();
+            return;
+        }
+
         let index = this.selected.indexOf(option);
-        if (event.target.checked && index === -1) {
+
+        if (target.checked && index === -1) {
             this.selected.push(option);
         }
-        if (!event.target.checked && index > -1) {
+        if (!target.checked && index > -1) {
             this.selected.splice(index, 1);
         }
     }

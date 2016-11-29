@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, ViewChild, ChangeDetectorRef, Injector, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild, ChangeDetectorRef, ViewContainerRef } from '@angular/core';
 
 import { Endpoint } from './models/endpoint';
 import { Globals } from './models/globals';
@@ -56,7 +56,7 @@ export class AppComponent implements OnInit {
         private messenger: Messenger,
         private zone: NgZone,
         private cd: ChangeDetectorRef,
-        private injector: Injector,
+        private licenseService: LicenseService,
         private toastr: ToastsManager, viewContainerRef: ViewContainerRef) {
 
         this.toastr.setRootViewContainerRef(viewContainerRef);
@@ -127,9 +127,8 @@ export class AppComponent implements OnInit {
     endpointSelected(endpoint: Endpoint) {
         this.optionService.currentEndpoint = endpoint;
 
-        // we have to get this service here since selected endpoint is a dependency of LicenseService
-        this.injector.get(LicenseService)
-            .getLicense()
+        this.licenseService.setEndpoint(endpoint);
+        this.licenseService.getLicense()
             .subscribe(
             (license: ILicense) => {
                 if (license.Type === 'OpenSource') {

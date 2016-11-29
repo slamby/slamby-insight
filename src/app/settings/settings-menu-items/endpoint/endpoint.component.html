@@ -1,5 +1,6 @@
 <div>
 	<sl-change-secret-dialog></sl-change-secret-dialog>
+	<sl-change-license-dialog></sl-change-license-dialog>
 	<div *ngIf="!endpointMaintenanceIsInProgress">
 		<button type="button" class="btn  btn-outline-primary" (click)="add()" *ngIf="!endpointMaintenanceIsInProgress">Add New Endpoint</button>
 		<table class="table table-striped">
@@ -59,6 +60,9 @@
 									</li>
 									<li *ngIf="canModifySecret(currentEndpoint)">
 										<a (click)="modifySecret(currentEndpoint)">Modify secret</a>
+									</li>
+									<li *ngIf="canModifyLicense(currentEndpoint)">
+										<a (click)="modifyLicense(currentEndpoint)">Modify license</a>
 									</li>
 								</ul>
 							</div>

@@ -14,6 +14,7 @@ import { ConfirmDialogComponent } from './confirm.dialog.component';
 import { DocumentDetailsComponent } from '../../documents/document-details.component';
 import { OverlayComponent } from './overlay.component';
 import { ChangeSecretDialogComponent } from './change-secret-dialog.component';
+import { ChangeLicenseDialogComponent } from './change-license-dialog.component';
 
 import { PIPES_DECLARATIONS } from '../pipes/pipes.module';
 import { DIRECTIVES_DECLARATIONS } from '../directives/directives.module';
@@ -36,7 +37,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         OverlayComponent,
         TagListSelectorDialogComponent,
         TagListSelectorComponent,
-        ChangeSecretDialogComponent
+        ChangeSecretDialogComponent,
+        ChangeLicenseDialogComponent
     ],
     imports: [
         BrowserModule,
@@ -58,7 +60,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
         OverlayComponent,
         TagListSelectorDialogComponent,
         TagListSelectorComponent,
-        ChangeSecretDialogComponent
+        ChangeSecretDialogComponent,
+        ChangeLicenseDialogComponent
     ]
 })
 export class CommonComponentsModule { }

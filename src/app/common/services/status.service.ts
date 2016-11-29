@@ -18,7 +18,7 @@ export class StatusService extends BaseService<StatusApi> {
         return this.apiService.getStatus();
     }
 
-    setDefaultHeaders(endpoint: Endpoint) {
+    setEndpoint(endpoint: Endpoint) {
         if (!endpoint) {
             return;
         }

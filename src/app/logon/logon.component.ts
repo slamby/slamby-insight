@@ -34,7 +34,7 @@ export class LogonComponent implements OnInit {
 
     selectEndpoint(endpoint: Endpoint) {
         this.busy = true;
-        this._statusService.setDefaultHeaders(endpoint);
+        this._statusService.setEndpoint(endpoint);
         this._statusService.getStatus()
             .subscribe(
             (status) => {

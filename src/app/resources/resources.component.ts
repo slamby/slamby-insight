@@ -32,7 +32,7 @@ export class ResourcesComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.statusService.setDefaultHeaders(this.optionService.currentEndpoint);
+        this.statusService.setEndpoint(this.optionService.currentEndpoint);
         this.subscribe = this.timer.subscribe(t => {
             this.getStatus();
         });

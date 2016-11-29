@@ -10,6 +10,7 @@ import { ErrorsModelHelper } from '../../../common/helpers/errorsmodel.helper';
 
 import { DialogResult } from '../../../models/dialog-result';
 import { ChangeSecretDialogComponent } from '../../../common/components/change-secret-dialog.component';
+import { ChangeLicenseDialogComponent } from '../../../common/components/change-license-dialog.component';
 
 import * as _ from 'lodash';
 
@@ -26,6 +27,7 @@ export class EndpointComponent implements AfterContentInit {
     @Output() onEditing: EventEmitter<boolean> = new EventEmitter<boolean>();
     @ViewChild('endpointElement') endpointElement: ElementRef;
     @ViewChild(ChangeSecretDialogComponent) changeSecretDialog: ChangeSecretDialogComponent;
+    @ViewChild(ChangeLicenseDialogComponent) changeLicenseDialog: ChangeLicenseDialogComponent;
 
 
     endpointMaintenanceIsInProgress = false;
@@ -41,6 +43,7 @@ export class EndpointComponent implements AfterContentInit {
     canEdit = (endpoint: Endpoint): boolean => !(this.endpointMaintenanceIsInProgress);
     canDelete = (endpoint: Endpoint): boolean => !(this.endpointMaintenanceIsInProgress || this.isCurrentEndpoint(endpoint));
     canModifySecret = (endpoint: Endpoint): boolean => !this.endpointMaintenanceIsInProgress && this.isCurrentEndpoint(endpoint);
+    canModifyLicense = (endpoint: Endpoint): boolean => !this.endpointMaintenanceIsInProgress && this.isCurrentEndpoint(endpoint);
 
     constructor(private optionService: OptionService, private _statusService: StatusService,
         private renderer: Renderer) {
@@ -79,7 +82,7 @@ export class EndpointComponent implements AfterContentInit {
     }
 
     select(endpoint: Endpoint) {
-        this._statusService.setDefaultHeaders(endpoint);
+        this._statusService.setEndpoint(endpoint);
         this._statusService.getStatus()
             .subscribe(
             (status) => {
@@ -134,6 +137,15 @@ export class EndpointComponent implements AfterContentInit {
                 if (result === DialogResult.Ok) {
                     endpoint.ApiSecret = this.changeSecretDialog.newSecret;
                     this.saveInternal(endpoint);
+                }
+            }, (reason) => {
+            });
+    }
+
+    modifyLicense(endpoint: Endpoint) {
+        this.changeLicenseDialog.open()
+            .result.then((result) => {
+                if (result === DialogResult.Ok) {
                 }
             }, (reason) => {
             });

@@ -1,0 +1,34 @@
+<template #template let-c="close" let-d="dismiss">
+	<div class="modal-header">
+		<button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+		<h4 class="modal-title">Change license</h4>
+	</div>
+	<div class="modal-body">
+		<form #f="ngForm" novalidate>
+			<div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+				{{errorMessage}}
+			</div>
+			<div class="form-group" [class.has-error]="license.errors && license.touched">
+				<textarea class="form-control" rows="8" placeholder="Paste License here..."
+							[(ngModel)]="newLicense" 
+							name="license" #license="ngModel" 
+							required base64>
+				</textarea>
+				<div *ngIf="license.errors && license.touched">
+					<p class="text-danger" *ngIf="license.errors?.required">
+						This field is required
+					</p>
+					<p class="text-danger" *ngIf="license.errors?.base64">
+						License is not in the right format (base64). Please make sure there are no empty spaces at the beginning or end of the key.
+					</p>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn btn-success" (click)="change()" [disabled]="!f.valid">Change</button>
+		<button type="button" class="btn btn-warning" (click)="c('Cancel')">Cancel</button>
+	</div>
+</template>

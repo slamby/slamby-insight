@@ -61,7 +61,7 @@ export class AppErrorHandler implements ErrorHandler {
     }
 }
 
-export var APPERROR_HANDLER_PROVIDERS = [
+export let APPERROR_HANDLER_PROVIDERS = [
     {
         provide: APPERROR_HANDLER_OPTIONS,
         useValue: APPERROR_HANDLER_OPTIONS

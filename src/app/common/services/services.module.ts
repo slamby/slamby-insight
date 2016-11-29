@@ -6,6 +6,17 @@ import { ToasterNotificationService } from './toaster.notification.service';
 import { NotificationService } from './notification.service';
 import { MaintenanceService } from './maintenance.service';
 import { LicenseService } from './license.service';
+import { UpdaterService } from './updater.service';
+
+export { StatusService } from './status.service';
+export { ServicesService } from './services.service';
+export { Messenger } from './messenger.service';
+export { OptionService } from './option.service';
+export { ToasterNotificationService } from './toaster.notification.service';
+export { NotificationService } from './notification.service';
+export { MaintenanceService } from './maintenance.service';
+export { LicenseService } from './license.service';
+export { UpdaterService, IUpdaterResult } from './updater.service';
 
 export const SERVICE_PROVIDERS: any[] = [
     StatusService,
@@ -15,5 +26,6 @@ export const SERVICE_PROVIDERS: any[] = [
     NotificationService,
     OptionService,
     MaintenanceService,
-    LicenseService
+    LicenseService,
+    UpdaterService
 ];

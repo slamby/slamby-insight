@@ -1,4 +1,5 @@
 import { Component, OnInit, NgZone, ViewChild, ChangeDetectorRef, ViewContainerRef } from '@angular/core';
+import { Http } from '@angular/http';
 
 import { Endpoint } from './models/endpoint';
 import { Globals } from './models/globals';
@@ -15,12 +16,10 @@ import { ConfirmDialogComponent } from './common/components/confirm.dialog.compo
 import { ConfirmModel } from './models/confirm.model';
 import { DialogResult } from './models/dialog-result';
 
-import { OptionService } from './common/services/option.service';
-import { Messenger } from './common/services/messenger.service';
 import { IpcHelper } from './common/helpers/ipc.helper';
-import { LicenseService } from './common/services/license.service';
 
-import { NotificationService } from './common/services/notification.service';
+import { OptionService, Messenger, LicenseService, NotificationService, UpdaterService, IUpdaterResult } from './common/services/services.module';
+
 import { SlimLoadingBarService } from 'ng2-slim-loading-bar';
 import { ToastyService } from 'ng2-toasty';
 import { TabsComponent } from './common/components/tabs.component';
@@ -57,7 +56,9 @@ export class AppComponent implements OnInit {
         private zone: NgZone,
         private cd: ChangeDetectorRef,
         private licenseService: LicenseService,
-        private toastr: ToastsManager, viewContainerRef: ViewContainerRef) {
+        private toastr: ToastsManager,
+        private updaterService: UpdaterService,
+        viewContainerRef: ViewContainerRef) {
 
         this.toastr.setRootViewContainerRef(viewContainerRef);
 
@@ -126,18 +127,47 @@ export class AppComponent implements OnInit {
 
     endpointSelected(endpoint: Endpoint) {
         this.optionService.currentEndpoint = endpoint;
-
         this.licenseService.setEndpoint(endpoint);
+
+        this.updaterService.checkNewerVersion()
+            .then((result: IUpdaterResult) => {
+                // newer version found
+                if (result.updateVersion) {
+                    let title = 'New API update available';
+                    let text = `Available API version is v${result.updateVersion}.`;
+                    
+                    // has /update endpoint
+                    if (result.updatable) {
+                        text = `${text} To update your server open your server settings and select update.`;
+                    }
+                    
+                    this.notificationService.info(text, title);
+                    this.toastr.info(`${text}`, title,
+                        <ToastOptions>{
+                            enableHTML: true,
+                            showCloseButton: false,
+                            dismiss: 'auto',
+                            toastLife: 5000
+                        }
+                    );
+                }
+            })
+            .catch((reason) => {
+                // could not get update information
+                let title = 'API Update';
+                this.notificationService.error(reason, title);
+            });
+
         this.licenseService.getLicense()
             .subscribe(
             (license: ILicense) => {
                 if (license.Type === 'OpenSource') {
-                    let header = 'No commercial license';
+                    let title = 'No commercial license';
                     let text = `This Slamby API is activated under a free license for test purpose and opensourced projects. 
                         For commercial license, please purchase a commercial license. 
                         <b><a href="mailto:sales@slamby.com">sales@slamby.com</a></b>`;
-                    this.notificationService.warning(text, header);
-                    this.toastr.warning(`${text}`, header,
+                    this.notificationService.warning(text, title);
+                    this.toastr.warning(`${text}`, title,
                         <ToastOptions>{
                             enableHTML: true,
                             showCloseButton: true,
@@ -145,12 +175,12 @@ export class AppComponent implements OnInit {
                         }
                     );
                 } else if (license.IsValid === false) {
-                    let header = 'Your license is expired';
+                    let title = 'Your license is expired';
                     let text = `You have no valid license.
                         Your license has expired on this instance. Please request a valid license from our sales center. 
                         When you have a new license, you can manage it under the settings menu.`;
-                    this.notificationService.error(text, header);
-                    this.toastr.error(text, header,
+                    this.notificationService.error(text, title);
+                    this.toastr.error(text, title,
                         <ToastOptions>{
                             enableHTML: true,
                             showCloseButton: true,

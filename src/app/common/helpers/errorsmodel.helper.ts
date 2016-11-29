@@ -12,7 +12,7 @@ export module ErrorsModelHelper {
                 return { Errors: [response.statusText] };
             }
 
-            model = JSON.parse((<any>response)._body);
+            model = response.json();
         } catch (error) {
             return { Errors: ['Invalid JSON response!'] };
         }
@@ -29,7 +29,7 @@ export module ErrorsModelHelper {
 
         let model: any = {};
         try {
-            model = (<any>response)._body;
+            model = response.json();
             if (!model) {
                 return emptyResult;
             }

@@ -4,13 +4,14 @@ import { Endpoint } from '../../../models/endpoint';
 import { IpcHelper } from '../../../common/helpers/ipc.helper';
 import { CommonHelper } from '../../../common/helpers/common.helper';
 
-import { OptionService } from '../../../common/services/option.service';
-import { StatusService } from '../../../common/services/status.service';
+import { OptionService, StatusService, UpdaterService, UpdaterResult } from '../../../common/services/services.module';
 import { ErrorsModelHelper } from '../../../common/helpers/errorsmodel.helper';
 
 import { DialogResult } from '../../../models/dialog-result';
 import { ChangeSecretDialogComponent } from '../../../common/components/change-secret-dialog.component';
 import { ChangeLicenseDialogComponent } from '../../../common/components/change-license-dialog.component';
+import { ConfirmDialogComponent } from '../../../common/components/confirm.dialog.component';
+import { ConfirmModel } from '../../../models/confirm.model';
 
 import * as _ from 'lodash';
 
@@ -28,7 +29,7 @@ export class EndpointComponent implements AfterContentInit {
     @ViewChild('endpointElement') endpointElement: ElementRef;
     @ViewChild(ChangeSecretDialogComponent) changeSecretDialog: ChangeSecretDialogComponent;
     @ViewChild(ChangeLicenseDialogComponent) changeLicenseDialog: ChangeLicenseDialogComponent;
-
+    @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
 
     endpointMaintenanceIsInProgress = false;
     endpoints: Array<Endpoint> = [];
@@ -44,8 +45,9 @@ export class EndpointComponent implements AfterContentInit {
     canDelete = (endpoint: Endpoint): boolean => !(this.endpointMaintenanceIsInProgress || this.isCurrentEndpoint(endpoint));
     canModifySecret = (endpoint: Endpoint): boolean => !this.endpointMaintenanceIsInProgress && this.isCurrentEndpoint(endpoint);
     canModifyLicense = (endpoint: Endpoint): boolean => !this.endpointMaintenanceIsInProgress && this.isCurrentEndpoint(endpoint);
+    canUpdateServer = (endpoint: Endpoint): boolean => !this.endpointMaintenanceIsInProgress && this.isCurrentEndpoint(endpoint) && this.optionService.updatable;
 
-    constructor(private optionService: OptionService, private _statusService: StatusService,
+    constructor(private optionService: OptionService, private _statusService: StatusService, private updaterService: UpdaterService,
         private renderer: Renderer) {
     }
 
@@ -149,6 +151,27 @@ export class EndpointComponent implements AfterContentInit {
                 }
             }, (reason) => {
             });
+    }
+
+    updateServer(endpoint: Endpoint) {
+        let model: ConfirmModel = {
+            Header: 'Update API Server',
+            Message: `Please note that during updating process the API will not be accessible.
+            Are you sure you want to update the following API server: ${endpoint.ApiBaseEndpoint}?`,
+            Buttons: ['yes', 'no']
+        };
+        this.confirmDialog.model = model;
+        this.confirmDialog.modalOptions.windowClass = 'md-dialog';
+        this.confirmDialog.dialogClosed.subscribe(
+            (result: ConfirmModel) => {
+                if (result.Result === DialogResult.Yes) {
+                    this.updaterService.updateApiServer()
+                        .then(response =>  IpcHelper.reload())
+                        .catch((error: string) => alert(error));
+                }
+            }
+        );
+        this.confirmDialog.open();
     }
 
     equals(first: Endpoint, second: Endpoint): boolean {

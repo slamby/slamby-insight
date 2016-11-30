@@ -18,7 +18,7 @@ import { DialogResult } from './models/dialog-result';
 
 import { IpcHelper } from './common/helpers/ipc.helper';
 
-import { OptionService, Messenger, LicenseService, NotificationService, UpdaterService, IUpdaterResult } from './common/services/services.module';
+import { OptionService, Messenger, LicenseService, NotificationService, UpdaterService, UpdaterResult } from './common/services/services.module';
 
 import { SlimLoadingBarService } from 'ng2-slim-loading-bar';
 import { ToastyService } from 'ng2-toasty';
@@ -127,12 +127,17 @@ export class AppComponent implements OnInit {
 
     endpointSelected(endpoint: Endpoint) {
         this.optionService.currentEndpoint = endpoint;
+        this.optionService.updateVersion = '';
+        this.optionService.updatable = false;
         this.licenseService.setEndpoint(endpoint);
 
         this.updaterService.checkNewerVersion()
-            .then((result: IUpdaterResult) => {
+            .then((result: UpdaterResult) => {
                 // newer version found
                 if (result.updateVersion) {
+                    this.optionService.updateVersion = result.updateVersion;
+                    this.optionService.updatable = result.updatable;
+
                     let title = 'New API update available';
                     let text = `Available API version is v${result.updateVersion}.`;
                     

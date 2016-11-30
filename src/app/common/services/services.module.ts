@@ -16,7 +16,7 @@ export { ToasterNotificationService } from './toaster.notification.service';
 export { NotificationService } from './notification.service';
 export { MaintenanceService } from './maintenance.service';
 export { LicenseService } from './license.service';
-export { UpdaterService, IUpdaterResult } from './updater.service';
+export { UpdaterService, UpdaterResult } from './updater.service';
 
 export const SERVICE_PROVIDERS: any[] = [
     StatusService,

@@ -1,43 +1,69 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
+import { Http, Response, RequestOptionsArgs, Headers } from '@angular/http';
 
 import { StatusService} from './status.service';
 import { OptionService } from './option.service';
+import { ErrorsModelHelper } from '../helpers/errorsmodel.helper'
 
 @Injectable()
 export class UpdaterService {
 
-    releaseUrl: string = 'https://api.github.com/repos/slamby/slamby-api/releases/latest'; 
+    private releaseUrl: string = 'https://api.github.com/repos/slamby/slamby-api/releases/latest';
+    private get updateUrl(): string {
+        return `${this.optionService.currentEndpoint.ApiBaseEndpoint}/update`;
+    }  
 
     constructor(private http: Http, 
         private statusService: StatusService,
         private optionService: OptionService) {
     }
 
-    async checkNewerVersion(): Promise<IUpdaterResult> {
+    async checkNewerVersion(): Promise<UpdaterResult> {
         try {
             let updatable = await this.hasUpdateEndpoint();
             let latestReleaseVersion = (await this.getLatestApiVersion()).slice(1);
             let currentApiVersion = await this.getApiVersion();
             let newerVersion = latestReleaseVersion !== currentApiVersion ? latestReleaseVersion : '';
 
-            return Promise.resolve<IUpdaterResult>(<IUpdaterResult>{ updateVersion : newerVersion, updatable: updatable }); 
+            return Promise.resolve<UpdaterResult>(<UpdaterResult>{ updateVersion : newerVersion, updatable: updatable }); 
         } catch (error) {
-            return Promise.reject<IUpdaterResult>(error) 
+            return Promise.reject<UpdaterResult>(error) 
         }
+    }
+
+    async updateApiServer(): Promise<any> {
+        return new Promise<any>((resolve, reject) => {
+            let headers = new Headers();
+            
+            headers.append('Content-Type', 'application/json');
+            headers.append('Authorization', `Slamby ${this.optionService.currentEndpoint.ApiSecret}`);
+
+            let requestOptions: RequestOptionsArgs = {
+                method: 'POST',
+                headers: headers
+            };
+            let url = this.updateUrl;
+
+            this.http.request(url, requestOptions)
+                .subscribe(
+                    (response: Response) => resolve(response.json()),
+                    (error: Response | any) => {
+                        if (error instanceof Response) {
+                            let errorsModel = ErrorsModelHelper.getFromResponse(error);
+                            let errors = ErrorsModelHelper.concatErrors(errorsModel, ' ');
+                            reject(errors);
+                        }
+                        reject(error);
+                    });
+        });
     }
 
     private async hasUpdateEndpoint(): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
-            let url = `${this.optionService.currentEndpoint.ApiBaseEndpoint}/update`;
-            this.http.get(url)
+            this.http.get(this.updateUrl)
                 .subscribe(
-                    (data: Response) => {
-                        resolve(data.status === 200)
-                    },
-                    (e) => {
-                        resolve(false)
-                    });
+                    (response: Response) => resolve(response.status === 200),
+                    (error: Response | any) => resolve(false));
         });
     }
 
@@ -45,8 +71,8 @@ export class UpdaterService {
         return new Promise<string>((resolve, reject) => {
             this.http.get(this.releaseUrl)
                 .subscribe(
-                    (data: any) => resolve(data.json().tag_name),
-                    (e) => reject(new Error('Failed to get latest API version')));
+                    (response: Response) => resolve(response.json().tag_name),
+                    (error: Response | any) => reject(new Error('Failed to get latest API version')));
         });
     }
 
@@ -54,13 +80,13 @@ export class UpdaterService {
         return new Promise<string>((resolve, reject) => {
             this.statusService.getStatus()
                 .subscribe(
-                status => resolve(status.ApiVersion),
+                response => resolve(response.ApiVersion),
                 error => reject(new Error('Failed to get API status')));
         });
     }
 }
 
-export interface IUpdaterResult {
+export class UpdaterResult {
     updateVersion: string;
     updatable: boolean;
 }

@@ -3,5 +3,7 @@ import { Endpoint } from '../../models/endpoint';
 
 @Injectable()
 export class OptionService {
-    currentEndpoint: Endpoint;
+    currentEndpoint: Endpoint = null;
+    updateVersion: string = '';
+    updatable: boolean = false;
 }

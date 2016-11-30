@@ -9,7 +9,7 @@ export class ConvertTextToUrl implements PipeTransform {
         return this.linkify(text);
     }
 
-    private linkify(plainText): string {
+    private linkify(plainText: string): string {
         let replacedText;
         let replacePattern1;
         let replacePattern2;

@@ -52,11 +52,11 @@ export module ErrorsModelHelper {
         return model.Errors.slice(0, 1)[0];
     }
 
-    export function concatErrors(model: IErrorsModel): string {
+    export function concatErrors(model: IErrorsModel, separator = ', '): string {
         if (!model || model.Errors.length === 0) {
             return '';
         }
 
-        return model.Errors.join(', ');
+        return model.Errors.join(separator);
     }
 }

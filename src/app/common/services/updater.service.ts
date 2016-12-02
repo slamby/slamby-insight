@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, RequestOptionsArgs, Headers } from '@angular/http';
 
-import { StatusService} from './status.service';
+import { StatusService } from './status.service';
 import { OptionService } from './option.service';
-import { ErrorsModelHelper } from '../helpers/errorsmodel.helper'
+import { ErrorsModelHelper } from '../helpers/errorsmodel.helper';
 
 @Injectable()
 export class UpdaterService {
@@ -11,9 +11,9 @@ export class UpdaterService {
     private releaseUrl: string = 'https://api.github.com/repos/slamby/slamby-api/releases/latest';
     private get updateUrl(): string {
         return `${this.optionService.currentEndpoint.ApiBaseEndpoint}/update`;
-    }  
+    }
 
-    constructor(private http: Http, 
+    constructor(private http: Http,
         private statusService: StatusService,
         private optionService: OptionService) {
     }
@@ -25,16 +25,16 @@ export class UpdaterService {
             let currentApiVersion = await this.getApiVersion();
             let newerVersion = latestReleaseVersion !== currentApiVersion ? latestReleaseVersion : '';
 
-            return Promise.resolve<UpdaterResult>(<UpdaterResult>{ updateVersion : newerVersion, updatable: updatable }); 
+            return Promise.resolve<UpdaterResult>(<UpdaterResult>{ updateVersion : newerVersion, updatable: updatable });
         } catch (error) {
-            return Promise.reject<UpdaterResult>(error) 
+            return Promise.reject<UpdaterResult>(error);
         }
     }
 
     async updateApiServer(): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             let headers = new Headers();
-            
+
             headers.append('Content-Type', 'application/json');
             headers.append('Authorization', `Slamby ${this.optionService.currentEndpoint.ApiSecret}`);
 

@@ -247,14 +247,9 @@
 					</div>
 				</div>
 				<div class="form-group" [class.has-error]="tagId.errors && tagId.dirty">
-					<label for="tagId" class="col-sm-3 control-label">TagId</label>
+					<label for="tagId" class="col-sm-3 control-label">Tag Id</label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus required>
-						<div *ngIf="tagId.errors?.required && tagId.touched">
-							<p class="tagId-danger">
-								Field is required!
-							</p>
-						</div>
+						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus>
 					</div>
 				</div>
 				<div class="form-group" [class.has-error]="weightsjson.errors">

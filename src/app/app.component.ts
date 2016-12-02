@@ -140,12 +140,14 @@ export class AppComponent implements OnInit {
 
                     let title = 'New API update available';
                     let text = `Available API version is v${result.updateVersion}.`;
-                    
+
                     // has /update endpoint
                     if (result.updatable) {
                         text = `${text} To update your server open your server settings and select update.`;
+                    } else {
+                        text = `${text} To update your server contact your system administrator.`;
                     }
-                    
+
                     this.notificationService.info(text, title);
                     this.toastr.info(`${text}`, title,
                         <ToastOptions>{
@@ -169,7 +171,7 @@ export class AppComponent implements OnInit {
                 if (license.Type === 'OpenSource') {
                     let title = 'No commercial license';
                     let text = `This Slamby API is activated under a free license for test purpose and opensourced projects. 
-                        For commercial license, please purchase a commercial license. 
+                        For commercial use, please purchase a commercial license. 
                         <b><a href="mailto:sales@slamby.com">sales@slamby.com</a></b>`;
                     this.notificationService.warning(text, title);
                     this.toastr.warning(`${text}`, title,

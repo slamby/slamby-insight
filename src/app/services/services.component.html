@@ -56,7 +56,10 @@
 			<div class="form-group" [class.has-error]="tags.errors && tags.dirty">
 				<label for="tags" class="col-sm-2 control-label">Tags</label>
 				<div class="col-sm-10">
-					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0 || smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
+					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">
+						<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</span>
+						<span *ngIf="smd.showProgress"><i class='fa fa-circle-o-notch fa-spin'></i> Loading...</span>
+					</button>
 					<input type="number" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedTagList.length" name="tags" #tags="ngModel"
 						[min]="1" />
 					<div *ngIf="tags.errors?.min">
@@ -122,7 +125,7 @@
 								<thead>
 									<th><input type="checkbox" [checked]="getSelectedItemsCount(smd.model.Model.fields) == smd.model.Model.fields.length"
 											name="checkAll" (change)="checkField($event)" style="margin: 3px;"></th>
-									<th>FieldsForRecommendation</th>
+									<th>Fields For Recommendation</th>
 								</thead>
 								<tbody>
 									<tr *ngFor='let field of smd.model.Model.fields'>
@@ -138,7 +141,7 @@
 		</div>
 		<div *ngIf='smd.model?.Type == "export"' export>
 			<div class="form-group" *ngIf="sm.model.Model.Type == serviceType.Classifier">
-				<label class="col-sm-2 control-label">NgramCount</label>
+				<label class="col-sm-2 control-label">Ngram Count</label>
 				<div class="col-sm-10">
 					<sl-ngram-selector name="ngram" [options]="smd.model.Model.NGramList" [(ngModel)]="smd.model.Model.SelectedNGramList"></sl-ngram-selector>
 				</div>
@@ -196,14 +199,14 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="count" class="col-sm-3 control-label">NeedTagInResult</label>
+					<label for="count" class="col-sm-3 control-label">Need Tag InResult</label>
 					<div class="col-sm-9">
 						<md-slide-toggle [checked]="smd.model.Model.NeedTagInResult" (change)='changeToggle("NeedTagInResult")' color="primary">
 						</md-slide-toggle>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="count" class="col-sm-3 control-label">UseEmphasizing</label>
+					<label for="count" class="col-sm-3 control-label">Use Emphasizing</label>
 					<div class="col-sm-9">
 						<md-slide-toggle [checked]="smd.model.Model.UseEmphasizing" (change)='changeToggle("UseEmphasizing")' color="primary">
 						</md-slide-toggle>
@@ -234,13 +237,7 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="filter" class="col-sm-3 control-label">Filter</label>
-					<div class="col-sm-9">
-						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Filter" filter="filter" #filter="ngModel" autofocus>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="count" class="col-sm-3 control-label">NeedDocumentInResult</label>
+					<label for="count" class="col-sm-3 control-label">Need Document In Result</label>
 					<div class="col-sm-9">
 						<md-slide-toggle [checked]="smd.model.Model.NeedDocumentInResult" (change)='changeToggle("NeedDocumentInResult")' color="primary">
 						</md-slide-toggle>
@@ -252,13 +249,29 @@
 						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus>
 					</div>
 				</div>
+				<div class="form-group">
+					<label for="count" class="col-sm-3 control-label">Filter</label>
+					<div class="col-sm-9">
+						<label for="query" class="col-sm-2 control-label">Query</label>
+						<div class="col-sm-5">
+							<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" query="query" #query="ngModel" autofocus>
+						</div>
+						<label for="tags" class="col-sm-1 control-label">Tags</label>
+						<div class="col-sm-4">
+							<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">
+								<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</span>
+								<span *ngIf="smd.showProgress"><i class='fa fa-circle-o-notch fa-spin'></i> Loading...</span>
+							</button>
+						</div>
+					</div>
+				</div>
 				<div class="form-group" [class.has-error]="weightsjson.errors">
 					<label for="weightsjson" class="col-sm-3 control-label">Weights</label>
 					<div class="col-sm-9">
-						<sl-json-editor [(ngModel)]="smd.model.Model.Weightsjson" name="weightsjson" #weightsjson="ngModel" height="300px" json></sl-json-editor>
+						<sl-json-editor [(ngModel)]="smd.model.Model.Weightsjson" name="weightsjson" #weightsjson="ngModel" height="200px" json></sl-json-editor>
 						<div *ngIf="weightsjson.dirty && !weightsjson.valid">
 							<p *ngIf="weightsjson.errors?.json" class="text-danger">
-								Invalid Compress Settings JSON!
+								Invalid Weights JSON!
 							</p>
 						</div>
 					</div>

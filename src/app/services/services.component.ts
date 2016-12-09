@@ -720,19 +720,43 @@ export class ServicesComponent implements OnInit {
             dialogModel = {
                 Text: '',
                 Count: 3,
-                Filter: '',
-                NeedDocumentInResult: false,
+                Query: '',
+                TagList: [],
+                SelectedTagList: [],
+                NeedDocumentInResult: true,
                 TagId: '',
                 Weightsjson: '[]',
                 Type: selected.Type
             };
+            this.sm.dialogOpened.subscribe(
+                () => {
+                    this.sm.showProgress = true;
+                    this._tagService.getTags((<IPrcService>selected).PrepareSettings.DataSetName, true).subscribe(
+                        (tags: Array<ITag>) => {
+                            let tagsForService = (<IPrcService>selected).PrepareSettings.TagIdList
+                                .map(tid => tags.find(t => t.Id === tid))
+                                .filter(t => t !== undefined);
+                            this.inputModel.Model.TagList = tagsForService;
+                            this.inputModel.Model.SelectedTagList = [];
+                            this.sm.showProgress = false;
+                        },
+                        error => {
+                            this.handleError(error);
+                            this.sm.showProgress = false;
+                        }
+                    );
+                }
+            );
             this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
                         let settings: IPrcRecommendationRequest = {
                             Text: model.Model.Text,
                             Count: model.Model.Count,
-                            Filter: model.Model.Filter,
+                            Filter: {
+                                Query: model.Model.Query,
+                                TagIdList: model.Model.SelectedTagList == null ? null : model.Model.SelectedTagList.slice()
+                            },
                             NeedDocumentInResult: model.Model.NeedDocumentInResult,
                             TagId: model.Model.TagId,
                             Weights: model.Model.Weightsjson
@@ -743,7 +767,7 @@ export class ServicesComponent implements OnInit {
                             (results: Array<IPrcRecommendationResult>) => {
                                 this.dialogService.close();
                                 this.resultDialog.model = {
-                                    Header: 'Prc recommendation result',
+                                    Header: 'Prc Recommendation Result',
                                     OutputObject: {
                                         RecommendationResult: results
                                     }
@@ -803,7 +827,7 @@ export class ServicesComponent implements OnInit {
                     this.sm.showProgress = true;
                     this._tagService.getTags((<IPrcService>selected).PrepareSettings.DataSetName, true).subscribe(
                         (tags: Array<ITag>) => {
-                            let tagsForService = (<IClassifierService>selected).PrepareSettings.TagIdList
+                            let tagsForService = (<IPrcService>selected).PrepareSettings.TagIdList
                                 .map(tid => tags.find(t => t.Id === tid))
                                 .filter(t => t !== undefined);
                             this.inputModel.Model.TagList = tagsForService;
@@ -889,7 +913,7 @@ export class ServicesComponent implements OnInit {
             DocumentId: '',
             Query: '',
             Count: 3,
-            NeedDocumentInResult: false,
+            NeedDocumentInResult: true,
             TagId: '',
             Weightsjson: '[]',
             Type: selected.Type

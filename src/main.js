@@ -80,7 +80,6 @@ function startApp() {
 
     SettingsHelper.Init();
 
-    registerGlobalShortcuts();
     registerIpcEvents();
     registerAutoUpdateEvents();
 
@@ -116,6 +115,7 @@ function createWindow() {
     if (isDevelopment) {
         mainWindow.webContents.openDevTools();
     }
+    registerGlobalShortcuts(mainWindow);
 
     // Emitted when the window is closed.
     mainWindow.on('closed', () => {
@@ -153,10 +153,13 @@ function createWindow() {
     });
 }
 
-function registerGlobalShortcuts() {
+function registerGlobalShortcuts(mainWindow) {
     // let ret = globalShortcut.register('F5', () => {
     //     loadIndexHtml();
     // });
+    let ret = globalShortcut.register('CommandOrControl+Shift+J', () => {
+        mainWindow.webContents.toggleDevTools();
+    });
 }
 
 function registerIpcEvents() {

@@ -1,73 +1,97 @@
 <div>
+	<sl-output-dialog></sl-output-dialog>
+	<sl-confirm-dialog></sl-confirm-dialog>
 	<div class="panel-body">
-		<div class="row">
-			<div class="col-sm-6">
+		<div class="col-md-8">
+			<div class="row">
 				<form class="form-horizontal">
 					<div class="form-group">
-						<label for="datasets" class="col-sm-2 control-label">Dataset</label>
-						<div class="col-sm-10">
+						<label for="datasets" class="col-md-2">Target Dataset</label>
+						<div class="col-md-4">
 							<select [(ngModel)]="selectedDataset" name="datasets" class="form-control">
                                 <option [ngValue]="dataset" *ngFor="let dataset of datasets">{{dataset.Name}}</option>
                             </select>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="importfile" class="col-sm-2 control-label">Import file</label>
-						<div class="col-sm-10">
+						<label for="importType" class="col-md-2">Import type</label>
+						<div class="col-md-4">
+							<md-button-toggle-group [(ngModel)]="importType" name="importType">
+								<md-button-toggle checked value="documents">Documents</md-button-toggle>
+								<md-button-toggle value="tags">Tags</md-button-toggle>
+							</md-button-toggle-group>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="importfile" class="col-md-2">
+							Source file
+							<i class="fa fa-info-circle" (click)="showHelp()"></i>
+						</label>
+						<div class="col-md-4">
 							<input (change)="onFileSelectionChange($event)" type="file" class="form-control" name="importfile" accept=".csv, .json" />
 						</div>
 					</div>
-					<div class="form-group">
-						<div class="col-sm-offset-2 col-sm-10">
-							<div class="checkbox">
-								<md-slide-toggle [(ngModel)]="tagImport" color="primary" [ngModelOptions]="{standalone: true}">
-									Tag Import
-								</md-slide-toggle>
+					<div class="row" *ngIf="selectedFile && selectedDataset && isCsvFile(selectedFile.name)">
+						<hr/>
+						<div class="form-group col-md-10 col-md-offset-2">
+							<div class="col-md-12"><label>CSV settings</label> <small>(Leave these empty for autodetection)</small></div>
+							<label class="col-md-2" for="lineEnding">Line Ending</label>
+							<div class="col-md-2">
+								<input [(ngModel)]="csvSettings.lineEnding" type="text" class="form-control" name="delimiter" placeholder="e.g.: \n" />
 							</div>
 						</div>
-					</div>
-					<div *ngIf="selectedFile && selectedDataset && isCsvFile(selectedFile.name)">
-						<div class="form-group">
-							<label for="importfile" class="col-sm-2 control-label">Delimiter</label>
-							<div class="col-sm-10">
-								<input [(ngModel)]="csvSettings.delimiter" (change)="onFileSelectionChange($event)" type="text" class="form-control" name="delimiter"
-									placeholder="Csv field delimiter" />
+						<div class="form-group col-md-10 col-md-offset-2">
+							<label class="col-md-2" for="delimiter">Delimiter</label>
+							<div class="col-md-2">
+								<input [(ngModel)]="csvSettings.delimiter" type="text" class="form-control" name="delimiter" placeholder="e.g.: ," />
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
-						<div class="col-sm-offset-2 col-sm-10">
-							<div class="button-container">
-								<button type="button" class="btn btn-default" (click)="this.import()" [disabled]="!selectedFile || !selectedDataset || status.inProgress">
-                                Import {{ tagImport ? 'Tags' : 'Documents'}}
-                            </button>
-							<button type="button" class="btn btn-default" (click)="cancel()" *ngIf="status.inProgress">
-                                Cancel
-                            </button>
+						<div class="col-md-12">
+							<div class="button-container" *ngIf="selectedFile && selectedDataset">
+								<button type="button" class="btn btn-primary" (click)="this.import()" *ngIf="tagImport() || isCsvFile(selectedFile.name)"
+									[disabled]="status.inProgress">
+									<span class="fa fa-refresh animate" *ngIf="status.inProgress"></span>
+									<span class="fa fa-cloud-upload" *ngIf="!status.inProgress"></span>
+                                		Import {{ tagImport() ? 'Tags' : 'Documents'}}{{status.inProgress ? '...' : ''}}
+                            	</button>
+								<button type="button" class="btn btn-warning" (click)="cancel()" *ngIf="status.inProgress">
+                                	Cancel
+                            	</button>
+								<div class="alert alert-danger" *ngIf="!tagImport() && !isCsvFile(selectedFile.name)">
+									Only <b>CSV</b> file allowed for Documents Import
+								</div>
 							</div>
 						</div>
 					</div>
 				</form>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-6">
-				<div class="progress" *ngIf="status.inProgress || status.finished">
-					<div class="progress-bar" role="progressbar" [attr.aria-valuenow]="status.percent" aria-valuemin="0" aria-valuemax="100"
-						[style.width]="status.percent + '%'">
-						{{status.percent}}%
+			<div class="row" [hidden]="!status.inProgress && !status.finished">
+				<hr/>
+				<div class="row">
+					<div class="col-md-4">
+						<label>Imported items: <span class="badge" [innerText]="status.importedCount"></span></label>
+					</div>
+					<div class="col-md-4">
+						<button type="button" class="btn btn-danger" [disabled]="!status.finished" (click)="this.setGridParseErrors()">CSV parse errors: <span class="badge" [innerText]="status.parseErrorMessages.length"></span></button>
+					</div>
+					<div class="col-md-4">
+						<button type="button" class="btn btn-danger" [disabled]="!status.finished" (click)="this.setGridErrors()">API validation errors: <span class="badge" [innerText]="status.errorMessages.length"></span></button>
 					</div>
 				</div>
-
-				<div class="alert alert-danger" role="alert" *ngIf="status.finished && status.errorMessages.length">
-					<ul>
-						<li *ngFor="let errorMessage of status.errorMessages">
-							{{errorMessage}}
-						</li>
-					</ul>
+				<hr/>
+				<div [hidden]="!status.finished || !(status.parseErrorMessages.length || status.errorMessages.length)">
+					<div class="alert alert-danger" role="alert">
+						<span>Click the buttons above to show the errors (maximum <span [innerText]="maximumElementInGrid"></span> items will be shown)!</span>
+					</div>
+					<div class="alert alert-danger" role="alert">
+						<ag-grid-ng2 #agGrid style="width: 100%; height: 400px;" class="ag-fresh" [gridOptions]="gridOptions">
+						</ag-grid-ng2>
+					</div>
 				</div>
-				<div class="alert alert-sucess" role="alert" *ngIf="status.finished && !status.errorMessages.length">
-					Import successful
+				<div class="alert alert-success" role="alert" *ngIf="status.finished && !status.errorMessages.length && !status.parseErrorMessages.length">
+					Congratulation! Import was successfully finished without any errors!
 				</div>
 			</div>
 		</div>

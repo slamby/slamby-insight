@@ -5,6 +5,10 @@ pre {
     font-size: inherit;
     padding: 0;
 }
+table {
+    user-select: text;
+    -webkit-user-select: text;
+}
 .string { color: green; }
 .number { color: darkorange; }
 .boolean { color: blue; }

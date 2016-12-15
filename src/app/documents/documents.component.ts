@@ -292,8 +292,13 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
             ...this.headers.map(h => <ColDef>{ headerName: h, field: h })];
         this.gridOptions.columnDefs = colDefs;
         this.gridOptions.getRowNodeId = (item: any) => item[this._dataset.IdField];
+        this.gridOptions.onRowDoubleClicked = this.onRowDoubleClicked;
         this.gridOptions.api.setColumnDefs(colDefs);
         this.gridOptions.api.setRowData(this.documents);
+    }
+
+    onRowDoubleClicked(event) {
+        event.context.mainComponent.preview(event.data);
     }
 
     ngOnInit(): void {

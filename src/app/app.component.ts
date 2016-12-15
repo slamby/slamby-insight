@@ -169,7 +169,7 @@ export class AppComponent implements OnInit {
             .subscribe(
             (license: ILicense) => {
                 if (license.Type === 'OpenSource') {
-                    let title = 'No commercial license';
+                    let title = 'Non-commercial license';
                     let text = `This Slamby API is activated under a free license for test purpose and opensourced projects. 
                         For commercial use, please purchase a commercial license. 
                         <b><a href="mailto:sales@slamby.com">sales@slamby.com</a></b>`;

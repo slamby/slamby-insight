@@ -10,6 +10,9 @@ export class ConvertTextToUrl implements PipeTransform {
     }
 
     private linkify(plainText: string): string {
+        if (plainText.replace === undefined) {
+            return plainText;
+        }
         let replacedText;
         let replacePattern1;
         let replacePattern2;

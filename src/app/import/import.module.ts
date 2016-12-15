@@ -12,6 +12,7 @@ import { OptionService } from '../common/services/option.service';
 
 import { MaterialModule } from '@angular/material';
 import { CommonComponentsModule } from '../common/components/common-components.module';
+import { AgGridModule } from 'ag-grid-ng2/main';
 
 
 @NgModule({
@@ -30,7 +31,8 @@ import { CommonComponentsModule } from '../common/components/common-components.m
         MaterialModule.forRoot(),
         BrowserModule,
         HttpModule,
-        FormsModule
+        FormsModule,
+        AgGridModule.withNg2ComponentSupport()
     ],
     bootstrap: [ImportComponent],
 })

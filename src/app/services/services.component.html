@@ -423,6 +423,7 @@
 								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.New">
 									<li><a (click)="details(service)">Details</a></li>
 									<li><a (click)="prepare(service)">Prepare</a></li>
+									<li><a (click)="modify(service)">Modify</a></li>
 									<li><a (click)="deleteConfirm(service)">Delete</a></li>
 								</ul>
 								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Busy">
@@ -434,6 +435,7 @@
 									<li><a (click)="details(service)">Details</a></li>
 									<li><a (click)="activate(service)">Activate</a></li>
 									<li><a (click)="export(service)">Export Dictionaries</a></li>
+									<li><a (click)="modify(service)">Modify</a></li>
 									<li><a (click)="deleteConfirm(service)">Delete</a></li>
 								</ul>
 								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Active">
@@ -444,6 +446,7 @@
 									<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="partialIndex(service)">PartialIndex</a></li>
 									<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="recommendById(service)">RecommendById</a></li>
 									<li><a (click)="export(service)">Export Dictionaries</a></li>
+									<li><a (click)="modify(service)">Modify</a></li>
 									<li><a (click)="deleteConfirm(service)">Delete</a></li>
 								</ul>
 							</div>

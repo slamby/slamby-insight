@@ -85,6 +85,41 @@ export class ServicesComponent implements OnInit {
     }
 
 
+    modify(selected: ServiceType) {
+        let defaultModel = {
+            Name: selected.Name,
+            Alias: selected.Alias,
+            Description: selected.Description,
+        };
+        let inputModel: CommonInputModel = {
+            Header: 'Modify Service',
+            Model: defaultModel,
+            Type: 'new'
+        };
+
+        this.sm.model = inputModel;
+        this.sm.open();
+        this.sm.dialogClosed.subscribe(
+            (model: CommonInputModel) => {
+                if (model.Result === DialogResult.Ok) {
+                    model.Model.Type = selected.Type;
+                    this._servicesService.updateService(selected.Id, <IService>model.Model).subscribe(
+                        (service: IService) => {
+                            this.services = _.concat(this.services, [service]);
+                            this.refresh(service);
+                            this.sm.unsubscribeAndClose();
+                        },
+                        error => {
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.sm.showProgress = false;
+                        }
+                    );
+                }
+            }
+        );
+    }
+
     deleteConfirm(selected: ServiceType) {
         let model: ConfirmModel = {
             Header: 'Delete service',

@@ -13,6 +13,7 @@
 			
 			<form (submit)="ok()" #f="ngForm" class="form-horizontal modal-body">
 				<ng-content *ngIf='model.Type == "new"' class="modal-body" select="[new]"></ng-content>
+				<ng-content *ngIf='model.Type == "modify"' class="modal-body" select="[modify]"></ng-content>
 				<ng-content *ngIf='model.Type == "prepare"' class="modal-body" select="[prepare]"></ng-content>
 				<ng-content *ngIf='model.Type == "activate"' class="modal-body" select="[activate]"></ng-content>
 				<ng-content *ngIf='model.Type == "export"' class="modal-body" select="[export]"></ng-content>

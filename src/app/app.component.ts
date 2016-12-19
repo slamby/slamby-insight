@@ -18,7 +18,8 @@ import { DialogResult } from './models/dialog-result';
 
 import { IpcHelper } from './common/helpers/ipc.helper';
 
-import { OptionService, Messenger, LicenseService, NotificationService, UpdaterService, UpdaterResult } from './common/services/services.module';
+import { OptionService, Messenger, LicenseService,
+         NotificationService, UpdaterService, UpdaterResult, StatusService } from './common/services/services.module';
 
 import { SlimLoadingBarService } from 'ng2-slim-loading-bar';
 import { ToastyService } from 'ng2-toasty';
@@ -58,6 +59,7 @@ export class AppComponent implements OnInit {
         private licenseService: LicenseService,
         private toastr: ToastsManager,
         private updaterService: UpdaterService,
+        private statusService: StatusService,
         viewContainerRef: ViewContainerRef) {
 
         this.toastr.setRootViewContainerRef(viewContainerRef);
@@ -130,6 +132,7 @@ export class AppComponent implements OnInit {
         this.optionService.updateVersion = '';
         this.optionService.updatable = false;
         this.licenseService.setEndpoint(endpoint);
+        this.statusService.setEndpoint(endpoint);
 
         this.updaterService.checkNewerVersion()
             .then((result: UpdaterResult) => {

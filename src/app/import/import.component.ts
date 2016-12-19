@@ -261,7 +261,7 @@ export class ImportComponent implements AfterContentInit {
                     pendingItems = [];
                 },
                 complete: (result) => {
-                    if ( result.meta.aborted && this._abortedLength ) {
+                    if ( result && result.meta.aborted && this._abortedLength ) {
                         this.status.parseErrorMessages.push(new Object({
                                 row: 0,
                                 error: new Object({ message: `There wasn't any parsed object in ${this._abortedLength} characters`}),

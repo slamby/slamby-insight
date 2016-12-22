@@ -47,10 +47,10 @@ module.exports = {
        *
        * See: https://github.com/webpack/file-loader
        */
-      {
-        test: /\.(png|ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
-        loader: 'file?name=fonts/[name].[hash].[ext]'
-      },
+      // {
+      //   test: /\.(png|ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
+      //   loader: 'file?name=fonts/[name].[hash].[ext]'
+      // },
       /*
        * the file-loader emits files from font-awesome
        * Returns file content as string

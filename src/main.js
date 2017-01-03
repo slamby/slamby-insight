@@ -125,6 +125,14 @@ function createWindow() {
         mainWindow = null;
     });
 
+    // hack to prevent JSON file preview
+    mainWindow.webContents.on('will-navigate', function(event, url) {
+        if (url.endsWith(".json")) {
+            event.preventDefault();
+            mainWindow.webContents.downloadURL(url);
+        }
+    });
+
     mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
         if (item.getURL().indexOf(nutsUrl) !== -1){
             //linux installer download

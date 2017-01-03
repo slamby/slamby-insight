@@ -537,7 +537,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     copyAllTo() {
-        this.dialogService.progressModel = { Header: 'Collectind documents...' };
+        this.dialogService.progressModel = { Header: 'Collecting documents...' };
         this.dialogService.openDialog('indeterminateprogress');
         let idField = this.dataset.IdField;
         let settings: IDocumentSampleSettings = _.cloneDeep(this.sampleSettings.Settings);
@@ -605,7 +605,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
     }
 
     moveAllTo() {
-        this.dialogService.progressModel = { Header: 'Collectind documents...' };
+        this.dialogService.progressModel = { Header: 'Collecting documents...' };
         this.dialogService.openDialog('indeterminateprogress');
         let idField = this.dataset.IdField;
         let settings: IDocumentSampleSettings = _.cloneDeep(this.sampleSettings.Settings);
@@ -618,7 +618,7 @@ export class DocumentsComponent implements OnInit, AfterContentInit {
         this._documentService.getDocumentsBySample(this.dataset.Name, settings)
             .subscribe(paginated => {
                 this.dialogService.close();
-                this.moveTo(paginated.Items.map<SelectedItem<any>>(d => { return { IsSelected: false, Item: d }; }));
+                this.moveTo(paginated.Items);
             },
             error => {
                 this.errorMessage = <any>error;

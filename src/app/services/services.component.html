@@ -121,266 +121,293 @@
 				<div class="form-group">
 					<div class="col-sm-10">
 						<div class="table-responsive" style="overflow-y: auto; overflow-x: auto; max-height: 300px">
-							<table class='table table-striped'>
-								<thead>
-									<th><input type="checkbox" [checked]="getSelectedItemsCount(smd.model.Model.fields) == smd.model.Model.fields.length"
-											name="checkAll" (change)="checkField($event)" style="margin: 3px;"></th>
-									<th>Fields For Recommendation</th>
-								</thead>
-								<tbody>
-									<tr *ngFor='let field of smd.model.Model.fields'>
-										<td><input type="checkbox" [checked]="field.IsSelected" name="check" (change)="checkField($event, field)"></td>
-										<td>{{field.Name}}</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
+<table class='table table-striped'>
+	<thead>
+		<th>
+			<input type="checkbox" [checked]="getSelectedItemsCount(smd.model.Model.fields) == smd.model.Model.fields.length" name="checkAll"
+				(change)="checkField($event)" style="margin: 3px;"></th>
+<th>Fields For Recommendation</th>
+</thead>
+<tbody>
+	<tr *ngFor='let field of smd.model.Model.fields'>
+		<td><input type="checkbox" [checked]="field.IsSelected" name="check" (change)="checkField($event, field)"></td>
+		<td>{{field.Name}}</td>
+	</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div *ngIf='smd.model?.Type == "export"' export>
+	<div class="form-group" *ngIf="sm.model.Model.Type == serviceType.Classifier">
+		<label class="col-sm-2 control-label">Ngram Count</label>
+		<div class="col-sm-10">
+			<sl-ngram-selector name="ngram" [options]="smd.model.Model.NGramList" [(ngModel)]="smd.model.Model.SelectedNGramList"></sl-ngram-selector>
+		</div>
+	</div>
+	<div class="form-group" [class.has-error]="tags.errors && tags.dirty">
+		<label for="tags" class="col-sm-2 control-label">TagIdList</label>
+		<div class="col-sm-10">
+			<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
+			<input type="number" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedTagList.length" name="tags" #tags="ngModel"
+				[min]="1" />
+			<div *ngIf="tags.errors?.min">
+				<p *ngIf="tags.errors?.min" class="text-danger">
+					No selected tag.
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+<div *ngIf='smd.model?.Type == "index"' index>
+	<div class="form-group">
+		<label for="query" class="col-sm-2 control-label">Query</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" query="query" #query="ngModel" autofocus>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="tags" class="col-sm-2 control-label">Tags</label>
+		<div class="col-sm-10">
+			<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
+		</div>
+	</div>
+</div>
+<div *ngIf='smd.model?.Type == "recommend"' recommend>
+	<div *ngIf="sm.model.Model.Type == serviceType.Classifier">
+		<div class="form-group" [class.has-error]="text.errors && text.dirty">
+			<label for="text" class="col-sm-3 control-label">Text</label>
+			<div class="col-sm-9">
+				<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" text="text" #text="ngModel" autofocus required>
+				<div *ngIf="text.errors?.required && text.touched">
+					<p class="text-danger">
+						Field is required!
+					</p>
 				</div>
 			</div>
 		</div>
-		<div *ngIf='smd.model?.Type == "export"' export>
-			<div class="form-group" *ngIf="sm.model.Model.Type == serviceType.Classifier">
-				<label class="col-sm-2 control-label">Ngram Count</label>
-				<div class="col-sm-10">
-					<sl-ngram-selector name="ngram" [options]="smd.model.Model.NGramList" [(ngModel)]="smd.model.Model.SelectedNGramList"></sl-ngram-selector>
-				</div>
-			</div>
-			<div class="form-group" [class.has-error]="tags.errors && tags.dirty">
-				<label for="tags" class="col-sm-2 control-label">TagIdList</label>
-				<div class="col-sm-10">
-					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
-					<input type="number" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedTagList.length" name="tags" #tags="ngModel"
-						[min]="1" />
-					<div *ngIf="tags.errors?.min">
-						<p *ngIf="tags.errors?.min" class="text-danger">
-							No selected tag.
-						</p>
-					</div>
+		<div class="form-group" [class.has-error]="count.errors && count.dirty">
+			<label for="count" class="col-sm-3 control-label">Count</label>
+			<div class="col-sm-9">
+				<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
+				<div *ngIf="count.errors?.min && count.touched">
+					<p class="text-danger">
+						Field is required!
+					</p>
 				</div>
 			</div>
 		</div>
-		<div *ngIf='smd.model?.Type == "index"' index>
-			<div class="form-group">
+		<div class="form-group">
+			<label for="count" class="col-sm-3 control-label">Need Tag In Result</label>
+			<div class="col-sm-9">
+				<md-slide-toggle [checked]="smd.model.Model.NeedTagInResult" (change)='changeToggle("NeedTagInResult")' color="primary">
+				</md-slide-toggle>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="count" class="col-sm-3 control-label">Use Emphasizing</label>
+			<div class="col-sm-9">
+				<md-slide-toggle [checked]="smd.model.Model.UseEmphasizing" (change)='changeToggle("UseEmphasizing")' color="primary">
+				</md-slide-toggle>
+			</div>
+		</div>
+	</div>
+	<div *ngIf="sm.model.Model.Type == serviceType.Prc">
+		<div class="form-group" [class.has-error]="text.errors && text.dirty">
+			<label for="text" class="col-sm-3 control-label">Text</label>
+			<div class="col-sm-9">
+				<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" text="text" #text="ngModel" autofocus required>
+				<div *ngIf="text.errors?.required && text.touched">
+					<p class="text-danger">
+						Field is required!
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="form-group" [class.has-error]="count.errors && count.dirty">
+			<label for="count" class="col-sm-3 control-label">Count</label>
+			<div class="col-sm-9">
+				<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
+				<div *ngIf="count.errors?.min && count.touched">
+					<p class="text-danger">
+						Field is required!
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="count" class="col-sm-3 control-label">Need Document In Result</label>
+			<div class="col-sm-9">
+				<md-slide-toggle [checked]="smd.model.Model.NeedDocumentInResult" (change)='changeToggle("NeedDocumentInResult")' color="primary">
+				</md-slide-toggle>
+			</div>
+		</div>
+		<div class="form-group" [class.has-error]="tagId.errors && tagId.dirty">
+			<label for="tagId" class="col-sm-3 control-label">Tag Id</label>
+			<div class="col-sm-9">
+				<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="count" class="col-sm-3 control-label">Filter</label>
+			<div class="col-sm-9">
 				<label for="query" class="col-sm-2 control-label">Query</label>
-				<div class="col-sm-10">
+				<div class="col-sm-5">
 					<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" query="query" #query="ngModel" autofocus>
 				</div>
-			</div>
-			<div class="form-group">
-				<label for="tags" class="col-sm-2 control-label">Tags</label>
-				<div class="col-sm-10">
-					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">Select Tags ({{smd.model.Model.SelectedTagList.length}})</button>
-				</div>
-			</div>
-		</div>
-		<div *ngIf='smd.model?.Type == "recommend"' recommend>
-			<div *ngIf="sm.model.Model.Type == serviceType.Classifier">
-				<div class="form-group" [class.has-error]="text.errors && text.dirty">
-					<label for="text" class="col-sm-3 control-label">Text</label>
-					<div class="col-sm-9">
-						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" text="text" #text="ngModel" autofocus required>
-						<div *ngIf="text.errors?.required && text.touched">
-							<p class="text-danger">
-								Field is required!
-							</p>
-						</div>
-					</div>
-				</div>
-				<div class="form-group" [class.has-error]="count.errors && count.dirty">
-					<label for="count" class="col-sm-3 control-label">Count</label>
-					<div class="col-sm-9">
-						<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
-						<div *ngIf="count.errors?.min && count.touched">
-							<p class="text-danger">
-								Field is required!
-							</p>
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="count" class="col-sm-3 control-label">Need Tag InResult</label>
-					<div class="col-sm-9">
-						<md-slide-toggle [checked]="smd.model.Model.NeedTagInResult" (change)='changeToggle("NeedTagInResult")' color="primary">
-						</md-slide-toggle>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="count" class="col-sm-3 control-label">Use Emphasizing</label>
-					<div class="col-sm-9">
-						<md-slide-toggle [checked]="smd.model.Model.UseEmphasizing" (change)='changeToggle("UseEmphasizing")' color="primary">
-						</md-slide-toggle>
-					</div>
-				</div>
-			</div>
-			<div *ngIf="sm.model.Model.Type == serviceType.Prc">
-				<div class="form-group" [class.has-error]="text.errors && text.dirty">
-					<label for="text" class="col-sm-3 control-label">Text</label>
-					<div class="col-sm-9">
-						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" text="text" #text="ngModel" autofocus required>
-						<div *ngIf="text.errors?.required && text.touched">
-							<p class="text-danger">
-								Field is required!
-							</p>
-						</div>
-					</div>
-				</div>
-				<div class="form-group" [class.has-error]="count.errors && count.dirty">
-					<label for="count" class="col-sm-3 control-label">Count</label>
-					<div class="col-sm-9">
-						<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
-						<div *ngIf="count.errors?.min && count.touched">
-							<p class="text-danger">
-								Field is required!
-							</p>
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="count" class="col-sm-3 control-label">Need Document In Result</label>
-					<div class="col-sm-9">
-						<md-slide-toggle [checked]="smd.model.Model.NeedDocumentInResult" (change)='changeToggle("NeedDocumentInResult")' color="primary">
-						</md-slide-toggle>
-					</div>
-				</div>
-				<div class="form-group" [class.has-error]="tagId.errors && tagId.dirty">
-					<label for="tagId" class="col-sm-3 control-label">Tag Id</label>
-					<div class="col-sm-9">
-						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="count" class="col-sm-3 control-label">Filter</label>
-					<div class="col-sm-9">
-						<label for="query" class="col-sm-2 control-label">Query</label>
-						<div class="col-sm-5">
-							<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" query="query" #query="ngModel" autofocus>
-						</div>
-						<label for="tags" class="col-sm-1 control-label">Tags</label>
-						<div class="col-sm-4">
-							<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">
+				<label for="tags" class="col-sm-1 control-label">Tags</label>
+				<div class="col-sm-4">
+					<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">
 								<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</span>
 								<span *ngIf="smd.showProgress"><i class='fa fa-circle-o-notch fa-spin'></i> Loading...</span>
 							</button>
-						</div>
-					</div>
-				</div>
-				<div class="form-group" [class.has-error]="weightsjson.errors">
-					<label for="weightsjson" class="col-sm-3 control-label">Weights</label>
-					<div class="col-sm-9">
-						<sl-json-editor [(ngModel)]="smd.model.Model.Weightsjson" name="weightsjson" #weightsjson="ngModel" height="200px" json></sl-json-editor>
-						<div *ngIf="weightsjson.dirty && !weightsjson.valid">
-							<p *ngIf="weightsjson.errors?.json" class="text-danger">
-								Invalid Weights JSON!
-							</p>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
-		<div *ngIf='smd.model?.Type == "recommendById"' recommendById>
-			<div *ngIf="sm.model.Model.Type == serviceType.Prc">
-				<div class="form-group" [class.has-error]="documentId.errors && documentId.dirty">
-					<label for="documentId" class="col-sm-3 control-label">DocumentId</label>
-					<div class="col-sm-9">
-						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.DocumentId" documentId="documentId" #documentId="ngModel"
-							autofocus required>
-						<div *ngIf="documentId.errors?.required && documentId.touched">
-							<p class="text-danger">
-								Field is required!
-							</p>
-						</div>
-					</div>
-				</div>
-				<div class="form-group" [class.has-error]="count.errors && count.dirty">
-					<label for="count" class="col-sm-3 control-label">Count</label>
-					<div class="col-sm-9">
-						<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
-						<div *ngIf="count.errors?.min && count.touched">
-							<p class="text-danger">
-								Field is required!
-							</p>
-						</div>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="query" class="col-sm-3 control-label">Query</label>
-					<div class="col-sm-9">
-						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" query="query" #query="ngModel" autofocus>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="count" class="col-sm-3 control-label">NeedDocumentInResult</label>
-					<div class="col-sm-9">
-						<md-slide-toggle [checked]="smd.model.Model.NeedDocumentInResult" (change)='changeToggle("NeedDocumentInResult")' color="primary">
-						</md-slide-toggle>
-					</div>
-				</div>
-				<div class="form-group" [class.has-error]="tagId.errors && tagId.dirty">
-					<label for="tagId" class="col-sm-3 control-label">TagId</label>
-					<div class="col-sm-9">
-						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus required>
-						<div *ngIf="tagId.errors?.required && tagId.touched">
-							<p class="tagId-danger">
-								Field is required!
-							</p>
-						</div>
-					</div>
-				</div>
-				<div class="form-group" [class.has-error]="weightsjson.errors">
-					<label for="weightsjson" class="col-sm-3 control-label">Weights</label>
-					<div class="col-sm-9">
-						<sl-json-editor [(ngModel)]="smd.model.Model.Weightsjson" name="weightsjson" #weightsjson="ngModel" height="300px" json></sl-json-editor>
-						<div *ngIf="weightsjson.dirty && !weightsjson.valid">
-							<p *ngIf="weightsjson.errors?.json" class="text-danger">
-								Invalid Compress Settings JSON!
-							</p>
-						</div>
-					</div>
+		<div class="form-group" [class.has-error]="weightsjson.errors">
+			<label for="weightsjson" class="col-sm-3 control-label">Weights</label>
+			<div class="col-sm-9">
+				<sl-json-editor [(ngModel)]="smd.model.Model.Weightsjson" name="weightsjson" #weightsjson="ngModel" height="200px" json></sl-json-editor>
+				<div *ngIf="weightsjson.dirty && !weightsjson.valid">
+					<p *ngIf="weightsjson.errors?.json" class="text-danger">
+						Invalid Weights JSON!
+					</p>
 				</div>
 			</div>
 		</div>
-	</sl-service-maintenance-dialog>
-	<div class="button-container">
-		<button type="button" class="btn btn-primary" (click)="add(serviceType.Classifier)">Add Classifier</button>
-		<button type="button" class="btn btn-primary" (click)="add(serviceType.Prc)">Add Prc</button>
 	</div>
-	<br role="separator" class="divider">
-	<div *ngIf="services && services.length">
-		<table class="table table-striped table-hover" contextmenu="contextmenu" style="overflow-y: auto; overflow-x: auto; height: 80%">
-			<thead>
-				<tr>
-					<th></th>
-					<th>Alias</th>
-					<th>Name</th>
-					<th>Id</th>
-					<th>Description</th>
-					<th>Type</th>
-					<th>Status</th>
-					<th>
-						<a class="btn" (click)="refresh()">
-							<i class="fa fa-refresh" aria-hidden="true"></i>
-						</a>
-					</th>
-					<th>Actions</th>
-				</tr>
-			</thead>
-			<tbody *vsFor="services; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
-				<tr *ngFor="let service of _items; let i = index">
-					<td>{{ i + _startIndex + 1}}</td>
-					<td>{{ service.Alias }}</td>
-					<td>{{ service.Name }}</td>
-					<td>{{ service.Id }}</td>
-					<td>{{ service.Description }}</td>
-					<td>{{ service.Type }}</td>
-					<td>{{ service.Status }}</td>
-					<td>
-						<a class="btn" (click)="refresh(service)">
-							<i class="fa fa-refresh" aria-hidden="true"></i>
-						</a>
-					</td>
-					<td>
-						<!--<div [ngSwitch]="service.Status">
+</div>
+<div *ngIf='smd.model?.Type == "recommendById"' recommendById>
+	<div *ngIf="sm.model.Model.Type == serviceType.Prc">
+		<div class="form-group" [class.has-error]="documentId.errors && documentId.dirty">
+			<label for="documentId" class="col-sm-3 control-label">DocumentId</label>
+			<div class="col-sm-9">
+				<input type="text" class="form-control" [(ngModel)]="smd.model.Model.DocumentId" documentId="documentId" #documentId="ngModel"
+					autofocus required>
+				<div *ngIf="documentId.errors?.required && documentId.touched">
+					<p class="text-danger">
+						Field is required!
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="form-group" [class.has-error]="count.errors && count.dirty">
+			<label for="count" class="col-sm-3 control-label">Count</label>
+			<div class="col-sm-9">
+				<input type="number" class="form-control" [(ngModel)]="smd.model.Model.Count" count="count" #count="ngModel" autofocus required>
+				<div *ngIf="count.errors?.min && count.touched">
+					<p class="text-danger">
+						Field is required!
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="query" class="col-sm-3 control-label">Query</label>
+			<div class="col-sm-9">
+				<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" query="query" #query="ngModel" autofocus>
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="count" class="col-sm-3 control-label">NeedDocumentInResult</label>
+			<div class="col-sm-9">
+				<md-slide-toggle [checked]="smd.model.Model.NeedDocumentInResult" (change)='changeToggle("NeedDocumentInResult")' color="primary">
+				</md-slide-toggle>
+			</div>
+		</div>
+		<div class="form-group" [class.has-error]="tagId.errors && tagId.dirty">
+			<label for="tagId" class="col-sm-3 control-label">TagId</label>
+			<div class="col-sm-9">
+				<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" tagId="tagId" #tagId="ngModel" autofocus required>
+				<div *ngIf="tagId.errors?.required && tagId.touched">
+					<p class="tagId-danger">
+						Field is required!
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="form-group" [class.has-error]="weightsjson.errors">
+			<label for="weightsjson" class="col-sm-3 control-label">Weights</label>
+			<div class="col-sm-9">
+				<sl-json-editor [(ngModel)]="smd.model.Model.Weightsjson" name="weightsjson" #weightsjson="ngModel" height="300px" json></sl-json-editor>
+				<div *ngIf="weightsjson.dirty && !weightsjson.valid">
+					<p *ngIf="weightsjson.errors?.json" class="text-danger">
+						Invalid Compress Settings JSON!
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div *ngIf='smd.model?.Type == "keywords"' keywords>
+	<div class="form-group" [class.has-error]="text.errors && text.dirty">
+		<label for="text" class="col-sm-3 control-label">Text</label>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" id="text" #text="ngModel" autofocus required>
+			<div *ngIf="text.errors?.required && text.touched">
+				<p class="text-danger">
+					Field is required!
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="form-group" [class.has-error]="tagId.errors && tagId.dirty">
+		<label for="tagId" class="col-sm-3 control-label">Tag Id</label>
+		<div class="col-sm-9">
+			<input type="text" class="form-control" [(ngModel)]="smd.model.Model.TagId" id="tagId" #tagId="ngModel">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="count" class="col-sm-3 control-label">Strict mode</label>
+			<div class="col-sm-9">
+				<md-slide-toggle [checked]="smd.model.Model.IsStrict" id="isStrict" (change)='changeToggle("IsStrict")' color="primary">
+				</md-slide-toggle>
+			</div>
+		</div>
+</div>
+</sl-service-maintenance-dialog>
+<div class="button-container">
+	<button type="button" class="btn btn-primary" (click)="add(serviceType.Classifier)">Add Classifier</button>
+	<button type="button" class="btn btn-primary" (click)="add(serviceType.Prc)">Add Prc</button>
+</div>
+<br role="separator" class="divider">
+<div *ngIf="services && services.length">
+	<table class="table table-striped table-hover" contextmenu="contextmenu" style="overflow-y: auto; overflow-x: auto; height: 80%">
+<thead>
+	<tr>
+		<th></th>
+		<th>Alias</th>
+		<th>Name</th>
+		<th>Id</th>
+		<th>Description</th>
+		<th>Type</th>
+		<th>Status</th>
+		<th>
+			<a class="btn" (click)="refresh()">
+				<i class="fa fa-refresh" aria-hidden="true"></i>
+			</a>
+		</th>
+		<th>Actions</th>
+	</tr>
+</thead>
+<tbody *vsFor="services; tagName:'tr'; scrollParent:'div'; excess: 2; autoresize:true; let _items = vsCollection; let _startIndex = vsStartIndex">
+	<tr *ngFor="let service of _items; let i = index">
+		<td>{{ i + _startIndex + 1}}</td>
+		<td>{{ service.Alias }}</td>
+		<td>{{ service.Name }}</td>
+		<td>{{ service.Id }}</td>
+		<td>{{ service.Description }}</td>
+		<td>{{ service.Type }}</td>
+		<td>{{ service.Status }}</td>
+		<td>
+			<a class="btn" (click)="refresh(service)">
+				<i class="fa fa-refresh" aria-hidden="true"></i>
+			</a>
+		</td>
+		<td>
+			<!--<div [ngSwitch]="service.Status">
                             <button md-icon-button [md-menu-trigger-for]="menu">
                                 <md-icon>more_vert</md-icon>
                             </button>
@@ -413,47 +440,48 @@
                             <md-menu #menu="mdMenu" *ngSwitchDefault>
                             </md-menu>
                         </div>-->
-						<div class="btn-group">
-							<div ngbDropdown class="dropdown" [ngSwitch]="service.Status">
-								<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
-									aria-haspopup="true" aria-expanded="true">
+			<div class="btn-group">
+				<div ngbDropdown class="dropdown" [ngSwitch]="service.Status">
+					<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="true">
                                         Actions
                                         <span class="caret"></span>
                                 </button>
-								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.New">
-									<li><a (click)="details(service)">Details</a></li>
-									<li><a (click)="prepare(service)">Prepare</a></li>
-									<li><a (click)="modify(service)">Modify</a></li>
-									<li><a (click)="deleteConfirm(service)">Delete</a></li>
-								</ul>
-								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Busy">
-									<li><a (click)="details(service)">Details</a></li>
-									<li><a (click)="cancelConfirm(service)">Cancel</a></li>
-									<li><a (click)="deleteConfirm(service)">Delete</a></li>
-								</ul>
-								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Prepared">
-									<li><a (click)="details(service)">Details</a></li>
-									<li><a (click)="activate(service)">Activate</a></li>
-									<li><a (click)="export(service)">Export Dictionaries</a></li>
-									<li><a (click)="modify(service)">Modify</a></li>
-									<li><a (click)="deleteConfirm(service)">Delete</a></li>
-								</ul>
-								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Active">
-									<li><a (click)="details(service)">Details</a></li>
-									<li><a (click)="deactivateConfirm(service)">Deactivate</a></li>
-									<li><a (click)="recommend(service)">Recommend</a></li>
-									<li *ngIf="service.Type==serviceType.Prc"><a (click)="index(service)">Index</a></li>
-									<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="partialIndex(service)">PartialIndex</a></li>
-									<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="recommendById(service)">RecommendById</a></li>
-									<li><a (click)="export(service)">Export Dictionaries</a></li>
-									<li><a (click)="modify(service)">Modify</a></li>
-									<li><a (click)="deleteConfirm(service)">Delete</a></li>
-								</ul>
-							</div>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+					<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.New">
+						<li><a (click)="details(service)">Details</a></li>
+						<li><a (click)="prepare(service)">Prepare</a></li>
+						<li><a (click)="modify(service)">Modify</a></li>
+						<li><a (click)="deleteConfirm(service)">Delete</a></li>
+					</ul>
+					<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Busy">
+						<li><a (click)="details(service)">Details</a></li>
+						<li><a (click)="cancelConfirm(service)">Cancel</a></li>
+						<li><a (click)="deleteConfirm(service)">Delete</a></li>
+					</ul>
+					<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Prepared">
+						<li><a (click)="details(service)">Details</a></li>
+						<li><a (click)="activate(service)">Activate</a></li>
+						<li><a (click)="export(service)">Export Dictionaries</a></li>
+						<li><a (click)="modify(service)">Modify</a></li>
+						<li><a (click)="deleteConfirm(service)">Delete</a></li>
+					</ul>
+					<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Active">
+						<li><a (click)="details(service)">Details</a></li>
+						<li><a (click)="deactivateConfirm(service)">Deactivate</a></li>
+						<li><a (click)="recommend(service)">Recommend</a></li>
+						<li *ngIf="service.Type==serviceType.Prc"><a (click)="keywords(service)">Extract Keywords</a></li>
+						<li *ngIf="service.Type==serviceType.Prc"><a (click)="index(service)">Index</a></li>
+						<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="partialIndex(service)">PartialIndex</a></li>
+						<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="recommendById(service)">RecommendById</a></li>
+						<li><a (click)="export(service)">Export Dictionaries</a></li>
+						<li><a (click)="modify(service)">Modify</a></li>
+						<li><a (click)="deleteConfirm(service)">Delete</a></li>
+					</ul>
+				</div>
+			</div>
+		</td>
+	</tr>
+</tbody>
+</table>
+</div>
 </div>

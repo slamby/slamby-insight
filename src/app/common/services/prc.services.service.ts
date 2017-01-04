@@ -66,8 +66,8 @@ export class PrcServicesService extends BaseService<PrcServiceApi> {
         return this.apiService.prcIndexPartialService(id);
     }
 
-    keyword(id: string, request: IPrcKeywordsRequest): Observable<Array<IPrcKeywordsResult>> {
+    keywords(id: string, request: IPrcKeywordsRequest, isStrict = false): Observable<Array<IPrcKeywordsResult>> {
         this.setContentTypeHeader();
-        return this.apiService.prcKeywordsService(id, request);
+        return this.apiService.prcKeywordsService(id, request, isStrict);
     }
 }

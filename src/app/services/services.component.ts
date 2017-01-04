@@ -10,7 +10,7 @@ import {
     IService, IPrcService, IClassifierService, IClassifierPrepareSettings, IProcess, IPrcPrepareSettings,
     IClassifierActivateSettings, IPrcActivateSettings, IExportDictionariesSettings,
     IClassifierRecommendationRequest, IClassifierRecommendationResult, IPrcRecommendationRequest,
-    IPrcRecommendationByIdRequest, IPrcRecommendationResult, IPrcIndexSettings, IDataSet, ITag
+    IPrcRecommendationByIdRequest, IPrcRecommendationResult, IPrcIndexSettings, IPrcKeywordsRequest, IPrcKeywordsResult, IDataSet, ITag
 } from 'slamby-sdk-angular2';
 import { ServicesService } from '../common/services/services.service';
 import { ClassifierServicesService } from '../common/services/classifier.services.service';
@@ -77,7 +77,7 @@ export class ServicesComponent implements OnInit {
             detailsObject[prop] = selected[prop];
         });
         let model: CommonOutputModel = {
-            Header: `${selected.Name} service details`,
+            Header: `${selected.Name} Service Details`,
             OutputObject: detailsObject
         };
         this.resultDialog.model = model;
@@ -122,7 +122,7 @@ export class ServicesComponent implements OnInit {
 
     deleteConfirm(selected: ServiceType) {
         let model: ConfirmModel = {
-            Header: 'Delete service',
+            Header: 'Delete Service',
             Message: 'Are you sure to remove the following service: ' + selected.Name,
             Buttons: ['yes', 'no']
         };
@@ -394,7 +394,7 @@ export class ServicesComponent implements OnInit {
     cancelConfirm(selected: ServiceType) {
         let model: ConfirmModel = {
             Header: 'Cancel',
-            Message: 'Are you sure to cancel the current process of ' + selected.Name + ' service',
+            Message: 'Are you sure to cancel the current process of the ' + selected.Name + ' service',
             Buttons: ['yes', 'no']
         };
         this.confirmDialog.model = model;
@@ -665,7 +665,7 @@ export class ServicesComponent implements OnInit {
 
     deactivateConfirm(selected: ServiceType) {
         let model: ConfirmModel = {
-            Header: 'Deactivate service',
+            Header: 'Deactivate Service',
             Message: 'Are you sure to deactivate the following service: ' + selected.Name,
             Buttons: ['yes', 'no']
         };
@@ -709,7 +709,7 @@ export class ServicesComponent implements OnInit {
             return;
         }
         this.dialogService.progressModel = {
-            Header: 'Waiting for recommendation result'
+            Header: 'Waiting for Recommendation Result'
         };
         let dialogModel;
         if (selected.Type === IService.ITypeEnum.Classifier) {
@@ -733,7 +733,7 @@ export class ServicesComponent implements OnInit {
                             (results: Array<IClassifierRecommendationResult>) => {
                                 this.dialogService.close();
                                 this.resultDialog.model = {
-                                    Header: 'Classifier recommendation result',
+                                    Header: 'Classifier Recommendation Result',
                                     OutputObject: {
                                         RecommendationResult: results
                                     }
@@ -821,7 +821,7 @@ export class ServicesComponent implements OnInit {
             );
         }
         this.inputModel = {
-            Header: selected.Type + ' Recommenation Request',
+            Header: selected.Type + ' Recommendation Request',
             Model: dialogModel,
             Type: 'recommend'
         };
@@ -908,7 +908,7 @@ export class ServicesComponent implements OnInit {
             return;
         }
         this.dialogService.progressModel = {
-            Header: 'Waiting for recommendation result'
+            Header: 'Waiting for Recommendation Result'
         };
         this.sm.dialogClosed.subscribe(
             (model: CommonInputModel) => {
@@ -927,7 +927,7 @@ export class ServicesComponent implements OnInit {
                         (results: Array<IPrcRecommendationResult>) => {
                             this.dialogService.close();
                             this.resultDialog.model = {
-                                Header: 'Prc recommendation result',
+                                Header: 'Prc Recommendation Result',
                                 OutputObject: {
                                     RecommendationResult: results
                                 }
@@ -954,9 +954,59 @@ export class ServicesComponent implements OnInit {
             Type: selected.Type
         };
         this.inputModel = {
-            Header: 'Prc RecommenationById Request',
+            Header: 'Prc Recommendation by Id Request',
             Model: model,
             Type: 'recommendById'
+        };
+        this.sm.model = this.inputModel;
+        this.sm.open();
+    }
+
+    keywords(selected: ServiceType) {
+        if (!selected || selected.Type === IService.ITypeEnum.Classifier) {
+            return;
+        }
+        this.dialogService.progressModel = {
+            Header: 'Waiting for the Keywords Extraction Result'
+        };
+        this.sm.dialogClosed.subscribe(
+            (model: CommonInputModel) => {
+                if (model.Result === DialogResult.Ok) {
+                    let settings: IPrcKeywordsRequest = {
+                        Text: model.Model.Text,
+                        TagId: model.Model.TagId
+                    };
+                    this._prcService.keywords(selected.Id, settings, model.Model.IsStrict).subscribe(
+                        (results: Array<IPrcKeywordsResult>) => {
+                            this.dialogService.close();
+                            this.resultDialog.model = {
+                                Header: 'Prc Keywords Extraction Result',
+                                OutputObject: {
+                                    KeywordsResult: results
+                                }
+                            };
+                            this.sm.unsubscribeAndClose();
+                            this.resultDialog.open();
+                        },
+                        error => {
+                            let errors = this.handleError(error);
+                            model.ErrorMessage = errors;
+                            this.sm.showProgress = false;
+                        }
+                    );
+                }
+            }
+        );
+        let model = {
+            Text: '',
+            TagId: '',
+            Type: selected.Type,
+            IsStrict: false
+        };
+        this.inputModel = {
+            Header: 'Prc Keywords Extraction Request',
+            Model: model,
+            Type: 'keywords'
         };
         this.sm.model = this.inputModel;
         this.sm.open();

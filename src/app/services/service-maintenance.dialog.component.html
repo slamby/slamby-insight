@@ -21,6 +21,7 @@
 				<ng-content *ngIf='model.Type == "recommend"' class="modal-body" select="[recommend]"></ng-content>
 				<ng-content *ngIf='model.Type == "keywords"' class="modal-body" select="[keywords]"></ng-content>
 				<ng-content *ngIf='model.Type == "recommendById"' class="modal-body" select="[recommendById]"></ng-content>
+				<ng-content *ngIf='model.Type == "search"' class="modal-body" select="[search]"></ng-content>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-success" [disabled]="!f.valid || showProgress">Ok</button>
 					<button type="button" class="btn btn-warning" (click)="cancel();">Close</button>

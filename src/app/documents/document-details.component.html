@@ -2,8 +2,8 @@
 	<table>
 		<tbody>
 			<tr *ngFor='let property of properties'>
-				<td>
-					<label>{{property.Key}}: </label>
+				<td class="property-name">
+					<label>{{property.Key}}: </label> 
 				</td>
 				<td style="width: 100%">
 					<p *ngIf="!isMultiline(property.Value)">

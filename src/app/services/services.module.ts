@@ -12,6 +12,7 @@ import { NotificationService } from '../common/services/notification.service';
 import { ClassifierServicesService } from '../common/services/classifier.services.service';
 import { PrcServicesService } from '../common/services/prc.services.service';
 import { ProcessesService } from '../common/services/processes.service';
+import { SearchServicesService } from '../common/services/search.services.service';
 
 import { MaterialModule } from '@angular/material';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -33,7 +34,8 @@ import { NGramSelectorComponent } from '../common/components/ngram-selector.comp
         NotificationService,
         ClassifierServicesService,
         PrcServicesService,
-        ProcessesService
+        ProcessesService,
+        SearchServicesService
     ],
     imports: [
         CommonComponentsModule,

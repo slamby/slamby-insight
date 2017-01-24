@@ -14,3 +14,7 @@ table {
 .boolean { color: blue; }
 .null { color: magenta; }
 .key { color: red; }
+
+tr td:first-child {
+    vertical-align: top;
+}

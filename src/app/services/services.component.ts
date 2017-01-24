@@ -10,11 +10,14 @@ import {
     IService, IPrcService, IClassifierService, IClassifierPrepareSettings, IProcess, IPrcPrepareSettings,
     IClassifierActivateSettings, IPrcActivateSettings, IExportDictionariesSettings,
     IClassifierRecommendationRequest, IClassifierRecommendationResult, IPrcRecommendationRequest,
-    IPrcRecommendationByIdRequest, IPrcRecommendationResult, IPrcIndexSettings, IPrcKeywordsRequest, IPrcKeywordsResult, IDataSet, ITag
+    IPrcRecommendationByIdRequest, IPrcRecommendationResult, IPrcIndexSettings, IPrcKeywordsRequest, IPrcKeywordsResult, IDataSet, ITag,
+    ISearchService, ISearchPrepareSettings, ISearchActivateSettings, ISearchResultWrapper, ISearchRequest, ISearchSettings, IFilter,
+    IAutoCompleteSettings, IClassifierSettings
 } from 'slamby-sdk-angular2';
 import { ServicesService } from '../common/services/services.service';
 import { ClassifierServicesService } from '../common/services/classifier.services.service';
 import { PrcServicesService } from '../common/services/prc.services.service';
+import { SearchServicesService } from '../common/services/search.services.service';
 import { Messenger } from '../common/services/messenger.service';
 import { ProcessesService } from '../common/services/processes.service';
 import { CommonInputDialogComponent } from '../common/components/common-input.dialog.component';
@@ -64,7 +67,8 @@ export class ServicesComponent implements OnInit {
         private _notificationService: NotificationService,
         private _messenger: Messenger,
         private _datasetService: DatasetService,
-        private _tagService: TagService) {
+        private _tagService: TagService,
+        private _searchService: SearchServicesService) {
     }
 
     ngOnInit(): void {
@@ -153,7 +157,7 @@ export class ServicesComponent implements OnInit {
             Description: '',
         };
         let inputModel: CommonInputModel = {
-            Header: type === IService.ITypeEnum.Classifier ? 'Add New Classifier Service' : 'Add New Prc Service',
+            Header: `Add New ${type} Service`,
             Model: defaultModel,
             Type: 'new'
         };
@@ -182,24 +186,37 @@ export class ServicesComponent implements OnInit {
 
     refresh(selected?: ServiceType) {
         if (selected) {
-            if (selected.Type === IService.ITypeEnum.Classifier) {
-                this._classifierService.get(selected.Id).subscribe(
-                    (classifierService: IClassifierService) => {
-                        let index = this.services.findIndex(s => s.Id === classifierService.Id);
-                        this.services[index] = classifierService;
-                        this.services = _.cloneDeep(this.services);
-                    },
-                    error => this.handleError(error)
-                );
-            } else {
-                this._prcService.get(selected.Id).subscribe(
-                    (prcService: IPrcService) => {
-                        let index = this.services.findIndex(s => s.Id === prcService.Id);
-                        this.services[index] = prcService;
-                        this.services = _.cloneDeep(this.services);
-                    },
-                    error => this.handleError(error)
-                );
+            switch (selected.Type) {
+                case IService.ITypeEnum.Classifier:
+                    this._classifierService.get(selected.Id).subscribe(
+                        (classifierService: IClassifierService) => {
+                            let index = this.services.findIndex(s => s.Id === classifierService.Id);
+                            this.services[index] = classifierService;
+                            this.services = _.cloneDeep(this.services);
+                        },
+                        error => this.handleError(error)
+                    );
+                    break;
+                case IService.ITypeEnum.Prc:
+                    this._prcService.get(selected.Id).subscribe(
+                        (prcService: IPrcService) => {
+                            let index = this.services.findIndex(s => s.Id === prcService.Id);
+                            this.services[index] = prcService;
+                            this.services = _.cloneDeep(this.services);
+                        },
+                        error => this.handleError(error)
+                    );
+                    break;
+                case IService.ITypeEnum.Search:
+                    this._searchService.get(selected.Id).subscribe(
+                        (searchService: ISearchService) => {
+                            let index = this.services.findIndex(s => s.Id === searchService.Id);
+                            this.services[index] = searchService;
+                            this.services = _.cloneDeep(this.services);
+                        },
+                        error => this.handleError(error)
+                    );
+                    break;
             }
         } else {
             this.services = [];
@@ -219,36 +236,16 @@ export class ServicesComponent implements OnInit {
                     this.dialogService.progressModel = dialogModel;
                     this.dialogService.openDialog('progress');
 
-                    // let sources = services.map<Observable<ServiceType>>(s => {
-                    //     return Observable.create((observer: Observer<ServiceType>) => {
-                    //         if (s.Type === IService.ITypeEnum.Classifier) {
-                    //             this._classifierService.get(s.Id).subscribe(
-                    //                 (classifierService: IClassifierService) => {
-                    //                     observer.next(classifierService);
-                    //                     observer.complete();
-                    //                 },
-                    //                 error => observer.error(error)
-                    //             );
-                    //         } else {
-                    //             this._prcService.get(s.Id).subscribe(
-                    //                 (prcService: IPrcService) => {
-                    //                     observer.next(prcService);
-                    //                     observer.complete();
-                    //                 },
-                    //                 error => observer.error(error)
-                    //             );
-                    //         }
-                    //     });
-                    // });
-                    // let source = Observable.concat(...sources);
-
                     // convert IService to async Observable .get() calls
                     let source = Observable.from(services)
                         .flatMap((s: IService, i: number) => {
-                            if (s.Type === IService.ITypeEnum.Classifier) {
-                                return <Observable<ServiceType>>this._classifierService.get(s.Id);
-                            } else {
-                                return <Observable<ServiceType>>this._prcService.get(s.Id);
+                            switch (s.Type) {
+                                case IService.ITypeEnum.Classifier:
+                                    return <Observable<ServiceType>>this._classifierService.get(s.Id);
+                                case IService.ITypeEnum.Prc:
+                                    return <Observable<ServiceType>>this._prcService.get(s.Id);
+                                case IService.ITypeEnum.Search:
+                                    return <Observable<ServiceType>>this._searchService.get(s.Id);
                             }
                         });
 
@@ -297,64 +294,89 @@ export class ServicesComponent implements OnInit {
         if (!selected) {
             return;
         }
-
-        if (selected.Type === IService.ITypeEnum.Classifier) {
-            this.sm.dialogClosed.subscribe(
-                (model: CommonInputModel) => {
-                    if (model.Result === DialogResult.Ok) {
-                        let prepareSettings: IClassifierPrepareSettings = {
+        switch (selected.Type) {
+            case IService.ITypeEnum.Classifier:
+                this.sm.dialogClosed.subscribe(
+                    (model: CommonInputModel) => {
+                        if (model.Result === DialogResult.Ok) {
+                            let prepareSettings: IClassifierPrepareSettings = {
+                                DataSetName: model.Model.SelectedDataset.Name,
+                                NGramList: model.Model.SelectedNGramList.slice(),
+                                TagIdList: model.Model.SelectedTagList.slice(),
+                                CompressLevel: model.Model.CompressLevel,
+                                CompressSettings: model.Model.CompressSettingsJson
+                                    .replace(' ', '')
+                                    .replace('\n', '') === '{}' ? null : JSON.parse(model.Model.CompressSettingsJson)
+                            };
+                            this._classifierService.prepare(selected.Id, prepareSettings).subscribe(
+                                (process: IProcess) => {
+                                    this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
+                                    this.refresh(selected);
+                                    this.sm.unsubscribeAndClose();
+                                },
+                                error => {
+                                    let errors = this.handleError(error);
+                                    model.ErrorMessage = errors;
+                                    this.sm.showProgress = false;
+                                }
+                            );
+                        }
+                    }
+                );
+                break;
+            case IService.ITypeEnum.Prc:
+                this.sm.dialogClosed.subscribe(
+                    (model: CommonInputModel) => {
+                        let prepareSettings: IPrcPrepareSettings = {
                             DataSetName: model.Model.SelectedDataset.Name,
-                            NGramList: model.Model.SelectedNGramList.slice(),
                             TagIdList: model.Model.SelectedTagList.slice(),
                             CompressLevel: model.Model.CompressLevel,
                             CompressSettings: model.Model.CompressSettingsJson
                                 .replace(' ', '')
                                 .replace('\n', '') === '{}' ? null : JSON.parse(model.Model.CompressSettingsJson)
                         };
-                        this._classifierService.prepare(selected.Id, prepareSettings).subscribe(
-                            (process: IProcess) => {
-                                this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
-                                this.refresh(selected);
-                                this.sm.unsubscribeAndClose();
-                            },
-                            error => {
-                                let errors = this.handleError(error);
-                                model.ErrorMessage = errors;
-                                this.sm.showProgress = false;
-                            }
-                        );
+                        if (model.Result === DialogResult.Ok) {
+                            this._prcService.prepare(selected.Id, prepareSettings).subscribe(
+                                (process: IProcess) => {
+                                    this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
+                                    this.refresh(selected);
+                                    this.sm.unsubscribeAndClose();
+                                },
+                                error => {
+                                    let errors = this.handleError(error);
+                                    model.ErrorMessage = errors;
+                                    this.sm.showProgress = false;
+                                }
+                            );
+                        }
                     }
-                }
-            );
-
-        } else {
-            this.sm.dialogClosed.subscribe(
-                (model: CommonInputModel) => {
-                    let prepareSettings: IPrcPrepareSettings = {
-                        DataSetName: model.Model.SelectedDataset.Name,
-                        TagIdList: model.Model.SelectedTagList.slice(),
-                        CompressLevel: model.Model.CompressLevel,
-                        CompressSettings: model.Model.CompressSettingsJson
-                            .replace(' ', '')
-                            .replace('\n', '') === '{}' ? null : JSON.parse(model.Model.CompressSettingsJson)
-                    };
-                    if (model.Result === DialogResult.Ok) {
-                        this._prcService.prepare(selected.Id, prepareSettings).subscribe(
-                            (process: IProcess) => {
-                                this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
-                                this.refresh(selected);
-                                this.sm.unsubscribeAndClose();
-                            },
-                            error => {
-                                let errors = this.handleError(error);
-                                model.ErrorMessage = errors;
-                                this.sm.showProgress = false;
+                );
+                break;
+            case IService.ITypeEnum.Search:
+                    this.sm.dialogClosed.subscribe(
+                        (model: CommonInputModel) => {
+                            let prepareSettings: ISearchPrepareSettings = {
+                                DataSetName: model.Model.SelectedDataset.Name
+                            };
+                            if (model.Result === DialogResult.Ok) {
+                                this._searchService.prepare(selected.Id, prepareSettings).subscribe(
+                                    (process: IProcess) => {
+                                        this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
+                                        this.refresh(selected);
+                                        this.sm.unsubscribeAndClose();
+                                    },
+                                    error => {
+                                        let errors = this.handleError(error);
+                                        model.ErrorMessage = errors;
+                                        this.sm.showProgress = false;
+                                    }
+                                );
                             }
-                        );
-                    }
-                }
-            );
+                        }
+                    );
+                break;
         }
+
         this.sm.dialogOpened.subscribe(
             () => {
                 this.sm.showProgress = true;
@@ -441,11 +463,11 @@ export class ServicesComponent implements OnInit {
         }
     }
 
-    checkField(e, field?: SelectedItem<any>) {
+    checkField(e, fields: any, field?: SelectedItem<any>) {
         if (field) {
-            this.inputModel.Model.fields[this.inputModel.Model.fields.indexOf(field)].IsSelected = e.target.checked;
+            fields[fields.indexOf(field)].IsSelected = e.target.checked;
         } else {
-            this.inputModel.Model.fields.forEach(t => {
+            fields.forEach(t => {
                 t.IsSelected = e.target.checked;
             });
         }
@@ -460,112 +482,271 @@ export class ServicesComponent implements OnInit {
             return;
         }
         let dialogModel;
-        if (selected.Type === IService.ITypeEnum.Classifier) {
-            dialogModel = {
-                SelectedNGramList: (<IClassifierService>selected).PrepareSettings.NGramList.slice(),
-                NGramList: (<IClassifierService>selected).PrepareSettings.NGramList.slice(),
-                SelectedTagList: [],
-                TagList: [],
-                SelectedEmphasizedTagList: [],
-                Type: selected.Type
-            };
-            this.sm.dialogClosed.subscribe(
-                (model: CommonInputModel) => {
-                    if (model.Result === DialogResult.Ok) {
-                        let settingsModel: IClassifierActivateSettings = {
-                            NGramList: model.Model.SelectedNGramList,
-                            TagIdList: model.Model.SelectedTagList.slice(),
-                            EmphasizedTagIdList: model.Model.SelectedEmphasizedTagList.slice()
-                        };
-                        this._classifierService.activate(selected.Id, settingsModel).subscribe(
-                            (process: IProcess) => {
-                                this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
-                                this.refresh(selected);
-                                this.sm.unsubscribeAndClose();
+        switch (selected.Type) {
+            case IService.ITypeEnum.Classifier:
+                dialogModel = {
+                    SelectedNGramList: (<IClassifierService>selected).PrepareSettings.NGramList.slice(),
+                    NGramList: (<IClassifierService>selected).PrepareSettings.NGramList.slice(),
+                    SelectedTagList: [],
+                    TagList: [],
+                    SelectedEmphasizedTagList: [],
+                    Type: selected.Type
+                };
+                this.sm.dialogClosed.subscribe(
+                    (model: CommonInputModel) => {
+                        if (model.Result === DialogResult.Ok) {
+                            let settingsModel: IClassifierActivateSettings = {
+                                NGramList: model.Model.SelectedNGramList,
+                                TagIdList: model.Model.SelectedTagList.slice(),
+                                EmphasizedTagIdList: model.Model.SelectedEmphasizedTagList.slice()
+                            };
+                            this._classifierService.activate(selected.Id, settingsModel).subscribe(
+                                (process: IProcess) => {
+                                    this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
+                                    this.refresh(selected);
+                                    this.sm.unsubscribeAndClose();
+                                },
+                                error => {
+                                    let errors = this.handleError(error);
+                                    model.ErrorMessage = errors;
+                                    this.sm.showProgress = false;
+                                }
+                            );
+                        }
+                    }
+                );
+                this.sm.dialogOpened.subscribe(
+                    () => {
+                        this.sm.showProgress = true;
+                        this._tagService.getTags((<IClassifierService>selected).PrepareSettings.DataSetName, true).subscribe(
+                            (tags: Array<ITag>) => {
+                                let tagsForService = (<IClassifierService>selected).PrepareSettings.TagIdList
+                                    .map(tid => tags.find(t => t.Id === tid))
+                                    .filter(t => t !== undefined);
+                                this.inputModel.Model.TagList = tagsForService;
+                                this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
+                                this.inputModel.Model.SelectedEmphasizedTagList = [];
+                                this.sm.showProgress = false;
                             },
                             error => {
-                                let errors = this.handleError(error);
-                                model.ErrorMessage = errors;
+                                this.handleError(error);
                                 this.sm.showProgress = false;
                             }
                         );
                     }
-                }
-            );
-            this.sm.dialogOpened.subscribe(
-                () => {
-                    this.sm.showProgress = true;
-                    this._tagService.getTags((<IClassifierService>selected).PrepareSettings.DataSetName, true).subscribe(
-                        (tags: Array<ITag>) => {
-                            let tagsForService = (<IClassifierService>selected).PrepareSettings.TagIdList
-                                .map(tid => tags.find(t => t.Id === tid))
-                                .filter(t => t !== undefined);
-                            this.inputModel.Model.TagList = tagsForService;
-                            this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
-                            this.inputModel.Model.SelectedEmphasizedTagList = [];
-                            this.sm.showProgress = false;
-                        },
-                        error => {
-                            this.handleError(error);
-                            this.sm.showProgress = false;
+                );
+                break;
+            case IService.ITypeEnum.Prc:
+                dialogModel = {
+                    Fields: [],
+                    Type: selected.Type
+                };
+                this.sm.dialogClosed.subscribe(
+                    (model: CommonInputModel) => {
+                        if (model.Result === DialogResult.Ok) {
+                            let settingsModel: IPrcActivateSettings = {
+                                FieldsForRecommendation: model.Model.Fields.filter(f => f.IsSelected).map(f => f.Item)
+                            };
+                            this._prcService.activate(selected.Id, settingsModel).subscribe(
+                                (process: IProcess) => {
+                                    this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
+                                    this.refresh(selected);
+                                    this.sm.unsubscribeAndClose();
+                                },
+                                error => {
+                                    let errors = this.handleError(error);
+                                    model.ErrorMessage = errors;
+                                    this.sm.showProgress = false;
+                                }
+                            );
                         }
-                    );
-                }
-            );
-
-        } else {
-            dialogModel = {
-                fields: [],
-                Type: selected.Type
-            };
-            this.sm.dialogClosed.subscribe(
-                (model: CommonInputModel) => {
-                    if (model.Result === DialogResult.Ok) {
-                        let settingsModel: IPrcActivateSettings = {
-                            FieldsForRecommendation: model.Model.fields.filter(f => f.IsSelected).map(f => f.Item)
-                        };
-                        this._prcService.activate(selected.Id, settingsModel).subscribe(
-                            (process: IProcess) => {
-                                this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
-                                this.refresh(selected);
-                                this.sm.unsubscribeAndClose();
+                    }
+                );
+                this.sm.dialogOpened.subscribe(
+                    () => {
+                        this.sm.showProgress = true;
+                        this._datasetService.getDataset((<IPrcService>selected).PrepareSettings.DataSetName).subscribe(
+                            (dataset: IDataSet) => {
+                                this.inputModel.Model.Fields = dataset.InterpretedFields.map(f => {
+                                    return {
+                                        Id: f,
+                                        Name: f,
+                                        IsSelected: true,
+                                        Item: f
+                                    };
+                                });
+                                this.sm.showProgress = false;
                             },
                             error => {
-                                let errors = this.handleError(error);
-                                model.ErrorMessage = errors;
+                                this.handleError(error);
                                 this.sm.showProgress = false;
                             }
                         );
                     }
-                }
-            );
-            this.sm.dialogOpened.subscribe(
-                () => {
-                    this.sm.showProgress = true;
-                    this._datasetService.getDataset((<IClassifierService>selected).PrepareSettings.DataSetName).subscribe(
-                        (dataset: IDataSet) => {
-                            this.inputModel.Model.fields = dataset.InterpretedFields.map(f => {
-                                return {
-                                    Id: f,
-                                    Name: f,
-                                    IsSelected: true,
-                                    Item: f
-                                };
-                            });
-                            this.sm.showProgress = false;
-                        },
-                        error => {
-                            this.handleError(error);
-                            this.sm.showProgress = false;
-                        }
-                    );
-                }
-            );
+                );
+                break;
         }
+
+
         this.inputModel = {
-            Header: selected.Type + ' Activate Settings',
+            Header: `${selected.Type} Activate Settings`,
             Model: dialogModel,
             Type: 'activate'
+        };
+        this.sm.model = this.inputModel;
+        this.sm.open();
+    }
+
+    search(selected: ServiceType, isActivate: boolean) {
+        if (!selected) {
+            return;
+        }
+        let emptyFilter: IFilter = {};
+        let dialogModel = {
+            Text: '',
+            AutoCompleteSettings: (<ISearchService>selected).ActivateSettings.AutoCompleteSettings != null
+                        ? (<ISearchService>selected).ActivateSettings.AutoCompleteSettings
+                        : {},
+
+            ClassifierSettings: (<ISearchService>selected).ActivateSettings.ClassifierSettings != null
+                        ? (<ISearchService>selected).ActivateSettings.ClassifierSettings
+                        : {},
+            SearchSettings: (<ISearchService>selected).ActivateSettings.SearchSettings != null
+                        ? (<ISearchService>selected).ActivateSettings.SearchSettings
+                        : {
+                            Filter: emptyFilter
+                        },
+            Type: selected.Type,
+
+            EnabledAutoComplete: false,
+            ShownAutoComplete: isActivate || (<ISearchService>selected).ActivateSettings.AutoCompleteSettings != null,
+            EnabledClassifier: false,
+            ShownClassifier: isActivate || (<ISearchService>selected).ActivateSettings.ClassifierSettings != null,
+            EnabledSearch: false,
+            ShownSearch: isActivate || (<ISearchService>selected).ActivateSettings.SearchSettings != null,
+            ResponseFieldListJson: (<ISearchService>selected).ActivateSettings.SearchSettings != null
+                            ? JSON.stringify((<ISearchService>selected).ActivateSettings.SearchSettings.ResponseFieldList)
+                            : '[]',
+            SearchFieldListJson: (<ISearchService>selected).ActivateSettings.SearchSettings != null
+                            ? JSON.stringify((<ISearchService>selected).ActivateSettings.SearchSettings.SearchFieldList)
+                            : '[]',
+            WeightsJson:    (<ISearchService>selected).ActivateSettings.SearchSettings != null &&
+                            (<ISearchService>selected).ActivateSettings.SearchSettings.Weights != null
+                            ? JSON.stringify((<ISearchService>selected).ActivateSettings.SearchSettings.Weights)
+                            : '[]',
+            Query:  (<ISearchService>selected).ActivateSettings.SearchSettings != null &&
+                    (<ISearchService>selected).ActivateSettings.SearchSettings.Filter != null
+                            ? (<ISearchService>selected).ActivateSettings.SearchSettings.Filter.Query
+                            : '',
+            TagList: [],
+            SelectedTagList: (<ISearchService>selected).ActivateSettings.SearchSettings != null &&
+                             (<ISearchService>selected).ActivateSettings.SearchSettings.Filter != null &&
+                             (<ISearchService>selected).ActivateSettings.SearchSettings.Filter.TagIdList != null
+                            ? (<ISearchService>selected).ActivateSettings.SearchSettings.Filter.TagIdList
+                            : [],
+            Types: Object.keys(ISearchSettings.ITypeEnum),
+            Operators: Object.keys(ISearchSettings.IOperatorEnum),
+            IsActivate: isActivate
+        };
+
+        this.sm.dialogClosed.subscribe(
+            (model: CommonInputModel) => {
+                if (model.Result === DialogResult.Ok) {
+                    let filter: IFilter;
+                    filter = dialogModel.Query || model.Model.SelectedTagList.length
+                            ? {
+                                Query: dialogModel.Query,
+                                TagIdList: model.Model.SelectedTagList.length ? model.Model.SelectedTagList.slice() : null
+                              }
+                            : null;
+                    let searchSettings: ISearchSettings;
+                    searchSettings = {
+                        Count: dialogModel.SearchSettings.Count,
+                        CutOffFrequency: dialogModel.SearchSettings.CutOffFrequency,
+                        Filter: filter,
+                        Fuzziness: dialogModel.SearchSettings.Fuzziness,
+                        Operator: dialogModel.SearchSettings.Operator,
+                        Type: dialogModel.SearchSettings.Type,
+                        ResponseFieldList: model.Model.ResponseFieldListJson
+                            .replace(' ', '')
+                            .replace('\n', '') === '[]' ? null : JSON.parse(model.Model.ResponseFieldListJson),
+                        SearchFieldList: model.Model.SearchFieldListJson
+                            .replace(' ', '')
+                            .replace('\n', '') === '[]' ? null : JSON.parse(model.Model.SearchFieldListJson),
+                        Weights: model.Model.WeightsJson
+                            .replace(' ', '')
+                            .replace('\n', '') === '[]' ? null : JSON.parse(model.Model.WeightsJson)
+                    };
+
+                    if (isActivate) {
+                        let settingsModel: ISearchActivateSettings = {
+                            AutoCompleteSettings: model.Model.AutoCompleteSettings,
+                            ClassifierSettings: model.Model.ClassifierSettings.Id ? model.Model.ClassifierSettings : null,
+                            SearchSettings: searchSettings
+                        };
+                        this._searchService.activate(selected.Id, settingsModel).subscribe(
+                            (process: IProcess) => {
+                                this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
+                                this.refresh(selected);
+                                this.sm.unsubscribeAndClose();
+                            },
+                            error => {
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.sm.showProgress = false;
+                            }
+                        );
+                    } else {
+                        let requestModel: ISearchRequest = {
+                            AutoCompleteSettings: model.Model.ShownAutoComplete ? model.Model.AutoCompleteSettings : null,
+                            ClassifierSettings: model.Model.ShownClassifier ? model.Model.ClassifierSettings : null,
+                            SearchSettings: model.Model.ShownSearch ? searchSettings : null,
+                            Text: model.Model.Text
+                        };
+                        this._searchService.search(selected.Id, requestModel).subscribe(
+                            (results: Array<ISearchResultWrapper>) => {
+                                this.dialogService.close();
+                                this.resultDialog.model = {
+                                    Header: 'Search Result',
+                                    OutputObject: {
+                                        SearchResult: results
+                                    }
+                                };
+                                // this.sm.unsubscribeAndClose();
+                                this.resultDialog.open();
+                                this.sm.showProgress = false;
+                            },
+                            error => {
+                                let errors = this.handleError(error);
+                                model.ErrorMessage = errors;
+                                this.sm.showProgress = false;
+                            }
+                        );
+                    }
+                }
+            }
+        );
+        this.sm.dialogOpened.subscribe(
+            () => {
+                this.sm.showProgress = true;
+                this._tagService.getTags((<ISearchService>selected).PrepareSettings.DataSetName, true).subscribe(
+                    (tags: Array<ITag>) => {
+                        this.inputModel.Model.TagList = tags;
+                        this.sm.showProgress = false;
+                    },
+                    error => {
+                        this.handleError(error);
+                        this.sm.showProgress = false;
+                    }
+                );
+            }
+        );
+
+
+        this.inputModel = {
+            Header: `${selected.Type} ${isActivate ? 'Activate' : ''} Settings - ${selected.Alias ? selected.Alias : selected.Name}`,
+            Model: dialogModel,
+            Type: 'search'
         };
         this.sm.model = this.inputModel;
         this.sm.open();
@@ -665,7 +846,7 @@ export class ServicesComponent implements OnInit {
 
     deactivateConfirm(selected: ServiceType) {
         let model: ConfirmModel = {
-            Header: 'Deactivate Service',
+            Header: `Deactivate ${selected.Type} Service`,
             Message: 'Are you sure to deactivate the following service: ' + selected.Name,
             Buttons: ['yes', 'no']
         };
@@ -685,18 +866,28 @@ export class ServicesComponent implements OnInit {
         if (!selected) {
             return;
         }
-        if (selected.Type === IService.ITypeEnum.Classifier) {
-            this._classifierService.deactivate(selected.Id).subscribe(
-                () => {
-                    this.refresh(selected);
-                },
-                error => this.handleError(error));
-        } else {
-            this._prcService.deactivate(selected.Id).subscribe(
-                () => {
-                    this.refresh(selected);
-                },
-                error => this.handleError(error));
+        switch (selected.Type) {
+            case IService.ITypeEnum.Classifier:
+                this._classifierService.deactivate(selected.Id).subscribe(
+                    () => {
+                        this.refresh(selected);
+                    },
+                    error => this.handleError(error));
+                break;
+            case IService.ITypeEnum.Prc:
+                this._prcService.deactivate(selected.Id).subscribe(
+                    () => {
+                        this.refresh(selected);
+                    },
+                    error => this.handleError(error));
+                break;
+            case IService.ITypeEnum.Search:
+                this._searchService.deactivate(selected.Id).subscribe(
+                    () => {
+                        this.refresh(selected);
+                    },
+                    error => this.handleError(error));
+                break;
         }
     }
 

@@ -465,6 +465,12 @@
 				</div>
 				<div *ngIf='smd.model.Model.EnabledSearch'>
 					<div class="form-group">
+						<label for="count" class="col-sm-3 control-label">Count</label>
+						<div class="col-sm-9">
+							<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.Count" id="count" #count="ngModel">
+						</div>
+					</div>
+					<div class="form-group">
 						<label for="type" class="col-sm-2 control-label">Type</label>
 						<div class="col-sm-4">
 							<select [(ngModel)]='smd.model.Model.SearchSettings.Type' class="form-control">
@@ -501,7 +507,19 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="count" class="col-sm-3 control-label">Filter</label>
+						<label for="fuzziness" class="col-sm-2 control-label">Fuzziness</label>
+						<div class="col-sm-4">
+							<input type="number" min="-1" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.Fuzziness" id="fuzziness" #fuzziness="ngModel">
+						</div>
+						<label for="cutoff" class="col-sm-2 control-label">Cut Off Frequency</label>
+						<div class="col-sm-4">
+							<input type="number" min="0" step="0.001" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.CutOffFrequency" id="cutoff" #cutoff="ngModel">
+						</div>
+					</div>
+					<div class="form-group">
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label">Filter</label>
 						<div class="col-sm-9">
 							<label for="query" class="col-sm-2 control-label">Query</label>
 							<div class="col-sm-5">

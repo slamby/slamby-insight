@@ -32,6 +32,6 @@ export interface IAutoCompleteResult {
 
     Score?: number;
 
-    ClassifierResultList?: Array<models.IClassifierRecommendationResult>;
+    ClassifierResultList?: Array<models.ISearchClassifierRecommendationResult>;
 }
 

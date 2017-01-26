@@ -484,6 +484,18 @@
 							</select>
 						</div>
 					</div>
+					<div class="form-group">
+						<label for="orderDirection" class="col-sm-2 control-label">Order Direction</label>
+						<div class="col-sm-4">
+							<select [(ngModel)]='smd.model.Model.Order.OrderDirection' class="form-control">
+								<option *ngFor="let order of smd.model.Model.Orders" [value]="order">{{order}}</option>
+							</select>
+						</div>
+						<label for="type" class="col-sm-2 control-label">Order by Field</label>
+						<div class="col-sm-4">
+							<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Order.OrderByField" id="orderByField" #orderByField="ngModel">
+						</div>
+					</div>
 					<div class="form-group" [class.has-error]="responseFieldListJson.errors">
 						<label for="responseFieldListJson" class="col-sm-3 control-label">Response Fields</label>
 						<div class="col-sm-9">
@@ -516,14 +528,32 @@
 							<input type="number" min="0" step="0.001" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.CutOffFrequency" id="cutoff" #cutoff="ngModel">
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="form-group" *ngIf="smd.model.Model.DefaultFilter">
+						<div class="checkbox col-sm-4">
+							<label class="control-label">
+								<input type="checkbox" [(ngModel)]="smd.model.Model.SearchSettings.UseDefaultFilter" id="useDefaultFilter" #useDefaultFilter="ngModel">
+								Use Default Filter
+							</label>
+						</div>
+						<div class="col-sm-8">
+							<label for="defaultQuery" class="col-sm-2 control-label">Query</label>
+							<div class="col-sm-5">
+								<input type="text" class="form-control" disabled [(ngModel)]="smd.model.Model.DefaultFilter.Query" id="defaultQuery" #defaultQuery="ngModel">
+							</div>
+							<label for="tags" class="col-sm-1 control-label">Tags</label>
+							<div class="col-sm-4">
+								<button type="button" class="btn btn-primary" disabled>
+											<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.DefaultFilter?.TagIdList?.length ? smd.model.Model.DefaultFilter.TagIdList.length : 0}})</span>
+								</button>
+							</div>
+						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label">Filter</label>
 						<div class="col-sm-9">
 							<label for="query" class="col-sm-2 control-label">Query</label>
 							<div class="col-sm-5">
-								<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" query="query" #query="ngModel" autofocus>
+								<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" id="query" #query="ngModel">
 							</div>
 							<label for="tags" class="col-sm-1 control-label">Tags</label>
 							<div class="col-sm-4">
@@ -534,10 +564,21 @@
 							</div>
 						</div>
 					</div>
+					<div class="form-group" *ngIf="smd.model.Model.DefaultWeightsJson">
+						<div class="checkbox col-sm-4">
+							<label class="control-label">
+								<input type="checkbox" [(ngModel)]="smd.model.Model.SearchSettings.UseDefaultWeights" id="useDefaultWeights" #useDefaultWeights="ngModel">
+								Use Default Weights
+							</label>
+						</div>
+						<div class="col-sm-8">
+							<sl-json-editor readonly="true" [(ngModel)]="smd.model.Model.DefaultWeightsJson" name="defaultWeightsJson" #defaultWeightsJson="ngModel" height="60px" json></sl-json-editor>
+						</div>
+					</div>
 					<div class="form-group" [class.has-error]="weightsjson.errors">
 						<label for="weightsjson" class="col-sm-3 control-label">Weights</label>
 						<div class="col-sm-9">
-							<sl-json-editor [(ngModel)]="smd.model.Model.WeightsJson" name="weightsjson" #weightsjson="ngModel" height="100px" json></sl-json-editor>
+							<sl-json-editor [(ngModel)]="smd.model.Model.WeightsJson" name="weightsjson" #weightsjson="ngModel" height="60px" json></sl-json-editor>
 							<div *ngIf="weightsjson.dirty && !weightsjson.valid">
 								<p *ngIf="weightsjson.errors?.json" class="text-danger">
 									Invalid Weights JSON!

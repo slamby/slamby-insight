@@ -41,6 +41,7 @@ export * from './IPrcRecommendationResult';
 export * from './IPrcService';
 export * from './IProcess';
 export * from './ISearchActivateSettings';
+export * from './ISearchClassifierRecommendationResult';
 export * from './ISearchPrepareSettings';
 export * from './ISearchRequest';
 export * from './ISearchResult';

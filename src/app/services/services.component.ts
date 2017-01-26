@@ -12,7 +12,7 @@ import {
     IClassifierRecommendationRequest, IClassifierRecommendationResult, IPrcRecommendationRequest,
     IPrcRecommendationByIdRequest, IPrcRecommendationResult, IPrcIndexSettings, IPrcKeywordsRequest, IPrcKeywordsResult, IDataSet, ITag,
     ISearchService, ISearchPrepareSettings, ISearchActivateSettings, ISearchResultWrapper, ISearchRequest, ISearchSettings, IFilter,
-    IAutoCompleteSettings, IClassifierSettings
+    IAutoCompleteSettings, IClassifierSettings, IOrder
 } from 'slamby-sdk-angular2';
 import { ServicesService } from '../common/services/services.service';
 import { ClassifierServicesService } from '../common/services/classifier.services.service';
@@ -602,17 +602,21 @@ export class ServicesComponent implements OnInit {
             return;
         }
         let emptyFilter: IFilter = {};
+        let emptyOrder: IOrder = {
+            OrderByField: '',
+            OrderDirection: IOrder.IOrderDirectionEnum.Desc
+        };
         let dialogModel = {
             Text: '',
             AutoCompleteSettings: (<ISearchService>selected).ActivateSettings.AutoCompleteSettings != null
-                        ? (<ISearchService>selected).ActivateSettings.AutoCompleteSettings
+                        ? _.cloneDeep((<ISearchService>selected).ActivateSettings.AutoCompleteSettings)
                         : {},
 
             ClassifierSettings: (<ISearchService>selected).ActivateSettings.ClassifierSettings != null
-                        ? (<ISearchService>selected).ActivateSettings.ClassifierSettings
+                        ? _.cloneDeep((<ISearchService>selected).ActivateSettings.ClassifierSettings)
                         : {},
             SearchSettings: (<ISearchService>selected).ActivateSettings.SearchSettings != null
-                        ? (<ISearchService>selected).ActivateSettings.SearchSettings
+                        ? _.cloneDeep((<ISearchService>selected).ActivateSettings.SearchSettings)
                         : {
                             Filter: emptyFilter
                         },
@@ -646,9 +650,25 @@ export class ServicesComponent implements OnInit {
                             : [],
             Types: Object.keys(ISearchSettings.ITypeEnum),
             Operators: Object.keys(ISearchSettings.IOperatorEnum),
-            IsActivate: isActivate
+            Orders: Object.keys(IOrder.IOrderDirectionEnum),
+            IsActivate: isActivate,
+            DefaultFilter: null,
+            DefaultWeightsJson: null,
+            Order: emptyOrder
         };
+        if (!isActivate) {
+            if (dialogModel.Query || dialogModel.SelectedTagList) {
+                dialogModel.DefaultFilter = _.cloneDeep(dialogModel.SearchSettings.Filter);
+                dialogModel.SearchSettings.Filter = emptyFilter;
+                dialogModel.Query = '';
+                dialogModel.SelectedTagList = [];
 
+            }
+            if (dialogModel.WeightsJson !== '[]') {
+                dialogModel.DefaultWeightsJson = dialogModel.WeightsJson;
+                dialogModel.WeightsJson = '[]';
+            }
+        }
         this.sm.dialogClosed.subscribe(
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
@@ -675,7 +695,10 @@ export class ServicesComponent implements OnInit {
                             .replace('\n', '') === '[]' ? null : JSON.parse(model.Model.SearchFieldListJson),
                         Weights: model.Model.WeightsJson
                             .replace(' ', '')
-                            .replace('\n', '') === '[]' ? null : JSON.parse(model.Model.WeightsJson)
+                            .replace('\n', '') === '[]' ? null : JSON.parse(model.Model.WeightsJson),
+                        UseDefaultFilter: dialogModel.SearchSettings.UseDefaultFilter,
+                        UseDefaultWeights: dialogModel.SearchSettings.UseDefaultWeights,
+                        Order: dialogModel.Order.OrderByField.trim() ? dialogModel.Order : null
                     };
 
                     if (isActivate) {

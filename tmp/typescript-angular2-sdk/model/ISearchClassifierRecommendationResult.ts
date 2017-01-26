@@ -25,43 +25,26 @@
 'use strict';
 import * as models from './models';
 
-export interface ISearchSettings {
+export interface ISearchClassifierRecommendationResult {
     
 
-    Filter?: models.IFilter;
+    SearchResultMatch?: boolean;
 
-    UseDefaultFilter?: boolean;
+    /**
+     * The recommended tag id
+     */
+    TagId?: string;
 
-    Weights?: Array<models.IWeight>;
+    /**
+     * The score that belongs to the tag id
+     */
+    Score?: number;
 
-    UseDefaultWeights?: boolean;
+    Tag?: models.ITag;
 
-    ResponseFieldList?: Array<string>;
-
-    SearchFieldList?: Array<string>;
-
-    Type?: ISearchSettings.ITypeEnum;
-
-    CutOffFrequency?: number;
-
-    Fuzziness?: number;
-
-    Count?: number;
-
-    Operator?: ISearchSettings.IOperatorEnum;
-
-    Order?: models.IOrder;
+    /**
+     * If there was applied emphasizing by this tag
+     */
+    IsEmphasized?: boolean;
 }
 
-export namespace ISearchSettings {
-
-    export enum ITypeEnum { 
-        Match = <any> 'Match',
-        Query = <any> 'Query',
-    }
-
-    export enum IOperatorEnum { 
-        AND = <any> 'AND',
-        OR = <any> 'OR',
-    }
-}

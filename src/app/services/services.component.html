@@ -370,219 +370,193 @@
 		<div *ngIf='smd.model?.Type == "search"' search>
 			<div *ngIf='!smd.model.Model.IsActivate'>
 				<div class="form-group" [class.has-error]="text.errors && text.dirty" *ngIf='!smd.model.Model.IsActivate'>
-					<label for="text" class="col-sm-3 control-label">Text</label>
-					<div class="col-sm-9">
-						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Text" text="text" #text="ngModel" autofocus required>
-						<div *ngIf="text.errors?.required && text.touched">
-							<p class="text-danger">
-								Field is required!
-							</p>
-						</div>
+					<label for="text">Text</label>
+					<input type="text" class="form-control input-lg" [(ngModel)]="smd.model.Model.Text" id="text" #text="ngModel" autofocus required>
+					<div *ngIf="text.errors?.required && text.touched">
+						<p class="text-danger">Field is required!</p>
 					</div>
 				</div>
 			</div>
-			<div *ngIf='smd.model.Model.ShownAutoComplete'>
-				<div class="row">
-					<div class="col-sm-3">
-						<h4>AutoComplete Settings</h4>
-					</div>
-					<div class="col-sm-9">
-						<md-slide-toggle [checked]="smd.model.Model.EnabledAutoComplete" (change)='changeToggle("EnabledAutoComplete")' color="primary">
-						</md-slide-toggle>
-					</div>
+
+			<div class="panel panel-default" *ngIf='smd.model.Model.ShownAutoComplete'>
+				<div class="panel-heading">
+					AutoComplete Settings
+					<md-slide-toggle class="pull-right" [checked]="smd.model.Model.EnabledAutoComplete" (change)='changeToggle("EnabledAutoComplete")' color="primary">
+					</md-slide-toggle>
 				</div>
-				<div *ngIf='smd.model.Model.EnabledAutoComplete'>
+				<div class="panel-body" *ngIf='smd.model.Model.EnabledAutoComplete'>
 					<div class="form-group" [class.has-error]="count.errors && count.dirty">
-						<label for="count" class="col-sm-3 control-label">Count</label>
-						<div class="col-sm-9">
-							<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.Count" id="count" #count="ngModel" required>
-							<div *ngIf="count.errors?.min && count.touched">
-								<p class="text-danger">
-									Field is required!
-								</p>
-							</div>
+						<label for="count">Count</label>
+						<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.Count" id="count" #count="ngModel" required>
+						<div *ngIf="count.errors?.min && count.touched">
+							<p class="text-danger">Field is required!</p>
 						</div>
 					</div>
 					<div class="form-group" [class.has-error]="confidence.errors && confidence.dirty">
-						<label for="confidence" class="col-sm-3 control-label">Confidence</label>
-						<div class="col-sm-9">
-							<input type="number" min="0" step="0.5" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.Confidence" id="confidence" #confidence="ngModel" required>
-							<div *ngIf="confidence.errors?.min && confidence.touched">
-								<p class="text-danger">
-									Field is required!
-								</p>
-							</div>
+						<label for="confidence">Confidence</label>
+						<input type="number" min="0" step="0.5" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.Confidence" id="confidence" #confidence="ngModel" required>
+						<div *ngIf="confidence.errors?.min && confidence.touched">
+							<p class="text-danger">Field is required!</p>
 						</div>
 					</div>
 					<div class="form-group" [class.has-error]="maxErrors.errors && maxErrors.dirty">
-						<label for="maxErrors" class="col-sm-3 control-label">Maximum Errors</label>
-						<div class="col-sm-9">
-							<input type="number" min="0" step="0.5" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.MaximumErrors" id="maxErrors" #maxErrors="ngModel" required>
-							<div *ngIf="maxErrors.errors?.min && maxErrors.touched">
-								<p class="text-danger">
-									Field is required!
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div *ngIf='smd.model.Model.ShownClassifier'>
-				<div class="row">
-					<div class="col-sm-3">
-						<h4>Classifier Settings</h4>
-					</div>
-					<div class="col-sm-9">
-						<md-slide-toggle [checked]="smd.model.Model.EnabledClassifier" (change)='changeToggle("EnabledClassifier")' color="primary">
-						</md-slide-toggle>
-					</div>
-				</div>
-				<div *ngIf='smd.model.Model.EnabledClassifier'>
-					<div class="form-group">
-						<label for="idOrAlias" class="col-sm-3 control-label">Id or Alias</label>
-						<div class="col-sm-9">
-							<input type="text" class="form-control" [(ngModel)]="smd.model.Model.ClassifierSettings.Id" id="idOrAlias" #idOrAlias="ngModel">
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="count" class="col-sm-3 control-label">Count</label>
-						<div class="col-sm-9">
-							<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.ClassifierSettings.Count" id="count" #count="ngModel">
+						<label for="maxErrors">Maximum Errors</label>
+						<input type="number" min="0" step="0.5" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.MaximumErrors" id="maxErrors" #maxErrors="ngModel" required>
+						<div *ngIf="maxErrors.errors?.min && maxErrors.touched">
+							<p class="text-danger">Field is required!</p>
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div *ngIf='smd.model.Model.ShownSearch'>
-				<div class="row">
-					<div class="col-sm-3">
-						<h4>Search Settings</h4>
+			<div class="panel panel-default" *ngIf='smd.model.Model.ShownClassifier'>
+				<div class="panel-heading">
+					Classifier Settings
+					<md-slide-toggle class="pull-right" [checked]="smd.model.Model.EnabledClassifier" (change)='changeToggle("EnabledClassifier")' color="primary">
+					</md-slide-toggle>
+				</div>
+				<div class="panel-body" *ngIf='smd.model.Model.EnabledClassifier'>
+					<div class="form-group">
+						<label for="idOrAlias">Alias (or ID)</label>
+						<input type="text" placeholder="Service alias or id" class="form-control" [(ngModel)]="smd.model.Model.ClassifierSettings.Id" id="idOrAlias" #idOrAlias="ngModel">
 					</div>
-					<div class="col-sm-9">
-						<md-slide-toggle [checked]="smd.model.Model.EnabledSearch" (change)='changeToggle("EnabledSearch")' color="primary">
-						</md-slide-toggle>
+					<div class="form-group">
+						<label for="classifierCount">Count</label>
+						<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.ClassifierSettings.Count" id="classifierCount" #classifierCount="ngModel">
 					</div>
 				</div>
-				<div *ngIf='smd.model.Model.EnabledSearch'>
-					<div class="form-group">
-						<label for="count" class="col-sm-3 control-label">Count</label>
-						<div class="col-sm-9">
-							<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.Count" id="count" #count="ngModel">
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="type" class="col-sm-2 control-label">Type</label>
-						<div class="col-sm-4">
-							<select [(ngModel)]='smd.model.Model.SearchSettings.Type' class="form-control">
-								<option *ngFor="let type of smd.model.Model.Types" [value]="type">{{type}}</option>
-							</select>
-						</div>
-						<label for="type" class="col-sm-2 control-label">Operator</label>
-						<div class="col-sm-4">
-							<select [(ngModel)]='smd.model.Model.SearchSettings.Operator' class="form-control">
-								<option *ngFor="let operator of smd.model.Model.Operators" [value]="operator">{{operator}}</option>
-							</select>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="orderDirection" class="col-sm-2 control-label">Order Direction</label>
-						<div class="col-sm-4">
-							<select [(ngModel)]='smd.model.Model.Order.OrderDirection' class="form-control">
-								<option *ngFor="let order of smd.model.Model.Orders" [value]="order">{{order}}</option>
-							</select>
-						</div>
-						<label for="type" class="col-sm-2 control-label">Order by Field</label>
-						<div class="col-sm-4">
-							<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Order.OrderByField" id="orderByField" #orderByField="ngModel">
-						</div>
-					</div>
-					<div class="form-group" [class.has-error]="responseFieldListJson.errors">
-						<label for="responseFieldListJson" class="col-sm-3 control-label">Response Fields</label>
-						<div class="col-sm-9">
-							<sl-json-editor [(ngModel)]="smd.model.Model.ResponseFieldListJson" name="responseFieldListJson" #responseFieldListJson="ngModel" height="100px" json></sl-json-editor>
-							<div *ngIf="responseFieldListJson.dirty && !responseFieldListJson.valid">
-								<p *ngIf="responseFieldListJson.errors?.json" class="text-danger">
-									Invalid Response Fields JSON!
-								</p>
+			</div>
+
+
+			<div class="panel panel-default" *ngIf='smd.model.Model.ShownSearch'>
+				<div class="panel-heading">
+					Search Settings
+					<md-slide-toggle class="pull-right" [checked]="smd.model.Model.EnabledSearch" (change)='changeToggle("EnabledSearch")' color="primary">
+					</md-slide-toggle>
+				</div>
+				<div class="panel-body" *ngIf='smd.model.Model.EnabledSearch'>
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="form-group">
+								<label for="searchCount">Count</label>
+								<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.Count" id="searchCount" #searchCount="ngModel">
 							</div>
 						</div>
 					</div>
-					<div class="form-group" [class.has-error]="searchFieldListJson.errors">
-						<label for="searchFieldListJson" class="col-sm-3 control-label">Search Fields</label>
-						<div class="col-sm-9">
-							<sl-json-editor [(ngModel)]="smd.model.Model.SearchFieldListJson" name="searchFieldListJson" #searchFieldListJson="ngModel" height="100px" json></sl-json-editor>
-							<div *ngIf="searchFieldListJson.dirty && !searchFieldListJson.valid">
-								<p *ngIf="searchFieldListJson.errors?.json" class="text-danger">
-									Invalid Search Fields JSON!
-								</p>
+					<div class="row">
+						<div class="col-xs-6">
+							<div class="form-group">
+								<label for="searchType">Type</label>
+								<select [(ngModel)]='smd.model.Model.SearchSettings.Type' class="form-control" id="searchType">
+									<option *ngFor="let type of smd.model.Model.Types" [value]="type">{{type}}</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-xs-6">
+							<div class="form-group">
+								<label for="searchOperator">Operator</label>
+								<select [(ngModel)]='smd.model.Model.SearchSettings.Operator' class="form-control" id="searchOperator">
+									<option *ngFor="let operator of smd.model.Model.Operators" [value]="operator">{{operator}}</option>
+								</select>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">
-						<label for="fuzziness" class="col-sm-2 control-label">Fuzziness</label>
-						<div class="col-sm-4">
-							<input type="number" min="-1" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.Fuzziness" id="fuzziness" #fuzziness="ngModel">
+					<div class="row">
+						<div class="col-xs-6">
+							<div class="form-group">
+								<label for="searchOrderDirection">Order Direction</label>
+								<select [(ngModel)]='smd.model.Model.Order.OrderDirection' class="form-control" id="searchOrderDirection">
+									<option *ngFor="let order of smd.model.Model.Orders" [value]="order">{{order}}</option>
+								</select>
+							</div>
 						</div>
-						<label for="cutoff" class="col-sm-2 control-label">Cut Off Frequency</label>
-						<div class="col-sm-4">
-							<input type="number" min="0" step="0.001" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.CutOffFrequency" id="cutoff" #cutoff="ngModel">
+						<div class="col-xs-6">
+							<div class="form-group">
+								<label for="searchOrderField">Order by Field</label>
+								<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Order.OrderByField" id="searchOrderField" #searchOrderField="ngModel">
+							</div>
 						</div>
 					</div>
-					<div class="form-group" *ngIf="smd.model.Model.DefaultFilter">
-						<div class="checkbox col-sm-4">
-							<label class="control-label">
-								<input type="checkbox" [(ngModel)]="smd.model.Model.SearchSettings.UseDefaultFilter" id="useDefaultFilter" #useDefaultFilter="ngModel">
-								Use Default Filter
-							</label>
-						</div>
-						<div class="col-sm-8">
-							<label for="defaultQuery" class="col-sm-2 control-label">Query</label>
-							<div class="col-sm-5">
-								<input type="text" class="form-control" disabled [(ngModel)]="smd.model.Model.DefaultFilter.Query" id="defaultQuery" #defaultQuery="ngModel">
+					<div class="row">
+						<div class="col-xs-6">
+							<div class="form-group" [class.has-error]="searchResponseFieldListJson.errors">
+								<label for="searchResponseFieldListJson">Response Field</label>
+								<sl-json-editor [(ngModel)]="smd.model.Model.ResponseFieldListJson" name="searchResponseFieldListJson" #searchResponseFieldListJson="ngModel" height="60px" json></sl-json-editor>
+								<div *ngIf="searchResponseFieldListJson.dirty && !searchResponseFieldListJson.valid">
+									<p *ngIf="searchResponseFieldListJson.errors?.json" class="text-danger">Invalid JSON!</p>
+								</div>
 							</div>
-							<label for="tags" class="col-sm-1 control-label">Tags</label>
-							<div class="col-sm-4">
-								<button type="button" class="btn btn-primary" disabled>
-											<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.DefaultFilter?.TagIdList?.length ? smd.model.Model.DefaultFilter.TagIdList.length : 0}})</span>
+						</div>
+						<div class="col-xs-6">
+							<div class="form-group">
+								<label for="searchSearchFieldListJson">Search Fields</label>
+								<sl-json-editor [(ngModel)]="smd.model.Model.SearchFieldListJson" name="searchSearchFieldListJson" #searchSearchFieldListJson="ngModel" height="60px" json></sl-json-editor>
+								<div *ngIf="searchSearchFieldListJson.dirty && !searchSearchFieldListJson.valid">
+									<p *ngIf="searchSearchFieldListJson.errors?.json" class="text-danger">Invalid JSON!</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-6">
+							<div class="form-group">
+								<label for="searchFuzziness">Fuziness</label>
+								<input type="number" min="-1" max="2" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.Fuzziness" id="searchFuzziness" #searchFuzziness="ngModel">
+							</div>
+						</div>
+						<div class="col-xs-6">
+							<div class="form-group">
+								<label for="searchCutOff">Cut Off Frequency</label>
+								<input type="number" min="0" step="0.001" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.CutOffFrequency" id="searchCutOff" #searchCutOff="ngModel">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+							<h4 class="page-header">Filter</h4>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-6">
+							<div class="form-group">
+								<label for="searchFilterQuery">Query</label>
+								<textarea class="form-control" [(ngModel)]="smd.model.Model.Query" id="searchFilterQuery" #searchFilterQuery="ngModel"></textarea>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" [(ngModel)]="smd.model.Model.SearchSettings.UseDefaultFilter" id="searchUseDefaultFilter" #searchUseDefaultFilter="ngModel">
+										Use Default Filter
+									</label>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-6">
+							<div class="form-group">
+								<label for="searchFilterTags">Tags</label>
+								<button type="button" class="btn btn-info form-control" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">
+									<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</span>
+									<span *ngIf="smd.showProgress"><i class='fa fa-circle-o-notch fa-spin'></i> Loading...</span>
 								</button>
 							</div>
 						</div>
 					</div>
-					<div class="form-group">
-						<label class="col-sm-3 control-label">Filter</label>
-						<div class="col-sm-9">
-							<label for="query" class="col-sm-2 control-label">Query</label>
-							<div class="col-sm-5">
-								<input type="text" class="form-control" [(ngModel)]="smd.model.Model.Query" id="query" #query="ngModel">
-							</div>
-							<label for="tags" class="col-sm-1 control-label">Tags</label>
-							<div class="col-sm-4">
-								<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">
-											<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</span>
-											<span *ngIf="smd.showProgress"><i class='fa fa-circle-o-notch fa-spin'></i> Loading...</span>
-										</button>
-							</div>
+					<div class="row">
+						<div class="col-xs-12">
+							<h4 class="page-header">Weights</h4>
 						</div>
 					</div>
-					<div class="form-group" *ngIf="smd.model.Model.DefaultWeightsJson">
-						<div class="checkbox col-sm-4">
-							<label class="control-label">
-								<input type="checkbox" [(ngModel)]="smd.model.Model.SearchSettings.UseDefaultWeights" id="useDefaultWeights" #useDefaultWeights="ngModel">
-								Use Default Weights
-							</label>
-						</div>
-						<div class="col-sm-8">
-							<sl-json-editor readonly="true" [(ngModel)]="smd.model.Model.DefaultWeightsJson" name="defaultWeightsJson" #defaultWeightsJson="ngModel" height="60px" json></sl-json-editor>
-						</div>
-					</div>
-					<div class="form-group" [class.has-error]="weightsjson.errors">
-						<label for="weightsjson" class="col-sm-3 control-label">Weights</label>
-						<div class="col-sm-9">
-							<sl-json-editor [(ngModel)]="smd.model.Model.WeightsJson" name="weightsjson" #weightsjson="ngModel" height="60px" json></sl-json-editor>
-							<div *ngIf="weightsjson.dirty && !weightsjson.valid">
-								<p *ngIf="weightsjson.errors?.json" class="text-danger">
-									Invalid Weights JSON!
-								</p>
+					<div class="row">
+						<div class="col-xs-6">
+							<div class="form-group">
+								<sl-json-editor [(ngModel)]="smd.model.Model.WeightsJson" name="searchWeightsJson" #searchWeightsJson="ngModel" height="60px" json></sl-json-editor>
+								<div *ngIf="searchWeightsJson.dirty && !searchWeightsJson.valid">
+									<p *ngIf="searchWeightsJson.errors?.json" class="text-danger">Invalid JSON!</p>
+								</div>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" [(ngModel)]="smd.model.Model.SearchSettings.UseDefaultWeights" id="searchUseDefaultWeights" #searchUseDefaultWeights="ngModel">
+										Use Default Weights
+									</label>
+								</div>
 							</div>
 						</div>
 					</div>

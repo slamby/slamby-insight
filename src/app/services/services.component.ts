@@ -772,6 +772,7 @@ export class ServicesComponent implements OnInit {
             Type: 'search'
         };
         this.sm.model = this.inputModel;
+        this.sm.isHorizontalForm = false;
         this.sm.open();
     }
 

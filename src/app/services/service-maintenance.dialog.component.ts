@@ -13,6 +13,7 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 export class ServiceMaintenanceDialogComponent {
     private _modalRef: any;
     @Input() model: CommonInputModel;
+    @Input() isHorizontalForm: boolean = true;
     @ViewChild('template') template;
     select;
     modalOptions: NgbModalOptions = {

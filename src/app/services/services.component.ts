@@ -192,7 +192,7 @@ export class ServicesComponent implements OnInit {
                         (classifierService: IClassifierService) => {
                             let index = this.services.findIndex(s => s.Id === classifierService.Id);
                             this.services[index] = classifierService;
-                            this.services = _.cloneDeep(this.services);
+                            this.services = _.sortBy( _.cloneDeep(this.services), 'Alias');
                         },
                         error => this.handleError(error)
                     );
@@ -202,7 +202,7 @@ export class ServicesComponent implements OnInit {
                         (prcService: IPrcService) => {
                             let index = this.services.findIndex(s => s.Id === prcService.Id);
                             this.services[index] = prcService;
-                            this.services = _.cloneDeep(this.services);
+                            this.services = _.sortBy( _.cloneDeep(this.services), 'Alias');
                         },
                         error => this.handleError(error)
                     );
@@ -212,7 +212,7 @@ export class ServicesComponent implements OnInit {
                         (searchService: ISearchService) => {
                             let index = this.services.findIndex(s => s.Id === searchService.Id);
                             this.services[index] = searchService;
-                            this.services = _.cloneDeep(this.services);
+                            this.services = _.sortBy( _.cloneDeep(this.services), 'Alias');
                         },
                         error => this.handleError(error)
                     );
@@ -251,7 +251,7 @@ export class ServicesComponent implements OnInit {
 
                     source.subscribe(
                         (s: ServiceType) => {
-                            this.services = this.services = _.concat(this.services, [s]);
+                            this.services = this.services = _.sortBy(_.concat(this.services, [s]), 'Alias');
                             dialogModel.Done += 1;
                             dialogModel.Percent = (dialogModel.Done / dialogModel.All) * 100;
                         },
@@ -772,8 +772,7 @@ export class ServicesComponent implements OnInit {
             Type: 'search'
         };
         this.sm.model = this.inputModel;
-        this.sm.isHorizontalForm = false;
-        this.sm.open();
+        this.sm.open(false);
     }
 
     export(selected: ServiceType) {

@@ -13,7 +13,6 @@ import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 export class ServiceMaintenanceDialogComponent {
     private _modalRef: any;
     @Input() model: CommonInputModel;
-    @Input() isHorizontalForm: boolean = true;
     @ViewChild('template') template;
     select;
     modalOptions: NgbModalOptions = {
@@ -21,6 +20,7 @@ export class ServiceMaintenanceDialogComponent {
         keyboard: true,
         size: 'lg'
     };
+    private isHorizontalForm: boolean;
     showProgress = false;
     private dialogClosedEventSource = new Subject<CommonInputModel>();
     dialogClosed = this.dialogClosedEventSource.asObservable();
@@ -31,7 +31,8 @@ export class ServiceMaintenanceDialogComponent {
     constructor(private modal: NgbModal) {
     }
 
-    open() {
+    open(isHorizontalForm = true) {
+        this.isHorizontalForm = isHorizontalForm;
         if (this.model.Type) {
             this.select = [this.model.Type];
         }

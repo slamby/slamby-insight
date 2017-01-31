@@ -86,7 +86,7 @@
     "request": "^2.75.0",
     "rollup": "^0.36.1",
     "rxjs": "5.0.0-beta.12",
-    "slamby-sdk-angular2": "1.2.0",
+    "slamby-sdk-angular2": "1.4.0",
     "winston": "^2.2.0",
     "zone.js": "^0.6.25"
   },

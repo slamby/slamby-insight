@@ -60,6 +60,7 @@
 						<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</span>
 						<span *ngIf="smd.showProgress"><i class='fa fa-circle-o-notch fa-spin'></i> Loading...</span>
 					</button>
+					<label style="margin-left: 15px">(0 means 'all the leaf tags')</label>
 					<input type="number" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedTagList.length" name="tags" #tags="ngModel"
 						[min]="1" />
 					<div *ngIf="tags.errors?.min">

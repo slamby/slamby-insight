@@ -22,12 +22,21 @@
 				</tr>
 				<tr>
 					<th></th>
-					<th><input type="text" class="form-control input-sm" [(ngModel)]="idFilter" (ngModelChange)="modelChange($event)" placeholder="Id Filter" slClearBox /></th>
+					<th>
+						<input type="text" class="form-control input-sm" [(ngModel)]="idFilter" (ngModelChange)="modelChange($event)" placeholder="Id Filter" slClearBox />
+					</th>
 					<th><input type="text" class="form-control input-sm" [(ngModel)]="nameFilter" (ngModelChange)="modelChange($event)" placeholder="Name Filter"
-						slClearBox /></th>
-					<th></th>
-					<th></th>
-					<th></th>
+						slClearBox />
+					</th>
+					<th>
+						<input type="text" class="form-control input-sm" [(ngModel)]="parentIdFilter" (ngModelChange)="modelChange($event)" placeholder="Parent Id Filter" slClearBox />
+					</th>
+					<th>
+						<input type="text" class="form-control input-sm" [(ngModel)]="leafFilter" (ngModelChange)="modelChange($event)" placeholder="Leaf Filter" slClearBox />
+					</th>
+					<th>
+						<input type="text" class="form-control input-sm" [(ngModel)]="levelFilter" (ngModelChange)="modelChange($event)" placeholder="Level Filter" slClearBox />
+					</th>
 					<th></th>
 					<th></th>
 				</tr>

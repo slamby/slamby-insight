@@ -280,7 +280,7 @@ export class ServicesComponent implements OnInit {
         this._tagService.getTags(dataset.Name, true).subscribe(
             (tags: Array<ITag>) => {
                 this.inputModel.Model.TagList = tags;
-                this.inputModel.Model.SelectedTagList = tags.map(t => t.Id);
+                this.inputModel.Model.SelectedTagList = [];
                 this.sm.showProgress = false;
             },
             (error) => {

@@ -16,6 +16,9 @@ export class TagListSelectorComponent implements AfterContentInit  {
 
     idFilter: string = '';
     nameFilter: string = '';
+    parentIdFilter: string = '';
+    levelFilter: string = '';
+    leafFilter: string = '';
 
     filteredTags: ITag[];
 
@@ -82,19 +85,46 @@ export class TagListSelectorComponent implements AfterContentInit  {
     }
 
     filter(): ITag[] {
-        if (!this.idFilter && !this.nameFilter) {
+        if (!this.idFilter &&
+            !this.nameFilter &&
+            !this.parentIdFilter &&
+            !this.levelFilter &&
+            !this.leafFilter) {
             return this.tags;
         }
 
         this.tableBodyDiv.nativeElement.scrollTop = 0;
 
-        return this.tags.filter(item => _.isMatchWith(item, { Id: this.idFilter }, this.matchCustomizer))
-            .filter(item => _.isMatchWith(item, { Name: this.nameFilter }, this.matchCustomizer));
+        let tags = this.tags;
+        if (this.idFilter) {
+            tags = tags .filter(item => _.isMatchWith(item, { Id: this.idFilter }, this.matchCustomizer));
+        }
+        if (this.nameFilter) {
+            tags = tags.filter(item => _.isMatchWith(item, { Name: this.nameFilter }, this.matchCustomizer));
+        }
+        if (this.parentIdFilter) {
+            tags = tags.filter(item => _.isMatchWith(item, { ParentId: this.parentIdFilter }, this.matchCustomizer));
+        }
+        if (this.levelFilter) {
+            tags = tags.filter(item => _.isMatchWith(item, { Properties: { Level: this.levelFilter }}, this.matchCustomizer));
+        }
+        if (this.leafFilter) {
+            tags = tags.filter(item => _.isMatchWith(item, { Properties: { IsLeaf: this.leafFilter }}, this.matchCustomizer));
+        }
+        return tags;
     }
 
     matchCustomizer(objValue: any, srcValue: any) {
         if (typeof objValue === 'string') {
             return objValue.toLowerCase().indexOf(srcValue) > -1;
+        }
+        if (typeof objValue === 'object') {
+            if (srcValue.Level !== undefined) {
+                return objValue.Level.toString() === srcValue.Level.toString();
+            }
+            if (srcValue.IsLeaf !== undefined) {
+                return objValue.IsLeaf.toString().toLowerCase().indexOf(srcValue.IsLeaf.toString()) > -1;
+            }
         }
     }
 }

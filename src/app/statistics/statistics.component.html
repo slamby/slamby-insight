@@ -2,7 +2,7 @@
     <div class="text-center alert alert-danger" role="alert" *ngIf="errorMessage">
         <strong>Error!</strong> {{errorMessage}}
     </div>
-    <div class="row" *ngIf="!errorMessage">
+    <div class="row" *ngIf="!errorMessage && selectedPeriod">
         <div class="form-group">
             <label>Request Count Sum:</label>
             <span>{{sum}}</span>

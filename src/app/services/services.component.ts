@@ -932,8 +932,26 @@ export class ServicesComponent implements OnInit {
                 Count: 3,
                 NeedTagInResult: true,
                 UseEmphasizing: false,
-                Type: selected.Type
+                Type: selected.Type,
+                TagList: [],
+                SelectedTagList: []
             };
+            this.sm.dialogOpened.subscribe(
+                () => {
+                    this.sm.showProgress = true;
+                    this._tagService.getTags((<IClassifierService>selected).PrepareSettings.DataSetName, true).subscribe(
+                        (tags: Array<ITag>) => {
+                            this.inputModel.Model.TagList = tags;
+                            this.inputModel.Model.SelectedTagList = [];
+                            this.sm.showProgress = false;
+                        },
+                        error => {
+                            this.handleError(error);
+                            this.sm.showProgress = false;
+                        }
+                    );
+                }
+            );
             this.sm.dialogClosed.subscribe(
                 (model: CommonInputModel) => {
                     if (model.Result === DialogResult.Ok) {
@@ -941,7 +959,8 @@ export class ServicesComponent implements OnInit {
                             Text: model.Model.Text,
                             Count: model.Model.Count,
                             NeedTagInResult: model.Model.NeedTagInResult,
-                            UseEmphasizing: model.Model.UseEmphasizing
+                            UseEmphasizing: model.Model.UseEmphasizing,
+                            ParentTagIdList: model.Model.SelectedTagList == null ? null : model.Model.SelectedTagList.slice()
                         };
                         this._classifierService.recommend(selected.Id, settings).subscribe(
                             (results: Array<IClassifierRecommendationResult>) => {

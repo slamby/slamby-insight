@@ -18,6 +18,7 @@ import { ResourcesModule } from './resources/resources.module';
 import { ProcessesModule } from './processes/processes.module';
 import { WelcomeModule } from './home/welcome.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { StatisticsModule } from './statistics/statistics.module';
 
 import { COMPONENTS_DECLARATIONS } from './common/components/components.module';
 import { SERVICE_PROVIDERS } from './common/services/services.module';
@@ -58,6 +59,7 @@ import { CommonComponentsModule } from './common/components/common-components.mo
         ResourcesModule,
         NotificationsModule,
         CommonComponentsModule,
+        StatisticsModule,
         LogonModule,
 
         BrowserModule,

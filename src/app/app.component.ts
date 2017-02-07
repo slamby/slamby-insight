@@ -13,6 +13,7 @@ import { ResourcesComponent } from './resources/resources.component';
 import { NotificationComponent } from './notifications/notification.component';
 import { SettingsDialogComponent } from './settings/settings.dialog.component';
 import { ConfirmDialogComponent } from './common/components/confirm.dialog.component';
+import { StatisticsComponent } from './statistics/statistics.component';
 import { ConfirmModel } from './models/confirm.model';
 import { DialogResult } from './models/dialog-result';
 
@@ -45,7 +46,7 @@ export class AppComponent implements OnInit {
     @ViewChild('tabs') tabs: TabsComponent;
     @ViewChild(SettingsDialogComponent) settingsDialog: SettingsDialogComponent;
     menuItems = [WelcomeComponent, DatasetsComponent, ImportComponent, ServicesComponent,
-        ProcessesComponent, ResourcesComponent, NotificationComponent];
+        ProcessesComponent, ResourcesComponent, StatisticsComponent, NotificationComponent];
     defaultTab = WelcomeComponent;
     globals: Globals;
 

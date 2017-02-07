@@ -1,0 +1,46 @@
+<div class="container col-xs-12 col-sm-12 col-md-8 col-lg-8">
+    <div class="text-center alert alert-danger" role="alert" *ngIf="errorMessage">
+        <strong>Error!</strong> {{errorMessage}}
+    </div>
+    <div class="row" *ngIf="!errorMessage">
+        <div class="form-group">
+            <label>Request Count Sum:</label>
+            <span>{{sum}}</span>
+        </div>
+        <br/>
+        <div>
+            <div class="form-group">
+                <label>Selected Period:</label>
+                <select [(ngModel)]="selectedPeriod" id="selectedPeriod">
+                    <option [ngValue]="period" *ngFor='let period of periods'>{{period}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Request Count Sum (in the period):</label>
+                <span>{{selectedPeriodSum}}</span>
+            </div>
+        </div>
+        <div>
+            <table class="table table-striped table-hover" *ngIf="selectedStatisticsActions()">
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Request Count</th>
+                    </tr>
+                    <tr>
+                        <th>
+                            <input type="text" class="form-control input-sm" [(ngModel)]="endpointFilter" placeholder="Endpoint Name"/>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let action of selectedStatisticsActions()">
+                        <td>{{action.Name}}</td>
+                        <td>{{action.Count}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

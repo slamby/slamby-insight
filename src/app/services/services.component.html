@@ -213,6 +213,15 @@
 						</md-slide-toggle>
 					</div>
 				</div>
+				<div class="form-group">
+					<label for="tags" class="col-sm-3 control-label">Parent Tags</label>
+						<div class="col-sm-9">
+							<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">
+								<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</span>
+								<span *ngIf="smd.showProgress"><i class='fa fa-circle-o-notch fa-spin'></i> Loading...</span>
+							</button>
+						</div>
+				</div>
 			</div>
 			<div *ngIf="sm.model.Model.Type == serviceType.Prc">
 				<div class="form-group" [class.has-error]="text.errors && text.dirty">

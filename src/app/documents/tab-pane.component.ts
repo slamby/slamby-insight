@@ -112,7 +112,9 @@ export class TabPaneComponent implements OnInit {
     }
 
     deleteTag(selectedItems?: Array<SelectedItem<ITag>>) {
-        let selectedTags = selectedItems ? selectedItems : this.tags.filter(d => d.IsSelected);
+        let selectedTags = selectedItems ? selectedItems :
+            this.tags.filter(d => d.IsSelected).sort((a, b) => a.Item.Properties.Level - b.Item.Properties.Level);
+        selectedTags.reverse();
         let dialogModel: ProgressDialogModel = {
             All: selectedTags.length,
             ErrorCount: 0,

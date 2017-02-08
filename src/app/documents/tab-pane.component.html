@@ -2,7 +2,10 @@
 <sl-confirm-dialog></sl-confirm-dialog>
 <sl-input-dialog></sl-input-dialog>
 <sl-tag-editor-dialog></sl-tag-editor-dialog>
-<div class='has-error' *ngIf='errorMessage'>{{errorMessage}}</div>
+<sl-dataset-selector></sl-dataset-selector>
+<div class="text-center alert alert-danger" role="alert" *ngIf="errorMessage">
+	<strong>Error!</strong> {{errorMessage}}
+</div>
 <br/>
 <!--bulk actions-->
 <div class="well">
@@ -10,6 +13,8 @@
 		<button type="button" class="btn btn-primary" (click)="saveOrEditTag()">Add New Tag</button>
 		<button type="button" class="btn btn-default" (click)="exportWords()">Export Words</button>
 		<button type="button" class="btn btn-default" [disabled]="getSelectedItemsCount(tags) === 0" (click)="deleteTagConfirm()">Delete</button>
+		<button type="button" class="btn btn-default" [disabled]="getSelectedItemsCount(tags) === 0" (click)="copyTo()">Copy To</button>
+		<button type="button" class="btn btn-default" (click)="copyAllTo()">Copy To All</button>
 	</div>
 </div>
 

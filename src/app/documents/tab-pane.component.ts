@@ -6,7 +6,10 @@ import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 
 import { TagService } from '../common/services/tag.service';
-import { IDataSet, ITag, IProcess, ITagsExportWordsSettings } from 'slamby-sdk-angular2';
+import { DatasetService } from '../common/services/dataset.service';
+import { DatasetSelectorModel } from '../datasets/dataset-selector.model';
+import { DatasetSelectorDialogComponent } from '../datasets/dataset-selector.dialog.component';
+import { IDataSet, ITag, IProcess, ITagsExportWordsSettings, IBulkResults } from 'slamby-sdk-angular2';
 import { SelectedItem } from '../models/selected-item';
 import { TagWrapper } from '../models/tag-wrapper';
 import { CommonInputModel } from '../models/common-input.model';
@@ -56,8 +59,10 @@ export class TabPaneComponent implements OnInit {
     @ViewChild(ConfirmDialogComponent) confirmDialog: ConfirmDialogComponent;
     @ViewChild(CommonInputDialogComponent) inputDialog: CommonInputDialogComponent;
     @ViewChild(TagEditorDialogComponent) tagEditorDialog: TagEditorDialogComponent;
+    @ViewChild(DatasetSelectorDialogComponent) datasetSelector: DatasetSelectorDialogComponent;
 
-    constructor(private _tagService: TagService, private _notificationService: NotificationService, private _messenger: Messenger) { }
+    constructor(private _tagService: TagService, private _notificationService: NotificationService,
+                private _messenger: Messenger, private _datasetService: DatasetService) { }
 
     ngOnInit() { }
 
@@ -257,10 +262,78 @@ export class TabPaneComponent implements OnInit {
         };
     }
 
+    copyAllTo() {
+        return this.copyTo(this.tags.map(t => t.Item));
+    }
+
+    copyTo(selectedTags: Array<any>) {
+        if (!selectedTags || selectedTags.length === 0) {
+            selectedTags = selectedTags ? selectedTags : this.tags.filter(t => t.IsSelected).map(t => t.Item);
+        }
+        if (this.checkArrayIsEmpty(selectedTags)) {
+            return;
+        }
+        let datasetSelectorModel: DatasetSelectorModel;
+        this.datasetSelector.dialogClosed.subscribe(
+            (model: DatasetSelectorModel) => {
+                if (model.Result !== DialogResult.Ok) {
+                    return;
+                }
+                this.dialogService.progressModel = { Header: 'Copy Tags...' };
+                this.dialogService.openDialog('indeterminateprogress');
+                this._tagService.bulkImport(
+                    model.Selected.Name,
+                    selectedTags
+                )
+                    .finally(() => {
+                        this.dialogService.close();
+                    })
+                    .subscribe((resp: IBulkResults) => {
+                        this.errorMessage = resp.Results.filter(r => r.StatusCode !== 200)
+                                .map(r => r.Error).join(' | ');
+                    },
+                    error => {
+                        this.handleError(error);
+                    });
+            },
+            error => this.handleError(error)
+        );
+        this.datasetSelector.dialogOpened.subscribe(() => {
+            this._datasetService.getDatasets().finally(() => this.datasetSelector.showProgress = false).subscribe(
+                (datasets: Array<IDataSet>) => {
+                    datasetSelectorModel = {
+                        Datasets: datasets
+                            .filter(ds => ds !== this._dataset)
+                            .sort((a, b) => a.Name.localeCompare(b.Name)),
+                        Selected: datasets.length > 0 ? datasets[0] : null
+                    };
+                    this.datasetSelector.model = datasetSelectorModel;
+                },
+                error => this.handleError(error)
+            );
+        });
+        this.datasetSelector.model = null;
+        this.datasetSelector.showProgress = true;
+        this.datasetSelector.open();
+    }
+
+    checkArrayIsEmpty(items: Array<any>): boolean {
+        if (items.length <= 0) {
+            this.confirmDialog.model = {
+                Header: 'Warning!',
+                Message: `Please select items!`,
+                Buttons: ['ok']
+            };
+            this.confirmDialog.open();
+        }
+        return items.length <= 0;
+    }
+
     handleError(response: Response): string {
         let model = ErrorsModelHelper.getFromResponse(response);
         let errors = ErrorsModelHelper.concatErrors(model);
         this._notificationService.error(`${errors}`, `Tag error (${response.status})`);
+        this.errorMessage = `${errors}`;
         return errors;
     }
 }

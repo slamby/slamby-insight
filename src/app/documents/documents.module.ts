@@ -29,7 +29,6 @@ import { AgGridModule } from 'ag-grid-ng2/main';
         DocumentsComponent,
         DocDropdownCellComponent,
         DocumentEditorDialogComponent,
-        TagEditorDialogComponent,
         DocumentDetailsDialogComponent,
         DatasetSelectorDialogComponent,
         TagEditorDialogComponent,

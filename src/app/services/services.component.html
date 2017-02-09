@@ -32,19 +32,37 @@
 			</div>
 		</div>
 		<div *ngIf='smd.model?.Type == "prepare"' prepare>
+			<div class="row" *ngIf="smd.model.Model.ClonableServices.length">
+				<div class="btn-group pull-right">
+					<div ngbDropdown class="dropdown">
+						<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="prepareClone" data-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="true">
+							Clone Prepare Settings From
+							<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="prepareClone">
+								<li *ngFor="let service of smd.model.Model.ClonableServices">
+									<a (click)="clonePrepareSettings(service)">{{service.Name}}</a>
+								</li>
+							</ul>
+					</div>
+				</div>
+			</div>
+			<br/>
 			<div class="form-group" [class.has-error]="datasetName.errors || !smd.model.Model.SelectedDataset">
 				<label for="datasetName" class="col-sm-2 control-label">DataSet</label>
 				<div class="col-sm-10">
-					<select [(ngModel)]='smd.model.Model.SelectedDataset' (ngModelChange)="sm.model.Model.Type != serviceType.Search && prepareDatasetChanged($event)" class="form-control">
+					<select [(ngModel)]='smd.model.Model.SelectedDataset' (ngModelChange)="sm.model.Model.Type != serviceType.Search && prepareDatasetChanged($event)"
+						class="form-control">
 						<option [ngValue]="dataset" *ngFor='let dataset of smd.model.Model.Datasets'>{{dataset.Name}}</option>
-					</select>
-					<input type="text" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedDataset?.Name" datasetName="datasetName"
-						#datasetName="ngModel" required autofocus>
-					<div *ngIf="datasetName.errors?.required || !smd.model.Model.SelectedDataset">
-						<p class="text-danger">
-							Field is required!
-						</p>
-					</div>
+						</select>
+						<input type="text" [hidden]="true" [disabled]="true" [ngModel]="smd.model.Model.SelectedDataset?.Name" datasetName="datasetName"
+							#datasetName="ngModel" required autofocus>
+							<div *ngIf="datasetName.errors?.required || !smd.model.Model.SelectedDataset">
+								<p class="text-danger">
+									Field is required!
+								</p>
+							</div>
 				</div>
 			</div>
 			<div class="form-group" *ngIf="sm.model.Model?.Type == serviceType.Classifier">
@@ -81,15 +99,32 @@
 				<div class="col-sm-10">
 					<sl-json-editor [(ngModel)]="smd.model.Model.CompressSettingsJson" name="compressjson" #compressjson="ngModel" height="300px"
 						json></sl-json-editor>
-					<div *ngIf="compressjson.dirty && !compressjson.valid">
-						<p *ngIf="compressjson.errors?.json" class="text-danger">
-							Invalid Compress Settings JSON!
-						</p>
-					</div>
+						<div *ngIf="compressjson.dirty && !compressjson.valid">
+							<p *ngIf="compressjson.errors?.json" class="text-danger">
+								Invalid Compress Settings JSON!
+							</p>
+						</div>
 				</div>
 			</div>
 		</div>
 		<div *ngIf='smd.model?.Type == "activate"' activate>
+			<div class="row" *ngIf="smd.model.Model.ClonableServices.length">
+				<div class="btn-group pull-right">
+					<div ngbDropdown class="dropdown">
+						<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="activateClone" data-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="true">
+							Clone Activate Settings From
+							<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="activateClone">
+								<li *ngFor="let service of smd.model.Model.ClonableServices">
+									<a (click)="cloneActivateSettings(service)">{{service.Name}}</a>
+								</li>
+							</ul>
+					</div>
+				</div>
+			</div>
+			<br/>
 			<div *ngIf="sm.model.Model.Type == serviceType.Classifier">
 				<div class="form-group">
 					<label class="col-sm-3 control-label">NGram</label>
@@ -215,12 +250,12 @@
 				</div>
 				<div class="form-group">
 					<label for="tags" class="col-sm-3 control-label">Parent Tags</label>
-						<div class="col-sm-9">
-							<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">
+					<div class="col-sm-9">
+						<button type="button" class="btn btn-primary" (click)="selectTags()" [disabled]="smd.model.Model.TagList.length === 0">
 								<span *ngIf="!smd.showProgress">Select Tags ({{smd.model.Model.SelectedTagList.length}})</span>
 								<span *ngIf="smd.showProgress"><i class='fa fa-circle-o-notch fa-spin'></i> Loading...</span>
 							</button>
-						</div>
+					</div>
 				</div>
 			</div>
 			<div *ngIf="sm.model.Model.Type == serviceType.Prc">
@@ -295,11 +330,11 @@
 					<div class="col-sm-9">
 						<input type="text" class="form-control" [(ngModel)]="smd.model.Model.DocumentId" documentId="documentId" #documentId="ngModel"
 							autofocus required>
-						<div *ngIf="documentId.errors?.required && documentId.touched">
-							<p class="text-danger">
-								Field is required!
-							</p>
-						</div>
+							<div *ngIf="documentId.errors?.required && documentId.touched">
+								<p class="text-danger">
+									Field is required!
+								</p>
+							</div>
 					</div>
 				</div>
 				<div class="form-group" [class.has-error]="count.errors && count.dirty">
@@ -370,13 +405,30 @@
 			</div>
 			<div class="form-group">
 				<label for="count" class="col-sm-3 control-label">Strict mode</label>
-					<div class="col-sm-9">
-						<md-slide-toggle [checked]="smd.model.Model.IsStrict" id="isStrict" (change)='changeToggle("IsStrict")' color="primary">
-						</md-slide-toggle>
-					</div>
+				<div class="col-sm-9">
+					<md-slide-toggle [checked]="smd.model.Model.IsStrict" id="isStrict" (change)='changeToggle("IsStrict")' color="primary">
+					</md-slide-toggle>
 				</div>
+			</div>
 		</div>
 		<div *ngIf='smd.model?.Type == "search"' search>
+			<div class="row" *ngIf='smd.model.Model.IsActivate && smd.model.Model.ClonableServices.length'>
+				<div class="btn-group pull-right">
+					<div ngbDropdown class="dropdown">
+						<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="activateClone" data-toggle="dropdown"
+							aria-haspopup="true" aria-expanded="true">
+							Clone Activate Settings From
+						<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="activateClone">
+							<li *ngFor="let service of smd.model.Model.ClonableServices">
+								<a (click)="cloneActivateSettings(service)">{{service.Name}}</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<br/>
 			<div *ngIf='!smd.model.Model.IsActivate'>
 				<div class="form-group" [class.has-error]="text.errors && text.dirty" *ngIf='!smd.model.Model.IsActivate'>
 					<label for="text">Text</label>
@@ -390,30 +442,34 @@
 			<div class="panel panel-default" *ngIf='smd.model.Model.ShownAutoComplete'>
 				<div class="panel-heading">
 					AutoComplete Settings
-					<md-slide-toggle class="pull-right" [checked]="smd.model.Model.EnabledAutoComplete" (change)='changeToggle("EnabledAutoComplete")' color="primary">
-					</md-slide-toggle>
+					<md-slide-toggle class="pull-right" [checked]="smd.model.Model.EnabledAutoComplete" (change)='changeToggle("EnabledAutoComplete")'
+						color="primary">
+						</md-slide-toggle>
 				</div>
 				<div class="panel-body" *ngIf='smd.model.Model.EnabledAutoComplete'>
 					<div class="form-group" [class.has-error]="count.errors && count.dirty">
 						<label for="count">Count</label>
-						<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.Count" id="count" #count="ngModel" required>
-						<div *ngIf="count.errors?.min && count.touched">
-							<p class="text-danger">Field is required!</p>
-						</div>
+						<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.Count" id="count" #count="ngModel"
+							required>
+							<div *ngIf="count.errors?.min && count.touched">
+								<p class="text-danger">Field is required!</p>
+							</div>
 					</div>
 					<div class="form-group" [class.has-error]="confidence.errors && confidence.dirty">
 						<label for="confidence">Confidence</label>
-						<input type="number" min="0" step="0.5" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.Confidence" id="confidence" #confidence="ngModel" required>
-						<div *ngIf="confidence.errors?.min && confidence.touched">
-							<p class="text-danger">Field is required!</p>
-						</div>
+						<input type="number" min="0" step="0.5" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.Confidence"
+							id="confidence" #confidence="ngModel" required>
+							<div *ngIf="confidence.errors?.min && confidence.touched">
+								<p class="text-danger">Field is required!</p>
+							</div>
 					</div>
 					<div class="form-group" [class.has-error]="maxErrors.errors && maxErrors.dirty">
 						<label for="maxErrors">Maximum Errors</label>
-						<input type="number" min="0" step="0.5" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.MaximumErrors" id="maxErrors" #maxErrors="ngModel" required>
-						<div *ngIf="maxErrors.errors?.min && maxErrors.touched">
-							<p class="text-danger">Field is required!</p>
-						</div>
+						<input type="number" min="0" step="0.5" class="form-control" [(ngModel)]="smd.model.Model.AutoCompleteSettings.MaximumErrors"
+							id="maxErrors" #maxErrors="ngModel" required>
+							<div *ngIf="maxErrors.errors?.min && maxErrors.touched">
+								<p class="text-danger">Field is required!</p>
+							</div>
 					</div>
 				</div>
 			</div>
@@ -421,17 +477,20 @@
 			<div class="panel panel-default" *ngIf='smd.model.Model.ShownClassifier'>
 				<div class="panel-heading">
 					Classifier Settings
-					<md-slide-toggle class="pull-right" [checked]="smd.model.Model.EnabledClassifier" (change)='changeToggle("EnabledClassifier")' color="primary">
-					</md-slide-toggle>
+					<md-slide-toggle class="pull-right" [checked]="smd.model.Model.EnabledClassifier" (change)='changeToggle("EnabledClassifier")'
+						color="primary">
+						</md-slide-toggle>
 				</div>
 				<div class="panel-body" *ngIf='smd.model.Model.EnabledClassifier'>
 					<div class="form-group">
 						<label for="idOrAlias">Alias (or ID)</label>
-						<input type="text" placeholder="Service alias or id" class="form-control" [(ngModel)]="smd.model.Model.ClassifierSettings.Id" id="idOrAlias" #idOrAlias="ngModel">
+						<input type="text" placeholder="Service alias or id" class="form-control" [(ngModel)]="smd.model.Model.ClassifierSettings.Id"
+							id="idOrAlias" #idOrAlias="ngModel">
 					</div>
 					<div class="form-group">
 						<label for="classifierCount">Count</label>
-						<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.ClassifierSettings.Count" id="classifierCount" #classifierCount="ngModel">
+						<input type="number" min="0" class="form-control" [(ngModel)]="smd.model.Model.ClassifierSettings.Count" id="classifierCount"
+							#classifierCount="ngModel">
 					</div>
 				</div>
 			</div>
@@ -490,19 +549,21 @@
 						<div class="col-xs-6">
 							<div class="form-group" [class.has-error]="searchResponseFieldListJson.errors">
 								<label for="searchResponseFieldListJson">Response Field</label>
-								<sl-json-editor [(ngModel)]="smd.model.Model.ResponseFieldListJson" name="searchResponseFieldListJson" #searchResponseFieldListJson="ngModel" height="60px" json></sl-json-editor>
-								<div *ngIf="searchResponseFieldListJson.dirty && !searchResponseFieldListJson.valid">
-									<p *ngIf="searchResponseFieldListJson.errors?.json" class="text-danger">Invalid JSON!</p>
-								</div>
+								<sl-json-editor [(ngModel)]="smd.model.Model.ResponseFieldListJson" name="searchResponseFieldListJson" #searchResponseFieldListJson="ngModel"
+									height="60px" json></sl-json-editor>
+									<div *ngIf="searchResponseFieldListJson.dirty && !searchResponseFieldListJson.valid">
+										<p *ngIf="searchResponseFieldListJson.errors?.json" class="text-danger">Invalid JSON!</p>
+									</div>
 							</div>
 						</div>
 						<div class="col-xs-6">
 							<div class="form-group">
 								<label for="searchSearchFieldListJson">Search Fields</label>
-								<sl-json-editor [(ngModel)]="smd.model.Model.SearchFieldListJson" name="searchSearchFieldListJson" #searchSearchFieldListJson="ngModel" height="60px" json></sl-json-editor>
-								<div *ngIf="searchSearchFieldListJson.dirty && !searchSearchFieldListJson.valid">
-									<p *ngIf="searchSearchFieldListJson.errors?.json" class="text-danger">Invalid JSON!</p>
-								</div>
+								<sl-json-editor [(ngModel)]="smd.model.Model.SearchFieldListJson" name="searchSearchFieldListJson" #searchSearchFieldListJson="ngModel"
+									height="60px" json></sl-json-editor>
+									<div *ngIf="searchSearchFieldListJson.dirty && !searchSearchFieldListJson.valid">
+										<p *ngIf="searchSearchFieldListJson.errors?.json" class="text-danger">Invalid JSON!</p>
+									</div>
 							</div>
 						</div>
 					</div>
@@ -510,13 +571,15 @@
 						<div class="col-xs-6">
 							<div class="form-group">
 								<label for="searchFuzziness">Fuziness</label>
-								<input type="number" min="-1" max="2" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.Fuzziness" id="searchFuzziness" #searchFuzziness="ngModel">
+								<input type="number" min="-1" max="2" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.Fuzziness" id="searchFuzziness"
+									#searchFuzziness="ngModel">
 							</div>
 						</div>
 						<div class="col-xs-6">
 							<div class="form-group">
 								<label for="searchCutOff">Cut Off Frequency</label>
-								<input type="number" min="0" step="0.001" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.CutOffFrequency" id="searchCutOff" #searchCutOff="ngModel">
+								<input type="number" min="0" step="0.001" class="form-control" [(ngModel)]="smd.model.Model.SearchSettings.CutOffFrequency"
+									id="searchCutOff" #searchCutOff="ngModel">
 							</div>
 						</div>
 					</div>
@@ -556,16 +619,17 @@
 					<div class="row">
 						<div class="col-xs-6">
 							<div class="form-group">
-								<sl-json-editor [(ngModel)]="smd.model.Model.WeightsJson" name="searchWeightsJson" #searchWeightsJson="ngModel" height="60px" json></sl-json-editor>
-								<div *ngIf="searchWeightsJson.dirty && !searchWeightsJson.valid">
-									<p *ngIf="searchWeightsJson.errors?.json" class="text-danger">Invalid JSON!</p>
-								</div>
-								<div class="checkbox">
-									<label>
+								<sl-json-editor [(ngModel)]="smd.model.Model.WeightsJson" name="searchWeightsJson" #searchWeightsJson="ngModel" height="60px"
+									json></sl-json-editor>
+									<div *ngIf="searchWeightsJson.dirty && !searchWeightsJson.valid">
+										<p *ngIf="searchWeightsJson.errors?.json" class="text-danger">Invalid JSON!</p>
+									</div>
+									<div class="checkbox">
+										<label>
 										<input type="checkbox" [(ngModel)]="smd.model.Model.SearchSettings.UseDefaultWeights" id="searchUseDefaultWeights" #searchUseDefaultWeights="ngModel">
 										Use Default Weights
 									</label>
-								</div>
+									</div>
 							</div>
 						</div>
 					</div>
@@ -618,41 +682,41 @@
 							<div ngbDropdown class="dropdown" [ngSwitch]="service.Status">
 								<button ngbDropdownToggle class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown"
 									aria-haspopup="true" aria-expanded="true">
-													Actions
-													<span class="caret"></span>
-											</button>
-								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.New">
-									<li><a (click)="details(service)">Details</a></li>
-									<li><a (click)="prepare(service)">Prepare</a></li>
-									<li><a (click)="modify(service)">Modify</a></li>
-									<li><a (click)="deleteConfirm(service)">Delete</a></li>
-								</ul>
-								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Busy">
-									<li><a (click)="details(service)">Details</a></li>
-									<li><a (click)="cancelConfirm(service)">Cancel</a></li>
-									<li><a (click)="deleteConfirm(service)">Delete</a></li>
-								</ul>
-								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Prepared">
-									<li><a (click)="details(service)">Details</a></li>
-									<li *ngIf="service.Type!=serviceType.Search"><a (click)="activate(service)">Activate</a></li>
-									<li *ngIf="service.Type==serviceType.Search"><a (click)="search(service,true)">Activate</a></li>
-									<li *ngIf="service.Type!=serviceType.Search"><a (click)="export(service)">Export Dictionaries</a></li>
-									<li><a (click)="modify(service)">Modify</a></li>
-									<li><a (click)="deleteConfirm(service)">Delete</a></li>
-								</ul>
-								<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Active">
-									<li><a (click)="details(service)">Details</a></li>
-									<li><a (click)="deactivateConfirm(service)">Deactivate</a></li>
-									<li *ngIf="service.Type!=serviceType.Search"><a (click)="recommend(service)">Recommend</a></li>
-									<li *ngIf="service.Type==serviceType.Search"><a (click)="search(service,false)">Search</a></li>
-									<li *ngIf="service.Type==serviceType.Prc"><a (click)="keywords(service)">Extract Keywords</a></li>
-									<li *ngIf="service.Type==serviceType.Prc"><a (click)="index(service)">Index</a></li>
-									<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="partialIndex(service)">PartialIndex</a></li>
-									<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="recommendById(service)">RecommendById</a></li>
-									<li *ngIf="service.Type!=serviceType.Search"><a (click)="export(service)">Export Dictionaries</a></li>
-									<li><a (click)="modify(service)">Modify</a></li>
-									<li><a (click)="deleteConfirm(service)">Delete</a></li>
-								</ul>
+									Actions
+									<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.New">
+										<li><a (click)="details(service)">Details</a></li>
+										<li><a (click)="prepare(service)">Prepare</a></li>
+										<li><a (click)="modify(service)">Modify</a></li>
+										<li><a (click)="deleteConfirm(service)">Delete</a></li>
+									</ul>
+									<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Busy">
+										<li><a (click)="details(service)">Details</a></li>
+										<li><a (click)="cancelConfirm(service)">Cancel</a></li>
+										<li><a (click)="deleteConfirm(service)">Delete</a></li>
+									</ul>
+									<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Prepared">
+										<li><a (click)="details(service)">Details</a></li>
+										<li *ngIf="service.Type!=serviceType.Search"><a (click)="activate(service)">Activate</a></li>
+										<li *ngIf="service.Type==serviceType.Search"><a (click)="search(service,true)">Activate</a></li>
+										<li *ngIf="service.Type!=serviceType.Search"><a (click)="export(service)">Export Dictionaries</a></li>
+										<li><a (click)="modify(service)">Modify</a></li>
+										<li><a (click)="deleteConfirm(service)">Delete</a></li>
+									</ul>
+									<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1" *ngSwitchCase="serviceStatus.Active">
+										<li><a (click)="details(service)">Details</a></li>
+										<li><a (click)="deactivateConfirm(service)">Deactivate</a></li>
+										<li *ngIf="service.Type!=serviceType.Search"><a (click)="recommend(service)">Recommend</a></li>
+										<li *ngIf="service.Type==serviceType.Search"><a (click)="search(service,false)">Search</a></li>
+										<li *ngIf="service.Type==serviceType.Prc"><a (click)="keywords(service)">Extract Keywords</a></li>
+										<li *ngIf="service.Type==serviceType.Prc"><a (click)="index(service)">Index</a></li>
+										<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="partialIndex(service)">PartialIndex</a></li>
+										<li *ngIf="service.Type==serviceType.Prc && service.IndexSettings"><a (click)="recommendById(service)">RecommendById</a></li>
+										<li *ngIf="service.Type!=serviceType.Search"><a (click)="export(service)">Export Dictionaries</a></li>
+										<li><a (click)="modify(service)">Modify</a></li>
+										<li><a (click)="deleteConfirm(service)">Delete</a></li>
+									</ul>
 							</div>
 						</div>
 					</td>

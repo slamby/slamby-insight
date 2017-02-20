@@ -64,7 +64,7 @@ export class TabPaneComponent implements OnInit {
 
     constructor(private _tagService: TagService, private _notificationService: NotificationService,
                 private _messenger: Messenger, private _datasetService: DatasetService,
-                private _toasterNotificationToaster: ToasterNotificationService) { }
+                private _toasterNotificationService: ToasterNotificationService) { }
 
     ngOnInit() { }
 
@@ -351,10 +351,10 @@ export class TabPaneComponent implements OnInit {
             function (error) {
                 if (error) {
                     that._notificationService.error(`${error}`, `Tag export error`);
-                    that._toasterNotificationToaster.error(`${error}`, `Tag export error`);
+                    that._toasterNotificationService.error(`${error}`, `Tag export error`);
                 } else {
                     that._notificationService.info(`Tags was successfully exported to ${filePath}`, 'Tag export finished');
-                    that._toasterNotificationToaster.success(`Tags was successfully exported to ${filePath}`, 'Tag export finished');
+                    that._toasterNotificationService.success(`Tags was successfully exported to ${filePath}`, 'Tag export finished');
                 }
             }
         );
@@ -376,7 +376,7 @@ export class TabPaneComponent implements OnInit {
         let model = ErrorsModelHelper.getFromResponse(response);
         let errors = ErrorsModelHelper.concatErrors(model);
         this._notificationService.error(`${errors}`, `Tag error (${response.status})`);
-        this._toasterNotificationToaster.error(`${errors}`, `Tag error (${response.status})`);
+        this._toasterNotificationService.error(`${errors}`, `Tag error (${response.status})`);
         return errors;
     }
 }

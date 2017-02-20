@@ -39,8 +39,8 @@ export class StatisticsComponent implements OnInit {
                 this.errorMessage = '';
                 this.sum = statWrapper.Sum;
                 this.statistics = statWrapper.Statistics;
-                this.periods = Object.keys(this.statistics);
-                this.selectedPeriod = this.periods[this.periods.length - 1];
+                this.periods = Object.keys(this.statistics).sort().reverse();
+                this.selectedPeriod = this.periods[0];
                 this.selectedPeriodSum = this.statistics[this.selectedPeriod].Sum;
             },
             error => this.handleError(error));

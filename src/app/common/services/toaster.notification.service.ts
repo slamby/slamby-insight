@@ -7,19 +7,19 @@ export class ToasterNotificationService {
 
     constructor(private _toastr: ToastsManager) { }
 
-    error(message: string, title?: string) {
-        this._toastr.error(message, title);
+    error(message: string, title?: string, isPermanent?: boolean) {
+        this._toastr.error(message, title, isPermanent ? { dismiss: 'click', showCloseButton: true } : {});
     }
 
-    info(message: string, title?: string) {
-        this._toastr.info(message, title);
+    info(message: string, title?: string, isPermanent?: boolean) {
+        this._toastr.info(message, title, isPermanent ? { dismiss: 'click', showCloseButton: true } : {});
     }
 
-    success(message: string, title?: string) {
-        this._toastr.success(message, title);
+    success(message: string, title?: string, isPermanent?: boolean) {
+        this._toastr.success(message, title, isPermanent ? { dismiss: 'click', showCloseButton: true } : {});
     }
 
-    warning(message: string, title?: string) {
-        this._toastr.warning(message, title);
+    warning(message: string, title?: string, isPermanent?: boolean) {
+        this._toastr.warning(message, title, isPermanent ? { dismiss: 'click', showCloseButton: true } : {});
     }
 }

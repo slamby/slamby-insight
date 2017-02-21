@@ -694,7 +694,6 @@ export class ServicesComponent implements OnInit {
             case IService.ITypeEnum.Prc:
                 let prcService = <IPrcService>service;
                 let actPrcService = <IPrcService>this.inputModel.Model.Service;
-                let ds = this.inputModel.Model.Datasets.filter(d => d.Name === actPrcService.PrepareSettings.DataSetName)[0];
                 let usableFields = _.intersection(
                     this.inputModel.Model.Fields.map(f => f.Id), actPrcService.ActivateSettings.FieldsForRecommendation);
                 this.inputModel.Model.Fields = this.inputModel.Model.Fields.map(
@@ -710,7 +709,43 @@ export class ServicesComponent implements OnInit {
                 break;
             case IService.ITypeEnum.Search:
                 let searchService = <ISearchService>service;
-                ds = this.inputModel.Model.Datasets.filter(d => d.Name === searchService.PrepareSettings.DataSetName)[0];
+                let actSearchService = <IPrcService>this.inputModel.Model.Service;
+
+                this.inputModel.Model.AutoCompleteSettings = _.cloneDeep(searchService.ActivateSettings.AutoCompleteSettings);
+                this.inputModel.Model.ClassifierSettings = _.cloneDeep(searchService.ActivateSettings.ClassifierSettings);
+
+                this.inputModel.Model.SearchSettings = _.cloneDeep(searchService.ActivateSettings.SearchSettings);
+
+                this.inputModel.Model.ResponseFieldListJson =
+                    JSON.stringify(searchService.ActivateSettings.SearchSettings.ResponseFieldList);
+
+                this.inputModel.Model.SearchFieldListJson =
+                    JSON.stringify(searchService.ActivateSettings.SearchSettings.SearchFieldList);
+
+                this.inputModel.Model.WeightsJson =
+                    searchService.ActivateSettings.SearchSettings.Weights != null ?
+                    JSON.stringify(searchService.ActivateSettings.SearchSettings.Weights) :
+                    '[]';
+
+                this.inputModel.Model.WeightsJson =
+                    searchService.ActivateSettings.SearchSettings.Weights != null ?
+                        JSON.stringify(searchService.ActivateSettings.SearchSettings.Weights) :
+                        '[]';
+
+                this.inputModel.Model.Query =
+                    searchService.ActivateSettings.SearchSettings.Filter != null ?
+                        searchService.ActivateSettings.SearchSettings.Filter.Query :
+                        '';
+
+                this.inputModel.Model.SelectedTagList =
+                    searchService.ActivateSettings.SearchSettings.Filter != null &&
+                    searchService.ActivateSettings.SearchSettings.Filter.TagIdList != null ?
+                    searchService.ActivateSettings.SearchSettings.Filter.TagIdList :
+                        [];
+
+                if (searchService.ActivateSettings.SearchSettings.Order != null) {
+                    this.inputModel.Model.Order = _.cloneDeep(searchService.ActivateSettings.SearchSettings.Order);
+                }
                 break;
         }
         this.sm.showProgress = false;

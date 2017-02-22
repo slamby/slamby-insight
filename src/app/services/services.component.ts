@@ -30,6 +30,8 @@ import { DialogComponent } from '../common/components/dialog.component';
 import { ConfirmDialogComponent } from '../common/components/confirm.dialog.component';
 import { ConfirmModel } from '../models/confirm.model';
 
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
 import { NotificationService } from '../common/services/notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 import { Observable } from 'rxjs';
@@ -37,7 +39,7 @@ import { Observable } from 'rxjs';
 import { ServiceMaintenanceDialogComponent } from './service-maintenance.dialog.component';
 import * as _ from 'lodash';
 
-type ServiceType = IService | IPrcService | IClassifierService;
+type ServiceType = IService | IPrcService | IClassifierService | ISearchService;
 
 @Component({
     template: require('./services.component.html'),
@@ -192,7 +194,7 @@ export class ServicesComponent implements OnInit {
                         (classifierService: IClassifierService) => {
                             let index = this.services.findIndex(s => s.Id === classifierService.Id);
                             this.services[index] = classifierService;
-                            this.services = _.sortBy( _.cloneDeep(this.services), 'Alias');
+                            this.services = _.sortBy(_.cloneDeep(this.services), 'Alias');
                         },
                         error => this.handleError(error)
                     );
@@ -202,7 +204,7 @@ export class ServicesComponent implements OnInit {
                         (prcService: IPrcService) => {
                             let index = this.services.findIndex(s => s.Id === prcService.Id);
                             this.services[index] = prcService;
-                            this.services = _.sortBy( _.cloneDeep(this.services), 'Alias');
+                            this.services = _.sortBy(_.cloneDeep(this.services), 'Alias');
                         },
                         error => this.handleError(error)
                     );
@@ -212,7 +214,7 @@ export class ServicesComponent implements OnInit {
                         (searchService: ISearchService) => {
                             let index = this.services.findIndex(s => s.Id === searchService.Id);
                             this.services[index] = searchService;
-                            this.services = _.sortBy( _.cloneDeep(this.services), 'Alias');
+                            this.services = _.sortBy(_.cloneDeep(this.services), 'Alias');
                         },
                         error => this.handleError(error)
                     );
@@ -353,27 +355,27 @@ export class ServicesComponent implements OnInit {
                 );
                 break;
             case IService.ITypeEnum.Search:
-                    this.sm.dialogClosed.subscribe(
-                        (model: CommonInputModel) => {
-                            let prepareSettings: ISearchPrepareSettings = {
-                                DataSetName: model.Model.SelectedDataset.Name
-                            };
-                            if (model.Result === DialogResult.Ok) {
-                                this._searchService.prepare(selected.Id, prepareSettings).subscribe(
-                                    (process: IProcess) => {
-                                        this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
-                                        this.refresh(selected);
-                                        this.sm.unsubscribeAndClose();
-                                    },
-                                    error => {
-                                        let errors = this.handleError(error);
-                                        model.ErrorMessage = errors;
-                                        this.sm.showProgress = false;
-                                    }
-                                );
-                            }
+                this.sm.dialogClosed.subscribe(
+                    (model: CommonInputModel) => {
+                        let prepareSettings: ISearchPrepareSettings = {
+                            DataSetName: model.Model.SelectedDataset.Name
+                        };
+                        if (model.Result === DialogResult.Ok) {
+                            this._searchService.prepare(selected.Id, prepareSettings).subscribe(
+                                (process: IProcess) => {
+                                    this._messenger.sendMessage({ message: 'newProcessCreated', arg: process });
+                                    this.refresh(selected);
+                                    this.sm.unsubscribeAndClose();
+                                },
+                                error => {
+                                    let errors = this.handleError(error);
+                                    model.ErrorMessage = errors;
+                                    this.sm.showProgress = false;
+                                }
+                            );
                         }
-                    );
+                    }
+                );
                 break;
         }
 
@@ -402,8 +404,29 @@ export class ServicesComponent implements OnInit {
             TagList: [],
             CompressLevel: 0,
             CompressSettingsJson: '{}',
-            Type: selected.Type
+            Type: selected.Type,
+            ClonableServices: []
         };
+        switch (selected.Type) {
+            case IService.ITypeEnum.Classifier:
+                model.ClonableServices = this.services.filter(s =>
+                    s.Type === IService.ITypeEnum.Classifier &&
+                    s.Id !== selected.Id &&
+                    (<IClassifierService>s).PrepareSettings);
+                break;
+            case IService.ITypeEnum.Prc:
+                model.ClonableServices = this.services.filter(s =>
+                    s.Type === IService.ITypeEnum.Prc &&
+                    s.Id !== selected.Id &&
+                    (<IPrcService>s).PrepareSettings);
+                break;
+            case IService.ITypeEnum.Search:
+                model.ClonableServices = this.services.filter(s =>
+                    s.Type === IService.ITypeEnum.Search &&
+                    s.Id !== selected.Id &&
+                    (<ISearchService>s).PrepareSettings);
+                break;
+        }
         this.inputModel = {
             Header: selected.Type + ' Prepare Settings',
             Model: model,
@@ -411,6 +434,44 @@ export class ServicesComponent implements OnInit {
         };
         this.sm.model = this.inputModel;
         this.sm.open();
+    }
+
+    clonePrepareSettings(service: IService) {
+        let ds;
+        switch (service.Type) {
+            case IService.ITypeEnum.Classifier:
+                let clService = <IClassifierService>service;
+                ds = this.inputModel.Model.Datasets.filter(d => d.Name === clService.PrepareSettings.DataSetName)[0];
+                this.prepareDatasetChanged(ds);
+                this.inputModel.Model.SelectedDataset = ds;
+                this.inputModel.Model.SelectedNGramList = clService.PrepareSettings.NGramList;
+                this.inputModel.Model.SelectedTagList = clService.PrepareSettings.TagIdList.slice();
+                this.inputModel.Model.CompressLevel = clService.PrepareSettings.CompressLevel;
+                if (clService.PrepareSettings.CompressLevel !== 0 &&
+                    clService.PrepareSettings.CompressLevel !== 1 &&
+                    clService.PrepareSettings.CompressLevel !== 2) {
+                    this.inputModel.Model.CompressSettingsJson = JSON.stringify(clService.PrepareSettings.CompressSettings);
+                }
+                break;
+            case IService.ITypeEnum.Prc:
+                let prcService = <IPrcService>service;
+                ds = this.inputModel.Model.Datasets.filter(d => d.Name === prcService.PrepareSettings.DataSetName)[0];
+                this.prepareDatasetChanged(ds);
+                this.inputModel.Model.SelectedDataset = ds;
+                this.inputModel.Model.SelectedTagList = prcService.PrepareSettings.TagIdList.slice();
+                if (prcService.PrepareSettings.CompressLevel !== 0 &&
+                    prcService.PrepareSettings.CompressLevel !== 1 &&
+                    prcService.PrepareSettings.CompressLevel !== 2) {
+                    this.inputModel.Model.CompressSettingsJson = JSON.stringify(prcService.PrepareSettings.CompressSettings);
+                }
+                break;
+            case IService.ITypeEnum.Search:
+                let searchService = <ISearchService>service;
+                ds = this.inputModel.Model.Datasets.filter(d => d.Name === searchService.PrepareSettings.DataSetName)[0];
+                this.prepareDatasetChanged(ds);
+                this.inputModel.Model.SelectedDataset = ds;
+                break;
+        }
     }
 
     cancelConfirm(selected: ServiceType) {
@@ -490,7 +551,9 @@ export class ServicesComponent implements OnInit {
                     SelectedTagList: [],
                     TagList: [],
                     SelectedEmphasizedTagList: [],
-                    Type: selected.Type
+                    Type: selected.Type,
+                    ClonableServices: [],
+                    Service: selected
                 };
                 this.sm.dialogClosed.subscribe(
                     (model: CommonInputModel) => {
@@ -539,7 +602,9 @@ export class ServicesComponent implements OnInit {
             case IService.ITypeEnum.Prc:
                 dialogModel = {
                     Fields: [],
-                    Type: selected.Type
+                    Type: selected.Type,
+                    ClonableServices: [],
+                    Service: selected
                 };
                 this.sm.dialogClosed.subscribe(
                     (model: CommonInputModel) => {
@@ -587,14 +652,103 @@ export class ServicesComponent implements OnInit {
                 break;
         }
 
+        switch (selected.Type) {
+            case IService.ITypeEnum.Classifier:
+                dialogModel.ClonableServices = this.services.filter(s =>
+                    s.Type === IService.ITypeEnum.Classifier &&
+                    s.Id !== selected.Id &&
+                    (<IClassifierService>s).ActivateSettings);
+                break;
+            case IService.ITypeEnum.Prc:
+                dialogModel.ClonableServices = this.services.filter(s =>
+                    s.Type === IService.ITypeEnum.Prc &&
+                    s.Id !== selected.Id &&
+                    (<IPrcService>s).ActivateSettings);
+                break;
+        }
 
         this.inputModel = {
             Header: `${selected.Type} Activate Settings`,
             Model: dialogModel,
             Type: 'activate'
         };
+
+
         this.sm.model = this.inputModel;
         this.sm.open();
+    }
+
+    cloneActivateSettings(service: IService) {
+        this.sm.showProgress = true;
+        switch (service.Type) {
+            case IService.ITypeEnum.Classifier:
+                let clService = <IClassifierService>service;
+                let actClService = <IClassifierService>this.inputModel.Model.Service;
+                this.inputModel.Model.SelectedNGramList =
+                    _.intersection(actClService.PrepareSettings.NGramList, clService.ActivateSettings.NGramList);
+                this.inputModel.Model.SelectedTagList =
+                    _.intersection(actClService.PrepareSettings.TagIdList, clService.ActivateSettings.TagIdList);
+                this.inputModel.Model.SelectedEmphasizedTagList =
+                    _.intersection(actClService.PrepareSettings.TagIdList, clService.ActivateSettings.EmphasizedTagIdList);
+                break;
+            case IService.ITypeEnum.Prc:
+                let prcService = <IPrcService>service;
+                let actPrcService = <IPrcService>this.inputModel.Model.Service;
+                let usableFields = _.intersection(
+                    this.inputModel.Model.Fields.map(f => f.Id), actPrcService.ActivateSettings.FieldsForRecommendation);
+                this.inputModel.Model.Fields = this.inputModel.Model.Fields.map(
+                    fObj => {
+                        return {
+                            Id: fObj.Id,
+                            Name: fObj.Name,
+                            IsSelected: usableFields.indexOf(fObj.Id),
+                            Item: fObj.Item
+                        };
+                    }
+                );
+                break;
+            case IService.ITypeEnum.Search:
+                let searchService = <ISearchService>service;
+                let actSearchService = <IPrcService>this.inputModel.Model.Service;
+
+                this.inputModel.Model.AutoCompleteSettings = _.cloneDeep(searchService.ActivateSettings.AutoCompleteSettings);
+                this.inputModel.Model.ClassifierSettings = _.cloneDeep(searchService.ActivateSettings.ClassifierSettings);
+
+                this.inputModel.Model.SearchSettings = _.cloneDeep(searchService.ActivateSettings.SearchSettings);
+
+                this.inputModel.Model.ResponseFieldListJson =
+                    JSON.stringify(searchService.ActivateSettings.SearchSettings.ResponseFieldList);
+
+                this.inputModel.Model.SearchFieldListJson =
+                    JSON.stringify(searchService.ActivateSettings.SearchSettings.SearchFieldList);
+
+                this.inputModel.Model.WeightsJson =
+                    searchService.ActivateSettings.SearchSettings.Weights != null ?
+                    JSON.stringify(searchService.ActivateSettings.SearchSettings.Weights) :
+                    '[]';
+
+                this.inputModel.Model.WeightsJson =
+                    searchService.ActivateSettings.SearchSettings.Weights != null ?
+                        JSON.stringify(searchService.ActivateSettings.SearchSettings.Weights) :
+                        '[]';
+
+                this.inputModel.Model.Query =
+                    searchService.ActivateSettings.SearchSettings.Filter != null ?
+                        searchService.ActivateSettings.SearchSettings.Filter.Query :
+                        '';
+
+                this.inputModel.Model.SelectedTagList =
+                    searchService.ActivateSettings.SearchSettings.Filter != null &&
+                    searchService.ActivateSettings.SearchSettings.Filter.TagIdList != null ?
+                    searchService.ActivateSettings.SearchSettings.Filter.TagIdList :
+                        [];
+
+                if (searchService.ActivateSettings.SearchSettings.Order != null) {
+                    this.inputModel.Model.Order = _.cloneDeep(searchService.ActivateSettings.SearchSettings.Order);
+                }
+                break;
+        }
+        this.sm.showProgress = false;
     }
 
     search(selected: ServiceType, isActivate: boolean) {
@@ -609,17 +763,17 @@ export class ServicesComponent implements OnInit {
         let dialogModel = {
             Text: '',
             AutoCompleteSettings: (<ISearchService>selected).ActivateSettings.AutoCompleteSettings != null
-                        ? _.cloneDeep((<ISearchService>selected).ActivateSettings.AutoCompleteSettings)
-                        : {},
+                ? _.cloneDeep((<ISearchService>selected).ActivateSettings.AutoCompleteSettings)
+                : {},
 
             ClassifierSettings: (<ISearchService>selected).ActivateSettings.ClassifierSettings != null
-                        ? _.cloneDeep((<ISearchService>selected).ActivateSettings.ClassifierSettings)
-                        : {},
+                ? _.cloneDeep((<ISearchService>selected).ActivateSettings.ClassifierSettings)
+                : {},
             SearchSettings: (<ISearchService>selected).ActivateSettings.SearchSettings != null
-                        ? _.cloneDeep((<ISearchService>selected).ActivateSettings.SearchSettings)
-                        : {
-                            Filter: emptyFilter
-                        },
+                ? _.cloneDeep((<ISearchService>selected).ActivateSettings.SearchSettings)
+                : {
+                    Filter: emptyFilter
+                },
             Type: selected.Type,
 
             EnabledAutoComplete: false,
@@ -629,32 +783,34 @@ export class ServicesComponent implements OnInit {
             EnabledSearch: false,
             ShownSearch: isActivate || (<ISearchService>selected).ActivateSettings.SearchSettings != null,
             ResponseFieldListJson: (<ISearchService>selected).ActivateSettings.SearchSettings != null
-                            ? JSON.stringify((<ISearchService>selected).ActivateSettings.SearchSettings.ResponseFieldList)
-                            : '[]',
+                ? JSON.stringify((<ISearchService>selected).ActivateSettings.SearchSettings.ResponseFieldList)
+                : '[]',
             SearchFieldListJson: (<ISearchService>selected).ActivateSettings.SearchSettings != null
-                            ? JSON.stringify((<ISearchService>selected).ActivateSettings.SearchSettings.SearchFieldList)
-                            : '[]',
-            WeightsJson:    (<ISearchService>selected).ActivateSettings.SearchSettings != null &&
-                            (<ISearchService>selected).ActivateSettings.SearchSettings.Weights != null
-                            ? JSON.stringify((<ISearchService>selected).ActivateSettings.SearchSettings.Weights)
-                            : '[]',
-            Query:  (<ISearchService>selected).ActivateSettings.SearchSettings != null &&
-                    (<ISearchService>selected).ActivateSettings.SearchSettings.Filter != null
-                            ? (<ISearchService>selected).ActivateSettings.SearchSettings.Filter.Query
-                            : '',
+                ? JSON.stringify((<ISearchService>selected).ActivateSettings.SearchSettings.SearchFieldList)
+                : '[]',
+            WeightsJson: (<ISearchService>selected).ActivateSettings.SearchSettings != null &&
+                (<ISearchService>selected).ActivateSettings.SearchSettings.Weights != null
+                ? JSON.stringify((<ISearchService>selected).ActivateSettings.SearchSettings.Weights)
+                : '[]',
+            Query: (<ISearchService>selected).ActivateSettings.SearchSettings != null &&
+                (<ISearchService>selected).ActivateSettings.SearchSettings.Filter != null
+                ? (<ISearchService>selected).ActivateSettings.SearchSettings.Filter.Query
+                : '',
             TagList: [],
             SelectedTagList: (<ISearchService>selected).ActivateSettings.SearchSettings != null &&
-                             (<ISearchService>selected).ActivateSettings.SearchSettings.Filter != null &&
-                             (<ISearchService>selected).ActivateSettings.SearchSettings.Filter.TagIdList != null
-                            ? (<ISearchService>selected).ActivateSettings.SearchSettings.Filter.TagIdList
-                            : [],
+                (<ISearchService>selected).ActivateSettings.SearchSettings.Filter != null &&
+                (<ISearchService>selected).ActivateSettings.SearchSettings.Filter.TagIdList != null
+                ? (<ISearchService>selected).ActivateSettings.SearchSettings.Filter.TagIdList
+                : [],
             Types: Object.keys(ISearchSettings.ITypeEnum),
             Operators: Object.keys(ISearchSettings.IOperatorEnum),
             Orders: Object.keys(IOrder.IOrderDirectionEnum),
             IsActivate: isActivate,
             DefaultFilter: null,
             DefaultWeightsJson: null,
-            Order: emptyOrder
+            Order: emptyOrder,
+            ClonableServices: [],
+            Service: selected
         };
         if (!isActivate) {
             if (dialogModel.Query || dialogModel.SelectedTagList) {
@@ -668,17 +824,22 @@ export class ServicesComponent implements OnInit {
                 dialogModel.DefaultWeightsJson = dialogModel.WeightsJson;
                 dialogModel.WeightsJson = '[]';
             }
+        } else {
+            dialogModel.ClonableServices = this.services.filter(s =>
+                s.Type === IService.ITypeEnum.Search &&
+                s.Id !== selected.Id &&
+                (<ISearchService>s).ActivateSettings);
         }
         this.sm.dialogClosed.subscribe(
             (model: CommonInputModel) => {
                 if (model.Result === DialogResult.Ok) {
                     let filter: IFilter;
                     filter = dialogModel.Query || model.Model.SelectedTagList.length
-                            ? {
-                                Query: dialogModel.Query,
-                                TagIdList: model.Model.SelectedTagList.length ? model.Model.SelectedTagList.slice() : null
-                              }
-                            : null;
+                        ? {
+                            Query: dialogModel.Query,
+                            TagIdList: model.Model.SelectedTagList.length ? model.Model.SelectedTagList.slice() : null
+                        }
+                        : null;
                     let searchSettings: ISearchSettings;
                     searchSettings = {
                         Count: dialogModel.SearchSettings.Count,
@@ -1091,24 +1252,24 @@ export class ServicesComponent implements OnInit {
             }
         );
         this.sm.dialogOpened.subscribe(
-                () => {
-                    this.sm.showProgress = true;
-                    this._tagService.getTags((<IPrcService>selected).PrepareSettings.DataSetName, true).subscribe(
-                        (tags: Array<ITag>) => {
-                            let tagsForService = (<IPrcService>selected).PrepareSettings.TagIdList
-                                .map(tid => tags.find(t => t.Id === tid))
-                                .filter(t => t !== undefined);
-                            this.inputModel.Model.TagList = tagsForService;
-                            this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
-                            this.sm.showProgress = false;
-                        },
-                        error => {
-                            this.handleError(error);
-                            this.sm.showProgress = false;
-                        }
-                    );
-                }
-            );
+            () => {
+                this.sm.showProgress = true;
+                this._tagService.getTags((<IPrcService>selected).PrepareSettings.DataSetName, true).subscribe(
+                    (tags: Array<ITag>) => {
+                        let tagsForService = (<IPrcService>selected).PrepareSettings.TagIdList
+                            .map(tid => tags.find(t => t.Id === tid))
+                            .filter(t => t !== undefined);
+                        this.inputModel.Model.TagList = tagsForService;
+                        this.inputModel.Model.SelectedTagList = tagsForService.map(t => t.Id);
+                        this.sm.showProgress = false;
+                    },
+                    error => {
+                        this.handleError(error);
+                        this.sm.showProgress = false;
+                    }
+                );
+            }
+        );
         let model = {
             Query: '',
             TagList: [],

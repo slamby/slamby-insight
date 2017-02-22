@@ -14,7 +14,8 @@
 		<button type="button" class="btn btn-default" (click)="exportWords()">Export Words</button>
 		<button type="button" class="btn btn-default" [disabled]="getSelectedItemsCount(tags) === 0" (click)="deleteTagConfirm()">Delete</button>
 		<button type="button" class="btn btn-default" [disabled]="getSelectedItemsCount(tags) === 0" (click)="copyTo()">Copy To</button>
-		<button type="button" class="btn btn-default" (click)="copyAllTo()">Copy To All</button>
+		<button type="button" class="btn btn-default" [disabled]="tags.length === 0" (click)="copyAllTo()">Copy To All</button>
+		<button type="button" class="btn btn-default" [disabled]="tags.length === 0" (click)="export()">Export Tags</button>
 	</div>
 </div>
 

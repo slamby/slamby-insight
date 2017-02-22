@@ -3,6 +3,7 @@ import { Response } from '@angular/http';
 import { Observable, Observer } from 'rxjs';
 
 import { NotificationService } from '../common/services/notification.service';
+import { ToasterNotificationService } from '../common/services/toaster.notification.service';
 import { ErrorsModelHelper } from '../common/helpers/errorsmodel.helper';
 
 import { TagService } from '../common/services/tag.service';
@@ -62,7 +63,8 @@ export class TabPaneComponent implements OnInit {
     @ViewChild(DatasetSelectorDialogComponent) datasetSelector: DatasetSelectorDialogComponent;
 
     constructor(private _tagService: TagService, private _notificationService: NotificationService,
-                private _messenger: Messenger, private _datasetService: DatasetService) { }
+                private _messenger: Messenger, private _datasetService: DatasetService,
+                private _toasterNotificationService: ToasterNotificationService) { }
 
     ngOnInit() { }
 
@@ -319,6 +321,45 @@ export class TabPaneComponent implements OnInit {
         this.datasetSelector.open();
     }
 
+    export() {
+        let papa = require('papaparse');
+        const {dialog} = require('electron').remote;
+        let fs = require('fs');
+        let filePath = dialog.showSaveDialog(
+            {
+                filters: [{name: 'CSV', extensions: ['csv'] }]
+            }
+        );
+        if (!filePath) {
+            return;
+        }
+        let that = this;
+        fs.writeFile(
+            filePath,
+            papa.unparse(
+                this.tags.map(function (t) {
+                    return {
+                        Id: t.Item.Id,
+                        Name: t.Item.Name,
+                        ParentId: t.Item.ParentId
+                    };
+                }),
+                {
+                    quotes: true,
+                    header: true
+                }),
+            function (error) {
+                if (error) {
+                    that._notificationService.error(`${error}`, `Tag export error`);
+                    that._toasterNotificationService.error(`${error}`, `Tag export error`);
+                } else {
+                    that._notificationService.info(`Tags was successfully exported to ${filePath}`, 'Tag export finished');
+                    that._toasterNotificationService.success(`Tags was successfully exported to ${filePath}`, 'Tag export finished');
+                }
+            }
+        );
+    }
+
     checkArrayIsEmpty(items: Array<any>): boolean {
         if (items.length <= 0) {
             this.confirmDialog.model = {
@@ -335,7 +376,7 @@ export class TabPaneComponent implements OnInit {
         let model = ErrorsModelHelper.getFromResponse(response);
         let errors = ErrorsModelHelper.concatErrors(model);
         this._notificationService.error(`${errors}`, `Tag error (${response.status})`);
-        this.errorMessage = `${errors}`;
+        this._toasterNotificationService.error(`${errors}`, `Tag error (${response.status})`);
         return errors;
     }
 }

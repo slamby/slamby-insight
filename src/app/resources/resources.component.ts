@@ -48,14 +48,18 @@ export class ResourcesComponent implements OnInit {
     }
 
     private getStatus() {
-        this.statusService.getStatus()
-            .finally(() => this.lastUpdateTimeString = new Date().toLocaleTimeString())
-            .subscribe(
-            status => {
-                this.errorMessage = '';
-                this.statusObj = status;
-            },
-            error => this.handleError(error));
+        try {
+            this.statusService.getStatus()
+                .finally(() => this.lastUpdateTimeString = new Date().toLocaleTimeString())
+                .subscribe(
+                status => {
+                    this.errorMessage = '';
+                    this.statusObj = status;
+                },
+                error => this.handleError(error));
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     handleError(response: Response) {

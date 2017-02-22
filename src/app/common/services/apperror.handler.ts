@@ -36,10 +36,10 @@ export class AppErrorHandler implements ErrorHandler {
                 ? this.findOriginalError(error)
                 : error;
 
-            this.notificationService.error(error.message, 'Internal Error');
+            this.notificationService.error(`Message: ${error.message} Stack: ${error.stack}`, 'Insight Internal Error');
 
             // TODO: send to main thread via Ipc
-            console.error(errorToSend);
+            // console.error(errorToSend);
         } catch (loggingError) {
             console.group('ErrorHandler');
             console.warn('Error when trying to log error to');

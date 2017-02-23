@@ -695,13 +695,13 @@ export class ServicesComponent implements OnInit {
                 let prcService = <IPrcService>service;
                 let actPrcService = <IPrcService>this.inputModel.Model.Service;
                 let usableFields = _.intersection(
-                    this.inputModel.Model.Fields.map(f => f.Id), actPrcService.ActivateSettings.FieldsForRecommendation);
+                    this.inputModel.Model.Fields.map(f => f.Id), prcService.ActivateSettings.FieldsForRecommendation);
                 this.inputModel.Model.Fields = this.inputModel.Model.Fields.map(
                     fObj => {
                         return {
                             Id: fObj.Id,
                             Name: fObj.Name,
-                            IsSelected: usableFields.indexOf(fObj.Id),
+                            IsSelected: usableFields.indexOf(fObj.Id) > -1,
                             Item: fObj.Item
                         };
                     }
